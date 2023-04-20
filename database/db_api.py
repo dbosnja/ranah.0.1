@@ -7,15 +7,15 @@ class Database:
     """Database Interface
     
     This type provides database initialization and methods for common work with
-    a database
+    a database(CRUD operators)
     """
     def __init__(self):
-        self.create_engine()
+        self._create_engine()
         self.connection = self.engine.connect()
         self.metadata = metadata
-        self.persist_schema()
+        self._persist_schema()
     
-    def create_engine(self):
+    def _create_engine(self):
         db_url = URL.create(
             drivername=URL_PARAMS['drivername'],
             username=URL_PARAMS['username'],
@@ -26,5 +26,13 @@ class Database:
         )
         self.engine = create_engine(db_url)
 
-    def persist_schema(self):
+    def _persist_schema(self):
         self.metadata.create_all(self.engine)
+    
+    def insert_new_food_item_record(self, *, table_name='food_items', **values):
+        """Insert a new nutrition table record of a food item"""
+        ...
+    
+    def get_food_item_records(self, limit=10):
+        """Retrieve `limit` food item records"""
+        ...
