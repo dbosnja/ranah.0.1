@@ -1,4 +1,4 @@
-URL_PARAMS = {
+DB_URL_PARAMS = {
     'drivername': 'postgresql+psycopg2',
     'username': 'ranah',
     'password': 'ranah',

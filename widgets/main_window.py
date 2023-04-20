@@ -26,7 +26,7 @@ class MainWindow:
         self.root.title(ROOT_TITLE)
         self.root.geometry(ROOT_DIMENSION)
         # convenience
-        self.root.bind('<Escape>', lambda e: self.root.quit())
+        self.root.bind('<Escape>', lambda _: self.root.quit())
         # enable resizing
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
