@@ -4,10 +4,10 @@ from database.db_api import Database
 from widgets.main_window import MainWindow
 
 
-# persist the defined database schema and open up the connection
+# initialize ranah database
 db = Database()
 
-# main Tk window
+# main ranah window
 mw = MainWindow(Tk(), db)
 
 # start the main loop

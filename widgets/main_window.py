@@ -2,7 +2,7 @@ from .create_food_item_frame import CreateFoodItemFrame
 
 
 ROOT_TITLE = 'ranah'
-ROOT_DIMENSION = '500x700'
+ROOT_DIMENSION = '500x700+2500+200'
 
 
 class MainWindow:

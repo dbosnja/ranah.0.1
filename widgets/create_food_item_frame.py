@@ -29,9 +29,9 @@ class CreateFoodItemFrame:
         
         self._create_styles()
         self._create_widget_vars()
-        self._validate_input = (self.frame.register(self._validate_input), '%P')
         self._create_widgets()
         self._grid_widgets()
+        self._validate_input = (self.frame.register(self._validate_input), '%P')
     
     def _validate_input(self, entry_value):
         print(entry_value)
@@ -48,6 +48,15 @@ class CreateFoodItemFrame:
         self.proteins_var = DoubleVar(value='')
         self.fiber_var = DoubleVar(value='')
         self.food_name_var = StringVar(value='')
+        self.widget_vars = [
+            self.calory_var, self.fat_var, self.saturated_fat_var,
+            self.sugar_var, self.carbs_var, self.proteins_var,
+            self.fiber_var, self.food_name_var
+        ]
+    
+    def _reset_widget_vars(self):
+        for var in self.widget_vars:
+            var.set('')
     
     def _create_new_record(self, *args):
         record = {
@@ -66,14 +75,15 @@ class CreateFoodItemFrame:
         # TODO add a label widget containing success message
         # TODO separate concerns, i.e. create method for each of: creating widget variables, style(s), widgets and grid them
         self.db.insert_new_food_item_record(**record)
+        self._reset_widget_vars()
 
     def _create_widgets(self):
         """Create all (direct) children widgets"""
-        
+
         self.topic_lbl = ttk.Label(self.frame, text=self.text_constants['topic_lbl'], anchor='center')
         self.calory_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'],
                                     anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var, validate='all', validatecommand=self._validate_input)
+        self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var)
         self.fat_lbl = ttk.Label(self.frame, text=self.text_constants['fat_lbl'], 
                                  anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.fat_e = ttk.Entry(self.frame, textvariable=self.fat_var)
