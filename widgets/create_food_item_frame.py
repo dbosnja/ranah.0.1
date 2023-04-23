@@ -1,4 +1,4 @@
-from tkinter import ttk, DoubleVar, StringVar
+from tkinter import ttk, DoubleVar, StringVar, TclError
 
 
 class CreateFoodItemFrame:
@@ -26,15 +26,27 @@ class CreateFoodItemFrame:
         self.frame.grid(column=0, row=0, sticky='wen', padx=10, pady=10)
         self.frame.columnconfigure(0, weight=1, minsize=50)
         self.frame.columnconfigure(1, weight=1, minsize=50)
+
+        # define validations
+        self._validate_double = (self.frame.register(self._validate_double_input), '%P')
+        self._validate_food_name = (self.frame.register(self._validate_food_name_input), '%P')
         
+        # init and render widgets
         self._create_styles()
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
-        self._validate_input = (self.frame.register(self._validate_input), '%P')
     
-    def _validate_input(self, entry_value):
+    def _validate_double_input(self, entry_value):
         print(entry_value)
+        return True
+    
+    def _validate_food_name_input(self, food_name):
+        if food_name and self.db.is_food_name_unique(food_name):
+            self.create_btn.state(['!disabled'])
+            return True
+        self.create_btn.state(['disabled'])
+        return True
 
     def _create_styles(self):
         ttk.Style().configure('Main.TFrame', background='#CCFFCC')
@@ -48,17 +60,25 @@ class CreateFoodItemFrame:
         self.proteins_var = DoubleVar(value='')
         self.fiber_var = DoubleVar(value='')
         self.food_name_var = StringVar(value='')
-        self.widget_vars = [
+        self.widget_double_vars = [
             self.calory_var, self.fat_var, self.saturated_fat_var,
             self.sugar_var, self.carbs_var, self.proteins_var,
-            self.fiber_var, self.food_name_var
+            self.fiber_var
+        ]
+        self.widget_string_vars = [
+            self.food_name_var
         ]
     
     def _reset_widget_vars(self):
-        for var in self.widget_vars:
+        for var in self.widget_double_vars + self.widget_string_vars:
             var.set('')
     
     def _create_new_record(self, *args):
+        for var in self.widget_double_vars:
+            try:
+                var.get()
+            except TclError:
+                var.set(0.0)
         record = {
             'label_name': self.food_name_var.get(),
             'calories': self.calory_var.get(),
@@ -71,9 +91,7 @@ class CreateFoodItemFrame:
         }
         # TODO add validation for floats
         # TODO add validation for the name(just scan the table if the name is unique)
-        # TODO clean all the variables after recording a new food item
         # TODO add a label widget containing success message
-        # TODO separate concerns, i.e. create method for each of: creating widget variables, style(s), widgets and grid them
         self.db.insert_new_food_item_record(**record)
         self._reset_widget_vars()
 
@@ -104,9 +122,10 @@ class CreateFoodItemFrame:
         self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var)
         self.food_name_lbl = ttk.Label(self.frame, text=self.text_constants['food_name_lbl'],
                                        anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var)
+        self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var,
+                                     validate='all', validatecommand=self._validate_food_name)
         self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'],
-                                     command=self._create_new_record)
+                                     command=self._create_new_record, state='disabled')
     
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, pady=20, columnspan=2)

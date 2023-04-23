@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, URL
+from sqlalchemy import create_engine, URL, select
 
 from .connection_params import DB_URL_PARAMS
 from .schema import metadata, nutrition_labels_table
@@ -39,6 +39,12 @@ class Database:
             ins = nutrition_labels_table.insert().values(**values)
             conn.execute(ins)
             conn.commit()
+    
+    def is_food_name_unique(self, food_name):
+        sel = select(nutrition_labels_table.c.label_name)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            return food_name not in set(f_name for (f_name, ) in rp.fetchall())
     
     def get_food_item_records(self, limit=10):
         """Retrieve `limit` food item records"""

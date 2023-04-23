@@ -3,7 +3,6 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Numeric
 
 metadata = MetaData()
 
-
 test_table = Table(
     'test',
     metadata,
@@ -11,7 +10,7 @@ test_table = Table(
     Column('name', String(), unique=True)
 )
 
-
+# TODO: all numeric values should default to 0.0
 nutrition_labels_table = Table(
     'nutrition_facts_labels',
     metadata,
