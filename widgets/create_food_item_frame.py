@@ -1,5 +1,7 @@
 from tkinter import ttk, DoubleVar, StringVar, TclError
 
+from .leaf_frames import SuccessfulLabelCreationFrame
+
 
 class CreateFoodItemFrame:
     """Window for creating a new food item label
@@ -60,6 +62,7 @@ class CreateFoodItemFrame:
         self.proteins_var = DoubleVar(value='')
         self.fiber_var = DoubleVar(value='')
         self.food_name_var = StringVar(value='')
+        
         self.widget_double_vars = [
             self.calory_var, self.fat_var, self.saturated_fat_var,
             self.sugar_var, self.carbs_var, self.proteins_var,
@@ -78,7 +81,7 @@ class CreateFoodItemFrame:
             try:
                 var.get()
             except TclError:
-                var.set(0.0)
+                var.set(.0)
         record = {
             'label_name': self.food_name_var.get(),
             'calories': self.calory_var.get(),
@@ -90,40 +93,54 @@ class CreateFoodItemFrame:
             'fiber': self.fiber_var.get(),
         }
         # TODO add validation for floats
-        # TODO add validation for the name(just scan the table if the name is unique)
-        # TODO add a label widget containing success message
+        # TODO add a label widget containing success message on creation
         self.db.insert_new_food_item_record(**record)
         self._reset_widget_vars()
+        self._render_success_message()
+    
+    def _render_success_message(self):
+        self.success_msg_frame = SuccessfulLabelCreationFrame(self.frame)
+        self.success_msg_frame.frame.grid(row=4, column=0, rowspan=5, columnspan=2)
 
+    # TODO: bind ctrl+a event to every entry widget
     def _create_widgets(self):
         """Create all (direct) children widgets"""
 
         self.topic_lbl = ttk.Label(self.frame, text=self.text_constants['topic_lbl'], anchor='center')
+        
         self.calory_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'],
                                     anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var)
+        
         self.fat_lbl = ttk.Label(self.frame, text=self.text_constants['fat_lbl'], 
                                  anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.fat_e = ttk.Entry(self.frame, textvariable=self.fat_var)
+        
         self.saturated_fat_lbl = ttk.Label(self.frame, text=self.text_constants['sat_fat_lbl'],
                                            anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.sat_fat_e = ttk.Entry(self.frame, textvariable=self.saturated_fat_var)
+        
         self.carbs_lbl = ttk.Label(self.frame, text=self.text_constants['carb_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.carbs_e = ttk.Entry(self.frame, textvariable=self.carbs_var)
+        
         self.sugar_lbl = ttk.Label(self.frame, text=self.text_constants['sugar_lbl'], 
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.sugar_e = ttk.Entry(self.frame, textvariable=self.sugar_var)
+        
         self.proteins_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'],
                                       anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var)
+        
         self.fiber_lbl = ttk.Label(self.frame, text=self.text_constants['fiber_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var)
+        
         self.food_name_lbl = ttk.Label(self.frame, text=self.text_constants['food_name_lbl'],
                                        anchor='center', borderwidth=2, relief='groove', padding=(5))
         self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var,
                                      validate='all', validatecommand=self._validate_food_name)
+        
         self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'],
                                      command=self._create_new_record, state='disabled')
     
