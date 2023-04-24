@@ -1,3 +1,5 @@
+import re
+
 from tkinter import ttk, DoubleVar, StringVar, TclError
 
 from .leaf_frames import SuccessfulLabelCreationFrame
@@ -30,6 +32,7 @@ class CreateFoodItemFrame:
         self.frame.columnconfigure(1, weight=1, minsize=50)
 
         # define validations
+        self.double_pattern = re.compile('^\d*\.?\d*$')
         self._validate_double = (self.frame.register(self._validate_double_input), '%P')
         self._validate_food_name = (self.frame.register(self._validate_food_name_input), '%P')
         
@@ -40,7 +43,10 @@ class CreateFoodItemFrame:
         self._grid_widgets()
     
     def _validate_double_input(self, entry_value):
-        print(entry_value)
+        if entry_value == '.':
+            return True
+        if entry_value and self.double_pattern.match(entry_value) is None:
+            return False
         return True
     
     def _validate_food_name_input(self, food_name):
@@ -92,8 +98,6 @@ class CreateFoodItemFrame:
             'proteins': self.proteins_var.get(),
             'fiber': self.fiber_var.get(),
         }
-        # TODO add validation for floats
-        # TODO add a label widget containing success message on creation
         self.db.insert_new_food_item_record(**record)
         self._reset_widget_vars()
         self._render_success_message()
@@ -110,31 +114,31 @@ class CreateFoodItemFrame:
         
         self.calory_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'],
                                     anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var)
+        self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var, validate='all', validatecommand=self._validate_double)
         
         self.fat_lbl = ttk.Label(self.frame, text=self.text_constants['fat_lbl'], 
                                  anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.fat_e = ttk.Entry(self.frame, textvariable=self.fat_var)
+        self.fat_e = ttk.Entry(self.frame, textvariable=self.fat_var, validate='all', validatecommand=self._validate_double)
         
         self.saturated_fat_lbl = ttk.Label(self.frame, text=self.text_constants['sat_fat_lbl'],
                                            anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.sat_fat_e = ttk.Entry(self.frame, textvariable=self.saturated_fat_var)
+        self.sat_fat_e = ttk.Entry(self.frame, textvariable=self.saturated_fat_var, validate='all', validatecommand=self._validate_double)
         
         self.carbs_lbl = ttk.Label(self.frame, text=self.text_constants['carb_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.carbs_e = ttk.Entry(self.frame, textvariable=self.carbs_var)
+        self.carbs_e = ttk.Entry(self.frame, textvariable=self.carbs_var, validate='all', validatecommand=self._validate_double)
         
         self.sugar_lbl = ttk.Label(self.frame, text=self.text_constants['sugar_lbl'], 
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.sugar_e = ttk.Entry(self.frame, textvariable=self.sugar_var)
+        self.sugar_e = ttk.Entry(self.frame, textvariable=self.sugar_var, validate='all', validatecommand=self._validate_double)
         
         self.proteins_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'],
                                       anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var)
+        self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double)
         
         self.fiber_lbl = ttk.Label(self.frame, text=self.text_constants['fiber_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=(5))
-        self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var)
+        self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var, validate='all', validatecommand=self._validate_double)
         
         self.food_name_lbl = ttk.Label(self.frame, text=self.text_constants['food_name_lbl'],
                                        anchor='center', borderwidth=2, relief='groove', padding=(5))
