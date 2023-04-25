@@ -40,11 +40,15 @@ class Database:
             conn.execute(ins)
             conn.commit()
     
-    def is_food_name_unique(self, food_name):
+    @property
+    def all_food_label_names(self):
         sel = select(nutrition_labels_table.c.label_name)
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
-            return food_name not in set(f_name for (f_name, ) in rp.fetchall())
+            return [f_name for (f_name, ) in rp.fetchall()]
+    
+    def is_food_name_unique(self, food_name):
+        return food_name not in self.all_food_label_names
     
     def get_food_item_records(self, limit=10):
         """Retrieve `limit` food item records"""

@@ -40,18 +40,18 @@ class SuccessfulLabelCreationFrame:
 class ScrollBarWidget:
     """Scroll bar type"""
 
-    def __init__(self, parent, orient='vertical'):
+    def __init__(self, parent):
         """Create new scroll-bar and hook it to the parent in appropriate orientation"""
-        
-        self.scroll_bar = ttk.Scrollbar(parent, orient=orient)
-        if orient == 'horizontal':
-            parent.configure(xscrollcommand=self.scroll_bar.set)
-            command = parent.xview
-        else:
-            parent.configure(yscrollcommand=self.scroll_bar.set)
-            command = parent.yview
-        self.scroll_bar.configure(command=command)
-        self._grid()
+        self.scroll_bar = ttk.Scrollbar(parent)
     
-    def _grid(self):
-        self.scroll_bar.grid(row=0, column=1, sticky='ns')
+    def attach_to_scrollable(self, scrollable_widget, orient='vertical'):
+        if orient == 'horizontal':
+            scrollable_widget.configure(xscrollcommand=self.scroll_bar.set)
+            command = scrollable_widget.xview
+        else:
+            scrollable_widget.configure(yscrollcommand=self.scroll_bar.set)
+            command = scrollable_widget.yview
+        self.scroll_bar.configure(orient=orient, command=command)
+    
+    def grid(self, row, column, sticky=None, columnspan=None, padx=None, pady=None):
+        self.scroll_bar.grid(row=row, column=column, sticky=sticky, columnspan=columnspan, pady=pady, padx=padx)

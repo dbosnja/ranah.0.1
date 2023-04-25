@@ -1,8 +1,9 @@
 from .create_food_item_frame import CreateFoodItemFrame
+from .stored_food_labels_frame import StoredFoodLabelsFrame
 
 
 ROOT_TITLE = 'ranah'
-ROOT_DIMENSION = '700x700+2500+200'
+ROOT_DIMENSION = '780x800+2500+200'
 
 
 class MainWindow:
@@ -14,6 +15,7 @@ class MainWindow:
     """
     child_frames = (
             CreateFoodItemFrame,
+            StoredFoodLabelsFrame,
         )
     
     def __init__(self, root, db):

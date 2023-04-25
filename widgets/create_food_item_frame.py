@@ -27,7 +27,7 @@ class CreateFoodItemFrame:
         
         # main frame the `self` is composed of
         self.frame = ttk.Frame(parent, style='Main.TFrame', borderwidth=5, relief='raised')
-        self.frame.grid(column=0, row=0, sticky='wen', padx=10, pady=10)
+        self.frame.grid(column=0, row=0, sticky='wen', padx=10)
         self.frame.columnconfigure(0, weight=1, minsize=50)
         self.frame.columnconfigure(1, weight=1, minsize=50)
 
