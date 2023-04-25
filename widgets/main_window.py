@@ -1,4 +1,4 @@
-from .create_food_item_frame import CreateFoodItemFrame
+from .create_food_label_frame import CreateFoodLabelFrame
 from .stored_food_labels_frame import StoredFoodLabelsFrame
 
 
@@ -14,7 +14,7 @@ class MainWindow:
     and initializing its direct children frames
     """
     child_frames = (
-            CreateFoodItemFrame,
+            CreateFoodLabelFrame,
             StoredFoodLabelsFrame,
         )
     

@@ -17,3 +17,5 @@ nutrition_labels_table = Table(
     Column('proteins', Numeric(10, 5), default=0),
     Column('fiber', Numeric(10, 5), default=0),
 )
+
+# TODO: add meals table

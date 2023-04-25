@@ -5,7 +5,7 @@ from tkinter import ttk, DoubleVar, StringVar, TclError
 from .leaf_frames import SuccessfulLabelCreationFrame
 
 
-class CreateFoodItemFrame:
+class CreateFoodLabelFrame:
     """Window for creating a new food item label
     
     It is a direct (first) child of the root Window manager.
@@ -103,6 +103,7 @@ class CreateFoodItemFrame:
         self.db.insert_new_food_item_record(**record)
         self._reset_widget_vars()
         self._render_success_message()
+        self.create_btn.state(['disabled'])
     
     def _render_success_message(self):
         self.success_msg_frame = SuccessfulLabelCreationFrame(self.frame)

@@ -1,17 +1,18 @@
 from tkinter import ttk, Listbox, StringVar
 
-from .create_food_item_frame import CreateFoodItemFrame
+from .create_food_label_frame import CreateFoodLabelFrame
 from .leaf_frames import ScrollBarWidget
 
 
 class StoredFoodLabelsFrame:
     """Frame for rendering/filtering stored food labels/tables"""
 
-    text_constants = CreateFoodItemFrame.text_constants
+    text_constants = CreateFoodLabelFrame.text_constants
 
     def __init__(self, parent, db):
         self.db = db
         self.food_label_names = self.db.all_food_label_names
+        self.current_food_label_names = self.food_label_names
 
         # main frame
         self.frame = ttk.Frame(parent, style='StoredLabels.TFrame', borderwidth=5, relief='raised')
@@ -45,6 +46,7 @@ class StoredFoodLabelsFrame:
         self.food_names_lbox = Listbox(self.frame, height=5, listvariable=self.food_label_names_lboxvar, width=30)
         self.food_names_lbox_scroll_bar = ScrollBarWidget(self.frame)
         self.food_names_lbox_scroll_bar.attach_to_scrollable(self.food_names_lbox)
+        self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'{len(self.food_label_names)} rezultata', padding=5)
         
         self.search_btn = ttk.Button(self.frame, text='Pretraži po imenu', width=30)
         self.search_entry = ttk.Entry(self.frame, width=30, textvariable=self.search_entry_var)
@@ -53,6 +55,8 @@ class StoredFoodLabelsFrame:
     def _grid_widgets(self):
         self.food_names_lbox.grid(row=0, column=0, pady=5, columnspan=2, sticky='we')
         self.food_names_lbox_scroll_bar.grid(row=0, column=1, sticky='ns', pady=5)
+        
+        self.food_tables_tally_lbl.grid(row=1, column=0, sticky='w', padx=(5, 0))
         self.search_entry.grid(row=1, column=0, pady=5, columnspan=2)
         self.search_btn.grid(row=2, column=0, pady=5, columnspan=2)
         self.refresh_btn.grid(row=3, column=0, pady=5, columnspan=2)
@@ -99,6 +103,8 @@ class StoredFoodLabelsFrame:
         self.food_label_names_lboxvar.set(self.food_label_names)
         self.food_names_lbox.configure(listvariable=self.food_label_names_lboxvar)
         self.search_entry_var.set('')
+        self.current_food_label_names = self.food_label_names
+        self.food_tables_tally_lbl.configure(text=f'{len(self.food_label_names)} rezultata')
         
         self.results_frame.grid_forget()
         self._create_result_frame()
@@ -110,16 +116,15 @@ class StoredFoodLabelsFrame:
         self.filtered_names = [name for name in self.food_label_names if search_token.lower() in name.lower()]
         self.filtered_names_var = StringVar(value=self.filtered_names)
         self.food_names_lbox.configure(listvariable=self.filtered_names_var)
+        self.food_names_lbox.see(0)
+        text = f'{len(self.filtered_names)} rezultata' if len(self.filtered_names) > 1 else f'{len(self.filtered_names)} rezultat'
+        self.food_tables_tally_lbl.configure(text=text)
+        self.current_food_label_names = self.filtered_names
     
     def _get_record_from_doubleclick(self, event):
         # Currently only one item box can be selected
         food_idx = self.food_names_lbox.curselection()[0]
-        try:
-            # first try to find it among filtered names
-            food_name = self.filtered_names[food_idx]
-        except AttributeError:
-            # otherwise it has to be using the main names array
-            food_name = self.food_label_names[food_idx]
+        food_name = self.current_food_label_names[food_idx]
         self._render_searched_result(self.db.get_food_item_table(food_name))
     
     def _style_lbox_items(self):

@@ -36,7 +36,6 @@ class SuccessfulLabelCreationFrame:
         self.frame.grid_forget()
 
 
-# NOTE: root is not scrollable, either way I'll leave this type present
 class ScrollBarWidget:
     """Scroll bar type"""
 
