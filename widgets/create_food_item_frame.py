@@ -50,6 +50,8 @@ class CreateFoodItemFrame:
         return True
     
     def _validate_food_name_input(self, food_name):
+        # TODO: don't check against db on every keystroke
+        # at least not until it's indexed
         if food_name and self.db.is_food_name_unique(food_name):
             self.create_btn.state(['!disabled'])
             return True

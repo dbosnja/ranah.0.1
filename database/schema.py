@@ -11,6 +11,7 @@ test_table = Table(
 )
 
 # TODO: all numeric values should default to 0.0
+# TODO: index the name column
 nutrition_labels_table = Table(
     'nutrition_facts_labels',
     metadata,

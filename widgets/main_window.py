@@ -2,7 +2,7 @@ from .create_food_item_frame import CreateFoodItemFrame
 
 
 ROOT_TITLE = 'ranah'
-ROOT_DIMENSION = '500x700+2500+200'
+ROOT_DIMENSION = '700x700+2500+200'
 
 
 class MainWindow:
@@ -33,6 +33,7 @@ class MainWindow:
         self.root.rowconfigure(1, weight=1)
 
     def _attach_child_frames(self):
+        # Do I need the instances of the children frames?
         for ch_f in self.child_frames:
             ch_f(self.root, self.db)
     

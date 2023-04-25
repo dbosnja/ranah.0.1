@@ -34,3 +34,24 @@ class SuccessfulLabelCreationFrame:
     def _remove_widgets(self):
         """Remove this frame from its parent mapping"""
         self.frame.grid_forget()
+
+
+# NOTE: root is not scrollable, either way I'll leave this type present
+class ScrollBarWidget:
+    """Scroll bar type"""
+
+    def __init__(self, parent, orient='vertical'):
+        """Create new scroll-bar and hook it to the parent in appropriate orientation"""
+        
+        self.scroll_bar = ttk.Scrollbar(parent, orient=orient)
+        if orient == 'horizontal':
+            parent.configure(xscrollcommand=self.scroll_bar.set)
+            command = parent.xview
+        else:
+            parent.configure(yscrollcommand=self.scroll_bar.set)
+            command = parent.yview
+        self.scroll_bar.configure(command=command)
+        self._grid()
+    
+    def _grid(self):
+        self.scroll_bar.grid(row=0, column=1, sticky='ns')
