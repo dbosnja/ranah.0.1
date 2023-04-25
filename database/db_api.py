@@ -50,6 +50,10 @@ class Database:
     def is_food_name_unique(self, food_name):
         return food_name not in self.all_food_label_names
     
-    def get_food_item_records(self, limit=10):
-        """Retrieve `limit` food item records"""
-        ...
+    def get_food_item_table(self, food_name):
+        """Retrieve food item table based on its name"""
+        sel = select(nutrition_labels_table)
+        sel = sel.where(nutrition_labels_table.c.label_name == food_name)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            return rp.fetchall()

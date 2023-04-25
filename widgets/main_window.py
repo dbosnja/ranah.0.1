@@ -3,7 +3,7 @@ from .stored_food_labels_frame import StoredFoodLabelsFrame
 
 
 ROOT_TITLE = 'ranah'
-ROOT_DIMENSION = '780x800+2500+200'
+ROOT_DIMENSION = '900x800+2500+150'
 
 
 class MainWindow:
