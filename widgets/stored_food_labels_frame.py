@@ -1,7 +1,7 @@
 from tkinter import ttk, Listbox, StringVar
 
 from .constants import text_constants
-from .leaf_frames import ScrollBarWidget, NutritionTableResultFrame
+from .leaf_frames import ScrollBarWidget, NutritionTableResultFrame, AddNewFoodItemFrame
 
 
 class StoredFoodLabelsFrame:
@@ -50,6 +50,9 @@ class StoredFoodLabelsFrame:
         self.search_btn = ttk.Button(self.frame, text='Pretraži po imenu', width=30)
         self.search_entry = ttk.Entry(self.frame, width=30, textvariable=self.search_entry_var)
         self.refresh_btn = ttk.Button(self.frame, text='Osvježi', width=30)
+
+        # this one is gridded only when a food result is actually present
+        self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
     
     def _grid_widgets(self):
         self.food_names_lbox.grid(row=0, column=0, pady=5, columnspan=2, sticky='we')
@@ -76,6 +79,8 @@ class StoredFoodLabelsFrame:
         
         self.nutrition_table_frame.grid_forget()
         self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
+
+        self.add_food_btn.grid_forget()
     
     def _search_by_name(self):
         search_token = self.search_entry_var.get()
@@ -112,7 +117,23 @@ class StoredFoodLabelsFrame:
                     val = round(float(val), 2)
                 except ValueError:
                     # only for name column
-                    ...
+                    # this is a hack, it would be best to have an actual mapping between 
+                    # db column names and the actual values
+                    self.selected_food_name = val
                 lbl = ttk.Label(self.nutrition_table_frame.frame, text=val, borderwidth=2,
                                 relief='raised', padding=8, anchor='center', background='#ffffcc')
-                lbl.grid(row=4 + row_idx + 1, column=col_idx, padx=5)
+                lbl.grid(row=row_idx + 1, column=col_idx, padx=5)
+        if food_results:
+            # this 4 is because it's parent has 4 rows -> quite terrible, but I'll live with it for now
+            self.add_food_btn.grid(row=4 + len(food_results) + 1, column=0, padx=5, pady=10, sticky='w')
+    
+    def _render_add_new_food_button(self):
+        afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)
+        # TODO: I guess this should be part of publi API
+        afi_frame.frame.grid(row=0, column=0, rowspan=5, columnspan=2, sticky='n')
+    
+    def _add_new_food_item(self):
+        """Connect to db and create a new (eaten) food item"""
+        print('Spremljeno!... NOT :)')
+    
+

@@ -35,8 +35,6 @@ class CreateFoodLabelFrame:
         self._grid_widgets()
     
     def _validate_double_input(self, entry_value):
-        if entry_value == '.':
-            return True
         if entry_value and self.double_pattern.match(entry_value) is None:
             return False
         return True
