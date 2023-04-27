@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, URL, select
 
 from .connection_params import DB_URL_PARAMS
-from .schema import metadata, nutrition_labels_table
+from .schema import metadata, nutrition_labels_table, consumed_food_items_table
 
 class Database:
     """Database Interface
@@ -33,10 +33,10 @@ class Database:
     def insert_new_food_item_record(self, **values):
         """Insert a new nutrition table record of a food item"""
         
+        ins = nutrition_labels_table.insert().values(**values)
         with self.engine.connect() as conn:
             # TODO: handle exceptions, e.g. Integrity Error -> this could be a complex topic
             # TODO: return the result to the caller, e.g. True/False
-            ins = nutrition_labels_table.insert().values(**values)
             conn.execute(ins)
             conn.commit()
     
@@ -48,12 +48,24 @@ class Database:
             return [f_name for (f_name, ) in rp.fetchall()]
     
     def is_food_name_unique(self, food_name):
+        # TODO: remove this interface segment, this is application code
         return food_name not in self.all_food_label_names
     
     def get_food_item_table(self, food_name):
         """Retrieve food item table based on its name"""
+        
         sel = select(nutrition_labels_table)
         sel = sel.where(nutrition_labels_table.c.label_name == food_name)
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
             return rp.fetchall()
+    
+    def create_new_consumed_food_item(self, **values):
+        """Create new consumed food item record"""
+
+        ins = consumed_food_items_table.insert().values(**values)
+        # TODO: return boolean to the caller?
+        with self.engine.connect() as conn:
+            conn.execute(ins)
+            conn.commit()
+

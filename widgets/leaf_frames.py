@@ -10,7 +10,7 @@ This is a good starting point when bumping ranah to a new version.
 
 import re
 
-from tkinter import ttk
+from tkinter import ttk, DoubleVar
 
 from .constants import text_constants
 
@@ -142,7 +142,7 @@ class AddNewFoodItemFrame:
         # define validations
         # TODO: DRY: isolate this validations in a separate function(I don't want inheritance for this) -> CreateFoodLabelFrame
         self.double_pattern = re.compile('^\d*\.?\d*$')
-        self._validate_double = (self.frame.register(self._validate_double_input), '%P')
+        self._validate_double = self.frame.register(self._validate_double_input), '%P'
         
         self._create_styles()
         self._create_widget_vars()
@@ -157,13 +157,14 @@ class AddNewFoodItemFrame:
         self.cancel_text = 'Obustavi'
         self.msg_text = f'Unesite količinu odabranog artikla u gramima i kliknute `{self.add_text}` ' \
                         f'za trajnu pohranu ili `{self.cancel_text}` za prekid.'
+        self.food_weight_var = DoubleVar(value='')
     
     def _create_widgets(self):
         self.title_lbl = ttk.Label(self.frame, text=self.food_name, background='white', anchor='center')
         self.msg_lbl = ttk.Label(self.frame, text=self.msg_text)
-        self.add_button = ttk.Button(self.frame, text=self.add_text, command=self._add_new_food_item)
+        self.add_button = ttk.Button(self.frame, text=self.add_text, command=self._add_new_food_item, state='disabled')
         self.cancel_btn = ttk.Button(self.frame, text=self.cancel_text, command=self._grid_forget)
-        self.food_weight_entry = ttk.Entry(self.frame, validate='all', validatecommand=self._validate_double)
+        self.food_weight_entry = ttk.Entry(self.frame, validate='all', validatecommand=self._validate_double, textvariable=self.food_weight_var)
     
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, pady=5, padx=5, columnspan=2)
@@ -179,11 +180,17 @@ class AddNewFoodItemFrame:
     def _add_new_food_item(self):
         if self.callback is None:
             print('I should not be writing this, but the callback is void, does it make sense to be None?')
-        self.callback()
+        self.callback(food_item_weight=float(self.food_weight_var.get()))
         self._grid_forget()
         # TODO: add new leaf frame indicating successful storing message
 
     def _validate_double_input(self, entry_value):
+        if not entry_value:
+            self.add_button.state(['disabled'])
         if entry_value and self.double_pattern.match(entry_value) is None:
             return False
+        elif entry_value and self.double_pattern.match(entry_value) is not None:
+            self.add_button.state(['!disabled'])
+            return True
         return True
+

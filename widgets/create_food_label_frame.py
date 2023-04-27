@@ -11,9 +11,8 @@ class CreateFoodLabelFrame:
     
     It is a direct (first) child of the root Window manager.
     """
-    # TODO: this should be in a separate file, e.g. frame_constants.py
-    # other frames shouldn't rely on this frame for this particular value
     text_constants = text_constants
+    
     def __init__(self, parent, db):
         self.db = db
         
@@ -25,8 +24,8 @@ class CreateFoodLabelFrame:
 
         # define validations
         self.double_pattern = re.compile('^\d*\.?\d*$')
-        self._validate_double = (self.frame.register(self._validate_double_input), '%P')
-        self._validate_food_name = (self.frame.register(self._validate_food_name_input), '%P')
+        self._validate_double = self.frame.register(self._validate_double_input), '%P'
+        self._validate_food_name = self.frame.register(self._validate_food_name_input), '%P'
         
         # init and render widgets
         self._create_styles()
@@ -160,3 +159,4 @@ class CreateFoodLabelFrame:
         self.food_name_lbl.grid(row=8, column=0, sticky='e', padx=5)
         self.food_name_e.grid(row=8, column=1, pady=10, sticky='w', padx=5)
         self.create_btn.grid(row=9, column=0, pady=10, columnspan=2)
+

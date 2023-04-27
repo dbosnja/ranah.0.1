@@ -16,3 +16,4 @@ text_constants = {
         'food_name_lbl': 'Ime',
         'create_btn': 'Kreiraj',
     }
+

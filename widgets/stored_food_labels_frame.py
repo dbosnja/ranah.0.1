@@ -8,6 +8,8 @@ class StoredFoodLabelsFrame:
     """Frame for rendering/filtering stored food labels/tables"""
 
     text_constants = text_constants
+    # 100 grams is a normative
+    normative = 100
 
     def __init__(self, parent, db):
         self.db = db
@@ -42,6 +44,7 @@ class StoredFoodLabelsFrame:
         self.search_entry_var = StringVar()
     
     def _create_widgets(self):
+        # TODO: this Listbox has to be self-contained type -> it's going to be shared throughout the app
         self.food_names_lbox = Listbox(self.frame, height=5, listvariable=self.food_label_names_lboxvar, width=30)
         self.food_names_lbox_scroll_bar = ScrollBarWidget(self.frame)
         self.food_names_lbox_scroll_bar.attach_to_scrollable(self.food_names_lbox)
@@ -79,6 +82,9 @@ class StoredFoodLabelsFrame:
         
         self.nutrition_table_frame.grid_forget()
         self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
+        # style again the food_names_lbox
+        # TODO: 
+        self._style_lbox_items()
 
         self.add_food_btn.grid_forget()
     
@@ -129,11 +135,20 @@ class StoredFoodLabelsFrame:
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)
-        # TODO: I guess this should be part of publi API
+        # TODO: I guess this should be part of public API
         afi_frame.frame.grid(row=0, column=0, rowspan=5, columnspan=2, sticky='n')
     
-    def _add_new_food_item(self):
+    def _add_new_food_item(self, food_item_weight):
         """Connect to db and create a new (eaten) food item"""
-        print('Spremljeno!... NOT :)')
-    
+
+        ratio = food_item_weight / self.normative
+        # NOTE: quite ugly, should be better when I switch to sqlAlchemy ORM
+        food_name, *food_nutrition = self.db.get_food_item_table(self.selected_food_name)[0][1:]
+        # TODO: this is tightly coupled with the db schema,
+        # meaning if schema changes I need to change this list definition throughout the app
+        food_nutrition_column = ['calories', 'fat', 'saturated_fat', 'carbs', 'sugars', 'proteins', 'fiber']
+        record = {c: float(n) * ratio for c, n in zip(food_nutrition_column, food_nutrition)}
+        record['food_name'] = food_name
+        record['food_weight'] = food_item_weight
+        self.db.create_new_consumed_food_item(**record)
 
