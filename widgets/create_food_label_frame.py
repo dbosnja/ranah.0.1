@@ -3,6 +3,7 @@ import re
 from tkinter import ttk, DoubleVar, StringVar, TclError
 
 from .leaf_frames import SuccessfulLabelCreationFrame
+from .constants import text_constants
 
 
 class CreateFoodLabelFrame:
@@ -10,18 +11,9 @@ class CreateFoodLabelFrame:
     
     It is a direct (first) child of the root Window manager.
     """
-    text_constants = {
-        'topic_lbl': 'Nutritivne vrijednosti na 100 grama',
-        'calory_lbl': 'Kalorije',
-        'fat_lbl': 'Masti',
-        'sat_fat_lbl': 'Zasićene masti',
-        'carb_lbl': 'Ugljikohidrati',
-        'sugar_lbl': 'Šećeri',
-        'protein_lbl': 'Bjelančevine',
-        'fiber_lbl': 'Vlakna',
-        'food_name_lbl': 'Ime',
-        'create_btn': 'Kreiraj',
-    }
+    # TODO: this should be in a separate file, e.g. frame_constants.py
+    # other frames shouldn't rely on this frame for this particular value
+    text_constants = text_constants
     def __init__(self, parent, db):
         self.db = db
         

@@ -1,17 +1,18 @@
 from tkinter import ttk, Listbox, StringVar
 
-from .create_food_label_frame import CreateFoodLabelFrame
-from .leaf_frames import ScrollBarWidget
+from .constants import text_constants
+from .leaf_frames import ScrollBarWidget, NutritionTableResultFrame
 
 
 class StoredFoodLabelsFrame:
     """Frame for rendering/filtering stored food labels/tables"""
 
-    text_constants = CreateFoodLabelFrame.text_constants
+    text_constants = text_constants
 
     def __init__(self, parent, db):
         self.db = db
         self.food_label_names = self.db.all_food_label_names
+        # a reference to the current list of food label names exposed on UI
         self.current_food_label_names = self.food_label_names
 
         # main frame
@@ -25,10 +26,8 @@ class StoredFoodLabelsFrame:
         self._create_widgets()
         self._grid_widgets()
         
-        # TODO: this should be handled in the frame's own namespace
-        self._create_result_frame()
-        self._create_results_frame_children()
-        self._grid_results_frame_children()
+        # friend(child) frame
+        self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
         
         self._bind_events()
 
@@ -65,37 +64,6 @@ class StoredFoodLabelsFrame:
         self.refresh_btn.configure(command=self._refresh_food_names)
         self.search_btn.configure(command=self._search_by_name)
         self.food_names_lbox.bind('<Double-1>', self._get_record_from_doubleclick)
-    
-    def _create_result_frame(self):
-        # frame holding searched results
-        # TODO: this frame should a separate type, easily pluggable to self.frame
-        self.results_frame = ttk.Frame(self.frame, style='StoredLabels.TFrame')
-        # enable resizing
-        for i in range(9):
-            self.results_frame.columnconfigure(i, weight=1)
-        self.results_frame.grid(row=4, column=0, sticky='we')
-    
-    def _create_results_frame_children(self):
-        self.food_number_lbl = ttk.Label(self.results_frame, text='#', borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.food_name_lbl = ttk.Label(self.results_frame, text=self.text_constants['food_name_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.calories_lbl = ttk.Label(self.results_frame, text=self.text_constants['calory_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.fat_lbl = ttk.Label(self.results_frame, text=self.text_constants['fat_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.sat_fat_lbl = ttk.Label(self.results_frame, text=self.text_constants['sat_fat_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.carbs_lbl = ttk.Label(self.results_frame, text=self.text_constants['carb_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.sugar_lbl = ttk.Label(self.results_frame, text=self.text_constants['sugar_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.protein_lbl = ttk.Label(self.results_frame, text=self.text_constants['protein_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.fiber_lbl = ttk.Label(self.results_frame, text=self.text_constants['fiber_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-    
-    def _grid_results_frame_children(self):
-        self.food_number_lbl.grid(row=0, column=0, padx=5, pady=10, sticky='we')
-        self.food_name_lbl.grid(row=0, column=1, padx=5, pady=10, sticky='we')
-        self.calories_lbl.grid(row=0, column=2, padx=5, pady=10, sticky='we')
-        self.fat_lbl.grid(row=0, column=3, padx=5, pady=10, sticky='we')
-        self.sat_fat_lbl.grid(row=0, column=4, padx=5, pady=10, sticky='we')
-        self.carbs_lbl.grid(row=0, column=5, padx=5, pady=10, sticky='we')
-        self.sugar_lbl.grid(row=0, column=6, padx=5, pady=10, sticky='we')
-        self.protein_lbl.grid(row=0, column=7, padx=5, pady=10, sticky='we')
-        self.fiber_lbl.grid(row=0, column=8, padx=5, pady=10, sticky='we')
 
     
     def _refresh_food_names(self):
@@ -106,10 +74,8 @@ class StoredFoodLabelsFrame:
         self.current_food_label_names = self.food_label_names
         self.food_tables_tally_lbl.configure(text=f'{len(self.food_label_names)} rezultata')
         
-        self.results_frame.grid_forget()
-        self._create_result_frame()
-        self._create_results_frame_children()
-        self._grid_results_frame_children()
+        self.nutrition_table_frame.grid_forget()
+        self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
     
     def _search_by_name(self):
         search_token = self.search_entry_var.get()
@@ -133,20 +99,20 @@ class StoredFoodLabelsFrame:
 
     def _render_searched_result(self, food_results):
         # first clear all rendered results(if any)
-        self.results_frame.grid_forget()
+        self.nutrition_table_frame.grid_forget()
         # re-render the table headers
-        self._create_result_frame()
-        self._create_results_frame_children()
-        self._grid_results_frame_children()
+        self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
 
         # Expected to be a 1-element list, could change in future
         for row_idx, food_table_record in enumerate(food_results):
             food_table_record = list(food_table_record[1:])
             for col_idx, val in enumerate([row_idx + 1] + food_table_record):
+                # TODO: make this try/except clause a bit less painful, ie remove it completely
                 try:
                     val = round(float(val), 2)
                 except ValueError:
                     # only for name column
                     ...
-                lbl = ttk.Label(self.results_frame, text=val, borderwidth=2, relief='raised', padding=8, anchor='center', background='#ffffcc')
-                lbl.grid(row= 4 + row_idx + 1, column=col_idx, padx=5)
+                lbl = ttk.Label(self.nutrition_table_frame.frame, text=val, borderwidth=2,
+                                relief='raised', padding=8, anchor='center', background='#ffffcc')
+                lbl.grid(row=4 + row_idx + 1, column=col_idx, padx=5)
