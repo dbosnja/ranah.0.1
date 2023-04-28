@@ -79,7 +79,7 @@ class NutritionTableResultFrame:
 
     text_constants = text_constants
 
-    def __init__(self, parent):
+    def __init__(self, parent, **kw):
         self._create_styles()
         
         self.frame = ttk.Frame(parent, style='NutritionTableResults.TFrame')
@@ -88,40 +88,47 @@ class NutritionTableResultFrame:
             self.frame.columnconfigure(i, weight=1)
         self.grid_frame(row=4, column=0, sticky='we')
 
-        self._create_widgets()
+        self.label_widgets = []
+        self._create_widgets(**kw)
         self._grid_widgets()
 
     def _create_styles(self):
         # TODO: expose this as a configurable option via public API
-        ttk.Style().configure('NutritionTableResults.TFrame', background='#ade6e1')
+        self.nutrition_table_results_style = ttk.Style()
+        self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')
     
-    def grid_frame(self, row=None, column=None, sticky=None):
-        self.frame.grid(row=row or 4, column=column or 0, sticky=sticky or 'we')
+    def grid_frame(self, row=None, column=None, sticky=None, columnspan=None):
+        self.frame.grid(row=row or 4, column=column or 0, sticky=sticky or 'we', columnspan=columnspan or 1)
     
-    def _create_widgets(self):
-        self.food_number_lbl = ttk.Label(self.frame, text='#', borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.food_name_lbl = ttk.Label(self.frame, text=self.text_constants['food_name_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.calories_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.fat_lbl = ttk.Label(self.frame, text=self.text_constants['fat_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.sat_fat_lbl = ttk.Label(self.frame, text=self.text_constants['sat_fat_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.carbs_lbl = ttk.Label(self.frame, text=self.text_constants['carb_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.sugar_lbl = ttk.Label(self.frame, text=self.text_constants['sugar_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.protein_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
-        self.fiber_lbl = ttk.Label(self.frame, text=self.text_constants['fiber_lbl'], borderwidth=2, relief='raised', padding=8, anchor='center')
+    def _create_and_enumerate_widgets(self, widget, text):
+        # NOTE: not the best design, but good enough for now, the real question is how configurable things should acutally be?
+        self.label_widgets.append(widget(self.frame, text=text, borderwidth=2, relief='raised', padding=8, anchor='center'))
+        return self.label_widgets[-1]
+    
+    def _create_widgets(self, **kw):
+        self.food_number_lbl = self._create_and_enumerate_widgets(ttk.Label, text='#')
+        self.food_name_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['food_name_lbl'])
+        
+        if kw.get('food_weight'):
+            self.food_weight_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['food_weight'])
+        
+        self.calories_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['calory_lbl'])
+        self.fat_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['fat_lbl'])
+        self.sat_fat_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['sat_fat_lbl'])
+        self.carbs_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['carb_lbl'])
+        self.sugar_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['sugar_lbl'])
+        self.protein_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['protein_lbl'])
+        self.fiber_lbl = self._create_and_enumerate_widgets(ttk.Label, self.text_constants['fiber_lbl'])
     
     def _grid_widgets(self):
-        self.food_number_lbl.grid(row=0, column=0, padx=5, pady=10, sticky='we')
-        self.food_name_lbl.grid(row=0, column=1, padx=5, pady=10, sticky='we')
-        self.calories_lbl.grid(row=0, column=2, padx=5, pady=10, sticky='we')
-        self.fat_lbl.grid(row=0, column=3, padx=5, pady=10, sticky='we')
-        self.sat_fat_lbl.grid(row=0, column=4, padx=5, pady=10, sticky='we')
-        self.carbs_lbl.grid(row=0, column=5, padx=5, pady=10, sticky='we')
-        self.sugar_lbl.grid(row=0, column=6, padx=5, pady=10, sticky='we')
-        self.protein_lbl.grid(row=0, column=7, padx=5, pady=10, sticky='we')
-        self.fiber_lbl.grid(row=0, column=8, padx=5, pady=10, sticky='we')
+        for i, widget in enumerate(self.label_widgets):
+            widget.grid(row=0, column=i, padx=5, pady=10, sticky='we')
     
     def grid_forget(self):
         self.frame.grid_forget()
+    
+    def configure_style(self, style_name):
+        self.frame.configure(style=style_name)
 
 
 class AddNewFoodItemFrame:

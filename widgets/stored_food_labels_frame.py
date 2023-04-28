@@ -44,7 +44,7 @@ class StoredFoodLabelsFrame:
         self.search_entry_var = StringVar()
     
     def _create_widgets(self):
-        # TODO: this Listbox has to be self-contained type -> it's going to be shared throughout the app
+        # TODO: this Listbox has to be a self-contained type -> it's going to be shared throughout the app
         self.food_names_lbox = Listbox(self.frame, height=5, listvariable=self.food_label_names_lboxvar, width=30)
         self.food_names_lbox_scroll_bar = ScrollBarWidget(self.frame)
         self.food_names_lbox_scroll_bar.attach_to_scrollable(self.food_names_lbox)
@@ -83,7 +83,6 @@ class StoredFoodLabelsFrame:
         self.nutrition_table_frame.grid_forget()
         self.nutrition_table_frame = NutritionTableResultFrame(self.frame)
         # style again the food_names_lbox
-        # TODO: 
         self._style_lbox_items()
 
         self.add_food_btn.grid_forget()
@@ -109,6 +108,8 @@ class StoredFoodLabelsFrame:
             self.food_names_lbox.itemconfigure(i, background='#fff3e6')
 
     def _render_searched_result(self, food_results):
+        # TODO: refactor; this method should rely on internal method of the NutritionTableResultFrame
+        
         # first clear all rendered results(if any)
         self.nutrition_table_frame.grid_forget()
         # re-render the table headers

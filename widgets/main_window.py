@@ -1,5 +1,6 @@
 from .create_food_label_frame import CreateFoodLabelFrame
 from .stored_food_labels_frame import StoredFoodLabelsFrame
+from .consumed_food_items_frame import ConsumedFoodItemsFrame
 
 
 ROOT_TITLE = 'ranah.0.1.'
@@ -16,6 +17,7 @@ class MainWindow:
     child_frames = (
             CreateFoodLabelFrame,
             StoredFoodLabelsFrame,
+            ConsumedFoodItemsFrame,
         )
     
     def __init__(self, root, db):

@@ -15,5 +15,6 @@ text_constants = {
         'fiber_lbl': 'Vlakna',
         'food_name_lbl': 'Ime',
         'create_btn': 'Kreiraj',
+        'food_weight': 'Masa'
     }
 
