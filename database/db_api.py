@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, URL, select
+from sqlalchemy import create_engine, URL, select, and_, extract
 
 from .connection_params import DB_URL_PARAMS
 from .schema import metadata, nutrition_labels_table, consumed_food_items_table
@@ -68,4 +68,17 @@ class Database:
         with self.engine.connect() as conn:
             conn.execute(ins)
             conn.commit()
+    
+    def get_consumed_food_on_date(self, date):
+        sel = select(consumed_food_items_table)
+        sel = sel.where(
+            and_(
+                extract('YEAR', consumed_food_items_table.c.timestamp) == date.year,
+                extract('MONTH', consumed_food_items_table.c.timestamp) == date.month,
+                extract('DAY', consumed_food_items_table.c.timestamp) == date.day,
+            )
+        )
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            return rp.fetchall()
 
