@@ -1,0 +1,29 @@
+Ranah2.0 Roadmap
+
+0. Create new ranah2.0 database
+1. Enable multiple tabs/windows option, ie obsolete one-window application
+2. Make Frames scrollable wherever it makes sense to
+3. Add price, created_on, updated_on dimensions for every food article/table
+4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
+   Enable updating the rows and deleting them
+5. Enhance reading through the consumed food articles with:
+	a) all possible combinations of day, month, year inputs
+	b) ranges of dates
+	c) it should be a drop-down list instead of user writing in the numbers
+	d) list all consumed food within the required time range together with their data
+	e) end the list with a final row which represents the total sum of all listed rows
+6. Enable templates. For a start user has to be able to choose a set of food articles together with their weights and store it permanently under a unique name.
+   a) There should be a tab for creating a new meal template, which should work in similar fashion to shopping cart, ie. user sees immediately which food articles
+   	  are added in the list
+   b) User should be able to read through all stored meal templates, add one of them as consumed, update and delete them.
+7. Use messageboxes for info/warning alerts/pop-ups.
+   
+
+TABS:
+
+1. create new nutrition table
+2. read through all nutrition table
+3. read through consumed food within a specified range
+4. Create new meal template
+5. Read through meal templates
+6. Calories
