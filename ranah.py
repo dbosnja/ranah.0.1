@@ -1,3 +1,5 @@
+#! /home/dom_ak45/.local/share/virtualenvs/ranah.0.1-U4ckHnxd/bin/python
+
 from tkinter import Tk
 
 from database.db_api import Database

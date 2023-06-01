@@ -150,7 +150,7 @@ class ConsumedFoodItemsFrame:
         if not consumed_food:
             return
 
-        consumed_food_sums = [len(consumed_food), 'Sve Zajedno']
+        consumed_food_sums = [len(consumed_food), 'Sve zajedno']
 
         for i, _ in enumerate(consumed_food[0]):
             # NOTE: terrible; this will go away once the method is internalized
