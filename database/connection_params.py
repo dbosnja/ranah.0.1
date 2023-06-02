@@ -3,6 +3,6 @@ DB_URL_PARAMS = {
     'username': 'ranah',
     'password': 'ranah',
     'host': 'localhost',
-    'database': 'ranah_01',
+    'database': 'ranah_02',
     'port': 5432
 }

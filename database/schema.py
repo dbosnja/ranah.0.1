@@ -16,8 +16,11 @@ nutrition_labels_table = Table(
     Column('saturated_fat', Numeric(10, 5), default=0),
     Column('carbs', Numeric(10, 5), default=0),
     Column('sugars', Numeric(10, 5), default=0),
-    Column('proteins', Numeric(10, 5), default=0),
     Column('fiber', Numeric(10, 5), default=0),
+    Column('proteins', Numeric(10, 5), default=0),
+    Column('price', Numeric(10, 5), nullable=False),
+    Column('created_on', DateTime, default=datetime.now),
+    Column('updated_on', DateTime, default=datetime.now, onupdate=datetime.now),
 )
 
 

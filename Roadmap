@@ -1,9 +1,16 @@
 Ranah2.0 Roadmap
 
-0. Create new ranah2.0 database
+0. Create new ranah2.0 database DONE
+
+# ITERATION 2.1 #
 1. Enable multiple tabs/windows option, ie obsolete one-window application
 2. Make Frames scrollable wherever it makes sense to
-3. Add price, created_on, updated_on dimensions for every food article/table
+
+3. Add price, created_on, updated_on dimensions for every food article/table  +
+
+## ITERATION 2.1 ##
+
+
 4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
    Enable updating the rows and deleting them
 5. Enhance reading through the consumed food articles with:
@@ -21,9 +28,9 @@ Ranah2.0 Roadmap
 
 TABS:
 
-1. create new nutrition table
-2. read through all nutrition table
-3. read through consumed food within a specified range
-4. Create new meal template
-5. Read through meal templates
-6. Calories
+1. create new nutrition table / Nova nutritivna tablica
+2. read through all nutrition table / Sve nutritivne tablice
+3. read through consumed food within a specified range / Konzumirana hrana
+4. Create new meal template / Novi predlozak objeda
+5. Read through meal templates / Svi predlosci objeda
+6. Calories / Kalorije
