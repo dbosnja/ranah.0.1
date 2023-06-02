@@ -8,7 +8,7 @@ class MainWindow:
     It is mainly concerned with configuring the root widget(ranah app)
     and initializing its direct child, which is the ranah notebook.
 
-    The children of Ranah notebook are Canvas widgets which hold frames
+    The children of ranah notebook are Canvas widgets which hold frames
     for each tab in the notebook, simulating a single page application.
     """
 
@@ -32,4 +32,3 @@ class MainWindow:
     
     def mainloop(self):
         self.root.mainloop()
-

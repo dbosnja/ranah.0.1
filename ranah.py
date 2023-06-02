@@ -14,4 +14,3 @@ mw = MainWindow(Tk(), db)
 
 # start the main loop
 mw.mainloop()
-

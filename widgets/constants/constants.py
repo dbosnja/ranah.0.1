@@ -5,7 +5,7 @@ this module into several modules within a (sub)package
 """
 
 text_constants = {
-        'topic_lbl': 'Nutritivne vrijednosti na 100 grama',
+        'topic_lbl': 'Nutritivne vrijednosti na 100 grama/miliLitara artikla',
         'calory_lbl': 'Kalorije',
         'fat_lbl': 'Masti',
         'sat_fat_lbl': 'Zasićene masti',
@@ -15,6 +15,6 @@ text_constants = {
         'fiber_lbl': 'Vlakna',
         'food_name_lbl': 'Ime',
         'create_btn': 'Kreiraj',
-        'food_weight': 'Masa'
+        'food_weight': 'Masa',
+        'food_price_lbl': 'Cijena',
     }
-

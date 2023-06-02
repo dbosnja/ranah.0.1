@@ -12,7 +12,7 @@ import re
 
 from tkinter import ttk, DoubleVar
 
-from .constants import text_constants
+from ..constants.constants import text_constants
 
 
 class SuccessfulLabelCreationFrame:
@@ -200,4 +200,3 @@ class AddNewFoodItemFrame:
             self.add_button.state(['!disabled'])
             return True
         return True
-
