@@ -23,7 +23,9 @@ Ranah2.0 Roadmap
    a) There should be a tab for creating a new meal template, which should work in similar fashion to shopping cart, ie. user sees immediately which food articles
    	  are added in the list
    b) User should be able to read through all stored meal templates, add one of them as consumed, update and delete them.
-7. Use messageboxes for info/warning alerts/pop-ups.
+7. Add calories tab
+8. Use messageboxes for info/warning alerts/pop-ups.
+9. Implement the Dependency Injection for database instance(instead of propagating it throughtout the app)
    
 
 TABS:
