@@ -1,4 +1,4 @@
-from tkinter import ttk, PhotoImage
+from tkinter import ttk
 
 from .canvas_widgets import CreateFoodTableCanvas, StoredFoodTablesCanvas, ConsumedFoodItemsCanvas
 
@@ -25,7 +25,6 @@ class MainNotebook:
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
-        self.img = PhotoImage(file='/home/dom_ak45/book_notes/Tkinter/src/12_organizing_complex_interfaces/flame.png')
 
         self._create_notebook(parent)
         self._initialize_tabs()
@@ -42,4 +41,4 @@ class MainNotebook:
         for tab, tab_label in zip(self.TABS, self.TABS_LABELS):
             # create the tab
             canvas_tab = tab(self.notebook, self.db)
-            self.notebook.add(canvas_tab.canvas, text=tab_label, image=self.img, compound='top')
+            self.notebook.add(canvas_tab.canvas, text=tab_label)

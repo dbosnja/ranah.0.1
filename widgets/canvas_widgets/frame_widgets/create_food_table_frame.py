@@ -2,17 +2,21 @@ import re
 
 from tkinter import ttk, DoubleVar, StringVar, TclError, messagebox
 
-from ...utility_widgets.leaf_frames import SuccessfulLabelCreationFrame
-from ...constants.constants import text_constants
+from constants.constants import text_constants
 
 
 class CreateFoodLabelFrame:
-    """Window for creating a new food item label"""
+    """Frame for creating a new food item label
+    
+    This Frame consists of all widgets needed to implement UI for creating a new
+    nutrition table of a food article. Those would be mostly Labels, Entries and Buttons.
+    It also has access to database API in order to store changes permanently.
+    """
     
     text_constants = text_constants
 
     # has to be updated manually!
-    ROW_COUNT = 6
+    ROW_COUNT = 7
     COL_COUNT = 4
     
     def __init__(self, parent, db):
@@ -23,11 +27,10 @@ class CreateFoodLabelFrame:
         # main frame the `self` is composed of
         self.frame = ttk.Frame(parent, style='Main.TFrame', borderwidth=2, relief='groove', padding=10)
         self.frame.grid(column=0, row=0, sticky='news')
-        for i in range(self.ROW_COUNT):
+        for i in range(self.COL_COUNT):
             self.frame.columnconfigure(i, weight=1)
 
-
-        # define validations
+        # define the validations
         self.double_pattern = re.compile('^\d*\.?\d*$')
         self._validate_double = self.frame.register(self._validate_double_input), '%P'
         
@@ -61,7 +64,7 @@ class CreateFoodLabelFrame:
             self.fiber_var, self.food_price_var
         ]
         self.widget_string_vars = [
-            self.food_name_var
+            self.food_name_var,
         ]
     
     def _reset_widget_vars(self):
@@ -99,13 +102,13 @@ class CreateFoodLabelFrame:
             'price': self.food_price_var.get(),
         }
         self.db.insert_new_food_item_record(**record)
+        temp_food_name = self.food_name_var.get()
         self._reset_widget_vars()
-        self._render_success_message()
+        self._render_success_message(temp_food_name)
     
-    def _render_success_message(self):
-        # TODO: replace this with messagebox widget
-        self.success_msg_frame = SuccessfulLabelCreationFrame(self.frame)
-        self.success_msg_frame.frame.grid(row=4, column=0, rowspan=5, columnspan=2)
+    def _render_success_message(self, temp_food_name):
+        messagebox.showinfo(title='Novi artikl kreiran',
+                            message=f'Uspjesno kreirana nova nutritivna tablica u ranahu\n`{temp_food_name}`')
 
     # TODO: bind ctrl+a event to every entry widget
     def _create_widgets(self):

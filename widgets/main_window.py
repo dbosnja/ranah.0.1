@@ -12,6 +12,10 @@ class MainWindow:
     for each tab in the notebook, simulating a single page application.
     """
 
+    # TODO: grid the root's geometry dinamically and handle 
+    # <Escape> event better -> separate between dev and prod mode
+    # dev mode -> Escape quits the app; prod mode -> pop-up asks are you sure
+
     ROOT_TITLE = 'ranah.2.0.'
     ROOT_DIMENSION = '900x800+2500+150'
     

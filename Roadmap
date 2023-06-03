@@ -3,16 +3,21 @@ Ranah2.0 Roadmap
 0. Create new ranah2.0 database DONE
 
 # ITERATION 2.1 #
-1. Enable multiple tabs/windows option, ie obsolete one-window application
-2. Make Frames scrollable wherever it makes sense to
 
-3. Add price, created_on, updated_on dimensions for every food article/table  +
+1. Enable multiple tabs/windows option, ie obsolete one-window application DONE
+2. Make Frames scrollable wherever it makes sense to
+3. Add price, created_on, updated_on dimensions for every food article/table DONE
 
 ## ITERATION 2.1 ##
 
 
+# ITERATION 2.2 #
+
 4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
    Enable updating the rows and deleting them
+
+## ITERATION 2.2 ##
+
 5. Enhance reading through the consumed food articles with:
 	a) all possible combinations of day, month, year inputs
 	b) ranges of dates
