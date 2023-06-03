@@ -1,1 +1,6 @@
+# python byte-code dirs
 __pycache__
+
+# libre office
+*.ods
+*.ods#
