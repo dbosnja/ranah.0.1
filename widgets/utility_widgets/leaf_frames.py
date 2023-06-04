@@ -110,7 +110,7 @@ class NutritionTableHeaders:
     
     def _create_widgets(self):
         for header_lbl in self.header_labels:
-            lbl = ttk.Label(self.parent, text=header_lbl, borderwidth=2, relief='raised', padding=8, anchor='center')
+            lbl = ttk.Label(self.parent, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
             self.label_widgets.append(lbl)
     
     def _grid_widgets(self):

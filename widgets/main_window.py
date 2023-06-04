@@ -17,7 +17,6 @@ class MainWindow:
     # dev mode -> Escape quits the app; prod mode -> pop-up asks are you sure
 
     ROOT_TITLE = 'ranah.2.0.'
-    ROOT_DIMENSION = '900x800+2500+150'
     
     def __init__(self, root, db):
         self.db = db
@@ -27,7 +26,7 @@ class MainWindow:
     def _initialize_the_root(self, root):
         self.root = root
         self.root.title(self.ROOT_TITLE)
-        self.root.geometry(self.ROOT_DIMENSION)
+        self.root.geometry(f'{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}')
         # convenience
         self.root.bind('<Escape>', lambda _: self.root.quit())
         # enable resizing

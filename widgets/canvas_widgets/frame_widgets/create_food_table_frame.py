@@ -46,6 +46,7 @@ class CreateFoodLabelFrame:
 
     def _create_styles(self):
         ttk.Style().configure('Main.TFrame', background='#CCFFCC')
+        ttk.Style().configure('Create.TButton', font='10')
     
     def _create_widget_vars(self):
         self.calory_var = DoubleVar(value='')
@@ -114,7 +115,7 @@ class CreateFoodLabelFrame:
     def _create_widgets(self):
         """Create all (direct) children widgets"""
 
-        self.topic_lbl = ttk.Label(self.frame, text=self.text_constants['topic_lbl'], anchor='center', padding=15, width=500)
+        self.topic_lbl = ttk.Label(self.frame, text=self.text_constants['topic_lbl'], anchor='center', padding=15, width=500, font=8)
         
         self.calory_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'],
                                     anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
@@ -161,7 +162,7 @@ class CreateFoodLabelFrame:
         self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, width=50, font='default 17')
         
         self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'],
-                                     command=self._create_new_record, padding=4)
+                                     command=self._create_new_record, padding=5, style='Create.TButton')
     
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, pady=(20, 60), columnspan=4, sticky='we')

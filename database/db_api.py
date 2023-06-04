@@ -30,6 +30,13 @@ class Database:
     def _persist_schema(self):
         self.metadata.create_all(self.engine)
     
+    def _format_nutrition_table_row(self, row):
+        # NOTE: this will look better once I switch to ORM Alchemy mode
+        row[2:-2] = [round(float(f), 2) for f in row[2:-2]]
+        row[-2] = row[-2].strftime('%d-%m-%Y, %H:%M')
+        row[-1] = row[-1].strftime('%d-%m-%Y, %H:%M')
+        return row
+    
     def insert_new_food_item_record(self, **values):
         """Insert a new nutrition table record of a food item"""
         
@@ -47,6 +54,14 @@ class Database:
             rp = conn.execute(sel)
             return [f_name for (f_name, ) in rp.fetchall()]
     
+    @property
+    def all_food_label_tables(self):
+        sel = select(nutrition_labels_table)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            results = rp.fetchall()
+        return [self._format_nutrition_table_row(list(r)) for r in results]
+    
     def is_food_name_unique(self, food_name):
         # TODO: remove this interface segment, this is application code
         return food_name not in self.all_food_label_names
@@ -63,11 +78,8 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
             result = list(rp.first())
-        # NOTE: this will look better once I switch to ORM Alchemy mode
-        result[2:-2] = [round(float(f), 2) for f in result[2:-2]]
-        result[-2] = result[-2].strftime('%d-%m-%Y, %H:%M')
-        result[-1] = result[-1].strftime('%d-%m-%Y, %H:%M')
-        return result
+        
+        return self._format_nutrition_table_row(result)
     
     def create_new_consumed_food_item(self, **values):
         """Create new consumed food item record"""

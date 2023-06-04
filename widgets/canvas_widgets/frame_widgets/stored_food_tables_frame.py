@@ -33,7 +33,11 @@ class StoredFoodTablesFrame:
 
         self._create_styles()
         # main frame
-        self.frame = ttk.Frame(parent, style='StoredLabels.TFrame', borderwidth=5, relief='raised')
+        self.frame = ttk.Frame(parent, style='StoredLabels.TFrame', borderwidth=2, relief='raised')
+        self.screen_width = self.frame.winfo_screenwidth()
+        self.screen_height = self.frame.winfo_screenheight()
+        self.frame.configure(width=self.screen_width)
+        self.frame.configure(height=self.screen_height)
         self.frame.grid(row=0, column=0, sticky='news', padx=10)
         self.frame.columnconfigure(0, weight=1)
 
@@ -44,7 +48,7 @@ class StoredFoodTablesFrame:
         
         # friend(child) frame
         self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, len(self.HEADER_LABELS))
-        self.nutrition_table_frame.grid_frame(row=1, column=0, sticky='we')
+        self.nutrition_table_frame.grid_frame(row=1, column=0, sticky='wes')
         self.nutrition_table_frame.render_headers(self.HEADER_LABELS)
         self.nutrition_table_frame.render_results(self.food_tables)
     
@@ -67,10 +71,11 @@ class StoredFoodTablesFrame:
         
         If no name segment is given, return all nutrition tables in Ranah.
         """
+        if not name_segment:
+            self.food_tables = self.db.all_food_label_tables[:1]
+            return
         for food_lbl in self.db.all_food_label_names:
-            if name_segment and name_segment.lower() in food_lbl.lower():
-                self.food_tables.append(self.db.get_food_item_table(food_lbl))
-            elif not name_segment:
+            if name_segment.lower() in food_lbl.lower():
                 self.food_tables.append(self.db.get_food_item_table(food_lbl))
     
     def _render_add_new_food_button(self):
