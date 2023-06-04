@@ -29,7 +29,7 @@ class StoredFoodTablesFrame:
         self.db = db
         self.food_tables = []
         # initialize the frame with all food tables in Ranah
-        self._get_food_results(name_segment='')
+        # self._get_food_results(name_segment='')
 
         self._create_styles()
         # main frame
@@ -72,7 +72,7 @@ class StoredFoodTablesFrame:
         If no name segment is given, return all nutrition tables in Ranah.
         """
         if not name_segment:
-            self.food_tables = self.db.all_food_label_tables[:1]
+            self.food_tables = self.db.all_food_label_tables
             return
         for food_lbl in self.db.all_food_label_names:
             if name_segment.lower() in food_lbl.lower():
