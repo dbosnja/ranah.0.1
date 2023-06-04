@@ -81,10 +81,12 @@ class NutritionTableResult:
         self.parent = parent
     
     def render_row(self, row, row_data):
-        # NOTE: ugly but SQLAlchemy wraps the results like it's Christmas
-        row_data = row_data[0]
         for i, data in enumerate(row_data):
-            lbl = ttk.Label(self.parent, text=data, anchor='center')
+            lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5))
+            if row % 2 == 0:
+                lbl.configure(background='#E3E7EA')
+            else:
+                lbl.configure(background='#ffffe6')
             lbl.grid(row=row, column=i, sticky='we')
 
 

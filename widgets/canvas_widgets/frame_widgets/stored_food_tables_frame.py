@@ -55,7 +55,7 @@ class StoredFoodTablesFrame:
         self.search_entry_var = StringVar()
     
     def _create_widgets(self):
-        self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'Nekoliko rezultata', padding=5)
+        self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'{len(self.food_tables)} rezultata', padding=5)
         # this one is gridded only when a food result is actually present
         self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
     

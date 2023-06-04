@@ -52,13 +52,22 @@ class Database:
         return food_name not in self.all_food_label_names
     
     def get_food_item_table(self, food_name):
-        """Retrieve food item table based on its name"""
+        """Retrieve food item table based on its name
+        
+        The API does also formatting of the fetched data. All floats are rounded to 2 decimals
+        and datetime is formatted as `day full-mont-name year HH:MM`
+        """
         
         sel = select(nutrition_labels_table)
         sel = sel.where(nutrition_labels_table.c.label_name == food_name)
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
-            return rp.fetchall()
+            result = list(rp.first())
+        # NOTE: this will look better once I switch to ORM Alchemy mode
+        result[2:-2] = [round(float(f), 2) for f in result[2:-2]]
+        result[-2] = result[-2].strftime('%d-%m-%Y, %H:%M')
+        result[-1] = result[-1].strftime('%d-%m-%Y, %H:%M')
+        return result
     
     def create_new_consumed_food_item(self, **values):
         """Create new consumed food item record"""
