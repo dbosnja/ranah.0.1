@@ -3,7 +3,7 @@ from datetime import date
 
 from tkinter import ttk, StringVar
 
-from .leaf_frames import NutritionTableResultFrame
+from .leaf_frames import NutritionTableResultsFrame
 
 
 class ConsumedFoodItemsFrame:
@@ -21,7 +21,7 @@ class ConsumedFoodItemsFrame:
         #     self.frame.rowconfigure(i, weight=1)
             
 
-        self.nutrition_table_frame = NutritionTableResultFrame(self.frame, food_weight=True)
+        self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, food_weight=True)
         self.nutrition_table_frame.grid_frame(row=8, column=0, sticky='we', columnspan=2)
         self.nutrition_table_frame.configure_style('ConsumedFoodItems.TFrame')
 
@@ -136,14 +136,14 @@ class ConsumedFoodItemsFrame:
         self._render_consumed_food(consumed_foods_on_date)
     
     def _render_consumed_food(self, consumed_food):
-        # TODO: refactor; this method should rely on internal method of the NutritionTableResultFrame
+        # TODO: refactor; this method should rely on internal method of the NutritionTableResultsFrame
         # NOTE: Repetition of code already! :) (stored_food_labels_frame.py)
         
         # first clear all rendered results(if any)
         self.nutrition_table_frame.grid_forget()
         
         # re-render the table headers
-        self.nutrition_table_frame = NutritionTableResultFrame(self.frame, food_weight=True)
+        self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, food_weight=True)
         self.nutrition_table_frame.grid_frame(row=8, column=0, sticky='we', columnspan=2)
         self.nutrition_table_frame.configure_style('ConsumedFoodItems.TFrame')
 

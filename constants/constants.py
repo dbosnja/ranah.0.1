@@ -17,4 +17,6 @@ text_constants = {
         'create_btn': 'Kreiraj',
         'food_weight': 'Masa',
         'food_price_lbl': 'Cijena',
+        'food_created_on': 'Kreirano',
+        'food_updated_on': 'Ažurirano',
     }
