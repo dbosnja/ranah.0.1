@@ -26,35 +26,36 @@ class StoredFoodTablesFrame:
     NORMATIVE = 100
 
     def __init__(self, parent, db):
+        self.parent = parent
         self.db = db
         # container for storing the nutrition table results
         self.food_tables = []
+        self.current_entered_food_name = None
 
         self._create_styles()
         # main frame
-        self.frame = ttk.Frame(parent, style='StoredLabels.TFrame', borderwidth=2, relief='raised')
-        # self.screen_width = self.frame.winfo_screenwidth()
-        # self.screen_height = self.frame.winfo_screenheight()
-        # self.frame.configure(width=self.screen_width)
-        # self.frame.configure(height=self.screen_height)
-        self.frame.grid(row=0, column=0, sticky='news', padx=10)
+        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame', borderwidth=2, relief='raised')
+        self.frame.grid(row=0, column=0, sticky='news')
         self.frame.columnconfigure(0, weight=1)
 
         # its children
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
+        self._bind_events()
     
     def _create_styles(self):
         ttk.Style().configure('StoredLabels.TFrame', background='#ade6e1')
     
     def _create_widget_vars(self):
         self.search_food_e_var = StringVar()
+        self.food_tables_tally_lbl_var = StringVar()
+        self.food_tables_tally_lbl_var.set('0 rezultata')
     
     def _create_widgets(self):
         self.search_food_e = ttk.Entry(self.frame, width=20, textvariable=self.search_food_e_var, font='15')
         self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food)
-        self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'{len(self.food_tables)} rezultata', padding=5)
+        self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
         # this one is gridded only when a food result is actually present
         self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
         
@@ -66,6 +67,9 @@ class StoredFoodTablesFrame:
         self.food_tables_tally_lbl.grid(row=2, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
 
         self.nutrition_table_frame.grid_frame(row=3, column=0, sticky='we')
+    
+    def _bind_events(self):
+        self.search_food_e.bind('<Return>', lambda _: self._search_food())
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
@@ -82,13 +86,24 @@ class StoredFoodTablesFrame:
     
     def _search_food(self):
         """Read user's input and render nutrition table rows based on a match"""
+        
         food_name_entry = self.search_food_e_var.get().strip()
+        # input didn't change -> rows don't change
+        if self.current_entered_food_name == food_name_entry:
+            return
+        self.current_entered_food_name = food_name_entry
         self._get_food_results(food_name_entry)
+        
+        # update the number of results label
+        cnt = len(self.food_tables)
+        # TODO: faila za 11, 111, 101..
+        text = 'rezultat' if str(cnt).endswith('1') else 'rezultata'
+        self.food_tables_tally_lbl_var.set(f'{cnt} {text}')
+        
         # Clear all rendered rows
-        self.nutrition_table_frame.grid_forget()
-        # re-render them with updated list of food tables
+        self.nutrition_table_frame.destroy_rows()
+        # re-render them with the updated list of food tables
         self.nutrition_table_frame.render_results(self.food_tables)
-
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)

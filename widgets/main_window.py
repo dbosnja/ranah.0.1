@@ -28,7 +28,7 @@ class MainWindow:
         self.root.title(self.ROOT_TITLE)
         self.root.geometry(f'{self.root.winfo_screenwidth()}x{self.root.winfo_screenheight()}')
         # convenience
-        self.root.bind('<Escape>', lambda _: self.root.quit())
+        self.root.bind('<Escape>', lambda _: self.root.destroy())
         # enable resizing
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)

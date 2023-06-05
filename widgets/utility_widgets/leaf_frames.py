@@ -86,9 +86,10 @@ class NutritionTableResult:
             lbl.grid(row=row, column=i, sticky='we')
             self.all_row_data.append(lbl)
     
-    def forget_row(self):
+    def destory_row(self):
         for rd in self.all_row_data:
-            rd.grid_forget()
+            rd.destroy()
+        self.all_row_data = []
 
 
 class NutritionTableHeaders:
@@ -149,10 +150,10 @@ class NutritionTableResultsFrame:
         # gridding the table rows not though, due to the lazy loading architecture
         self.render_headers()
     
-    def grid_forget(self):
-        """Forget, i.e. unmap/ungrid all rows"""
+    def destroy_rows(self):
+        """Destroy all widget rows"""
         for row in self.all_rows:
-            row.forget_row()
+            row.destory_row()
         self.all_rows = []
     
     def configure_style(self, style_name):
