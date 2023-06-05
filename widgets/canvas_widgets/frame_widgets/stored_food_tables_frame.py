@@ -1,7 +1,7 @@
-from tkinter import ttk, Listbox, StringVar
+from tkinter import ttk, StringVar
 
 from constants.constants import text_constants
-from ...utility_widgets import ScrollBarWidget, NutritionTableResultsFrame, AddNewFoodItemFrame
+from ...utility_widgets import NutritionTableResultsFrame, AddNewFoodItemFrame
 
 
 class StoredFoodTablesFrame:
@@ -27,17 +27,16 @@ class StoredFoodTablesFrame:
 
     def __init__(self, parent, db):
         self.db = db
+        # container for storing the nutrition table results
         self.food_tables = []
-        # initialize the frame with all food tables in Ranah
-        # self._get_food_results(name_segment='')
 
         self._create_styles()
         # main frame
         self.frame = ttk.Frame(parent, style='StoredLabels.TFrame', borderwidth=2, relief='raised')
-        self.screen_width = self.frame.winfo_screenwidth()
-        self.screen_height = self.frame.winfo_screenheight()
-        self.frame.configure(width=self.screen_width)
-        self.frame.configure(height=self.screen_height)
+        # self.screen_width = self.frame.winfo_screenwidth()
+        # self.screen_height = self.frame.winfo_screenheight()
+        # self.frame.configure(width=self.screen_width)
+        # self.frame.configure(height=self.screen_height)
         self.frame.grid(row=0, column=0, sticky='news', padx=10)
         self.frame.columnconfigure(0, weight=1)
 
@@ -45,12 +44,6 @@ class StoredFoodTablesFrame:
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
-        
-        # friend(child) frame
-        self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, len(self.HEADER_LABELS))
-        self.nutrition_table_frame.grid_frame(row=1, column=0, sticky='wes')
-        self.nutrition_table_frame.render_headers(self.HEADER_LABELS)
-        self.nutrition_table_frame.render_results(self.food_tables)
     
     def _create_styles(self):
         ttk.Style().configure('StoredLabels.TFrame', background='#ade6e1')
@@ -62,15 +55,20 @@ class StoredFoodTablesFrame:
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'{len(self.food_tables)} rezultata', padding=5)
         # this one is gridded only when a food result is actually present
         self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
+        
+        self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, self.HEADER_LABELS)
     
     def _grid_widgets(self):
         self.food_tables_tally_lbl.grid(row=0, column=0, sticky='w', padx=(5, 0), pady=10)
+
+        self.nutrition_table_frame.grid_frame(row=1, column=0, sticky='we')
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
         
         If no name segment is given, return all nutrition tables in Ranah.
         """
+        # TODO: not the best when some results are already present
         if not name_segment:
             self.food_tables = self.db.all_food_label_tables
             return

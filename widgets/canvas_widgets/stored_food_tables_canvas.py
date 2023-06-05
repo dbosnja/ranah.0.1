@@ -19,6 +19,7 @@ class StoredFoodTablesCanvas:
     def _initialize_canvas(self):
         self.canvas = Canvas(self.parent)
         self.canvas.grid(row=0, column=0, sticky='news')
+        # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
 
@@ -30,16 +31,15 @@ class StoredFoodTablesCanvas:
 
     def _initialize_frame(self):
         frame = StoredFoodTablesFrame(self.canvas, self.db)
-        self.frame_id = self.canvas.create_window(0, 0, window=frame.frame, anchor='nw')
-        self.canvas.bind('<Configure>', lambda _: self._configure_frame_surface())
+        self.frame_id = self.canvas.create_window(0, 0, window=frame.frame, anchor='nw')    
     
     def _initialize_scrollbar(self):
         scrolly = ScrollBarWidget(self.canvas)
         scrolly.attach_to_scrollable(self.canvas)
         scrolly.grid(row=0, column=1, sticky='ns')
-        scrolly
     
     def _bind_events(self):
+        self.canvas.bind('<Configure>', lambda _: self._configure_frame_surface())
         self.canvas.bind_all('<Button-4>', lambda _: self.canvas.yview_scroll(-5, "units"))
         self.canvas.bind_all('<Button-5>', lambda _: self.canvas.yview_scroll(5, "units"))
         # no idea why it's working with - 2; one thing's clear though

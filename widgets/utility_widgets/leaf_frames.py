@@ -72,21 +72,14 @@ class ScrollBarWidget:
 
 class NutritionTableResult:
     """"Frame for rendering one nutrition table/row"""
-
-    # TODO: add configurable background color and enable resizing
-
-    COL_COUNT = 12
-
+    
     def __init__(self, parent):
         self.parent = parent
     
     def render_row(self, row, row_data):
+        bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
         for i, data in enumerate(row_data):
-            lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5))
-            if row % 2 == 0:
-                lbl.configure(background='#E3E7EA')
-            else:
-                lbl.configure(background='#ffffe6')
+            lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5), background=bckgrnd_color)
             lbl.grid(row=row, column=i, sticky='we')
 
 
@@ -126,15 +119,15 @@ class NutritionTableResultsFrame:
     """
     text_constants = text_constants
 
-    def __init__(self, parent, col_count):
-        self.col_count = col_count
+    def __init__(self, parent, table_headers):
+        self.table_headers = table_headers
+        self.col_count = len(table_headers)
         self._create_styles()
         
         self.frame = ttk.Frame(parent, style='NutritionTableResults.TFrame')
         # enable resizing
         for i in range(self.col_count):
             self.frame.columnconfigure(i, weight=1)
-            
 
     def _create_styles(self):
         # TODO: expose this as a configurable option via public API
@@ -143,6 +136,9 @@ class NutritionTableResultsFrame:
     
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky)
+        # NOTE: gridding the whole table implies gridding the table headers as well
+        # gridding the table rows not though, due to the lazy loading architecture
+        self.render_headers()
     
     def grid_forget(self):
         self.frame.grid_forget()
@@ -150,8 +146,9 @@ class NutritionTableResultsFrame:
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
 
-    def render_headers(self, header_labels):
-        headers_frame = NutritionTableHeaders(self.frame, header_labels)
+    def render_headers(self):
+        # NOTE: Do I need to save the instance of the table headers?
+        headers_frame = NutritionTableHeaders(self.frame, self.table_headers)
     
     def render_results(self, food_tables):
         for i, food_table in enumerate(food_tables):
