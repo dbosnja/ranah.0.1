@@ -71,16 +71,24 @@ class ScrollBarWidget:
 
 
 class NutritionTableResult:
-    """"Frame for rendering one nutrition table/row"""
+    """"Labels for rendering one nutrition table/row"""
     
     def __init__(self, parent):
         self.parent = parent
+        self.all_row_data = []
     
     def render_row(self, row, row_data):
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
+        # replace primary key with its number in the table
+        row_data[0] = row
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5), background=bckgrnd_color)
             lbl.grid(row=row, column=i, sticky='we')
+            self.all_row_data.append(lbl)
+    
+    def forget_row(self):
+        for rd in self.all_row_data:
+            rd.grid_forget()
 
 
 class NutritionTableHeaders:
@@ -122,8 +130,9 @@ class NutritionTableResultsFrame:
     def __init__(self, parent, table_headers):
         self.table_headers = table_headers
         self.col_count = len(table_headers)
-        self._create_styles()
+        self.all_rows = []
         
+        self._create_styles()
         self.frame = ttk.Frame(parent, style='NutritionTableResults.TFrame')
         # enable resizing
         for i in range(self.col_count):
@@ -141,7 +150,10 @@ class NutritionTableResultsFrame:
         self.render_headers()
     
     def grid_forget(self):
-        self.frame.grid_forget()
+        """Forget, i.e. unmap/ungrid all rows"""
+        for row in self.all_rows:
+            row.forget_row()
+        self.all_rows = []
     
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
@@ -154,6 +166,7 @@ class NutritionTableResultsFrame:
         for i, food_table in enumerate(food_tables):
             row_frame = NutritionTableResult(self.frame)
             row_frame.render_row(i + 1, food_table)
+            self.all_rows.append(row_frame)
 
 
 class AddNewFoodItemFrame:

@@ -49,9 +49,11 @@ class StoredFoodTablesFrame:
         ttk.Style().configure('StoredLabels.TFrame', background='#ade6e1')
     
     def _create_widget_vars(self):
-        self.search_entry_var = StringVar()
+        self.search_food_e_var = StringVar()
     
     def _create_widgets(self):
+        self.search_food_e = ttk.Entry(self.frame, width=20, textvariable=self.search_food_e_var, font='15')
+        self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food)
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', text=f'{len(self.food_tables)} rezultata', padding=5)
         # this one is gridded only when a food result is actually present
         self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
@@ -59,22 +61,34 @@ class StoredFoodTablesFrame:
         self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, self.HEADER_LABELS)
     
     def _grid_widgets(self):
-        self.food_tables_tally_lbl.grid(row=0, column=0, sticky='w', padx=(5, 0), pady=10)
+        self.search_food_e.grid(row=0, column=0, sticky='w', padx=(20, 0), pady=10)
+        self.search_food_lbl.grid(row=1, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.food_tables_tally_lbl.grid(row=2, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
 
-        self.nutrition_table_frame.grid_frame(row=1, column=0, sticky='we')
+        self.nutrition_table_frame.grid_frame(row=3, column=0, sticky='we')
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
         
         If no name segment is given, return all nutrition tables in Ranah.
         """
-        # TODO: not the best when some results are already present
         if not name_segment:
             self.food_tables = self.db.all_food_label_tables
             return
-        for food_lbl in self.db.all_food_label_names:
-            if name_segment.lower() in food_lbl.lower():
-                self.food_tables.append(self.db.get_food_item_table(food_lbl))
+        name_segment = name_segment.lower()
+        self.food_tables = [self.db.get_food_item_table(food_lbl) 
+                            for food_lbl in self.db.all_food_label_names 
+                            if name_segment in food_lbl.lower()]
+    
+    def _search_food(self):
+        """Read user's input and render nutrition table rows based on a match"""
+        food_name_entry = self.search_food_e_var.get().strip()
+        self._get_food_results(food_name_entry)
+        # Clear all rendered rows
+        self.nutrition_table_frame.grid_forget()
+        # re-render them with updated list of food tables
+        self.nutrition_table_frame.render_results(self.food_tables)
+
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)

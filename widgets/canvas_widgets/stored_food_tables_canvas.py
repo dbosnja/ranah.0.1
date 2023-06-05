@@ -36,7 +36,7 @@ class StoredFoodTablesCanvas:
     def _initialize_scrollbar(self):
         scrolly = ScrollBarWidget(self.canvas)
         scrolly.attach_to_scrollable(self.canvas)
-        scrolly.grid(row=0, column=1, sticky='ns')
+        scrolly.grid(row=0, column=2, sticky='ns')
     
     def _bind_events(self):
         self.canvas.bind('<Configure>', lambda _: self._configure_frame_surface())
