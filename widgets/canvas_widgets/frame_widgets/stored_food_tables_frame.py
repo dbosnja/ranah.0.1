@@ -1,7 +1,107 @@
 from tkinter import ttk, StringVar
 
 from constants.constants import text_constants
-from ...utility_widgets import NutritionTableResultsFrame, AddNewFoodItemFrame
+from ...utility_widgets import AddNewFoodItemFrame
+
+
+class NutritionTableResult:
+    """"Labels for rendering one nutrition table/row"""
+    
+    def __init__(self, parent):
+        self.parent = parent
+        self.all_row_data = []
+    
+    def render_row(self, row, row_data):
+        bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
+        # replace primary key with its number in the table
+        row_data[0] = row
+        for i, data in enumerate(row_data):
+            lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5), background=bckgrnd_color)
+            lbl.grid(row=row, column=i, sticky='we')
+            self.all_row_data.append(lbl)
+    
+    def destory_row(self):
+        for rd in self.all_row_data:
+            rd.destroy()
+        self.all_row_data = []
+
+
+class NutritionTableHeaders:
+    """"Labels for rendering headers of nutrition tables"""
+
+    text_constants = text_constants
+
+    def __init__(self, parent, header_labels):
+        self.parent = parent
+        self.header_labels = header_labels
+        self.label_widgets = []
+        
+        self._create_widgets()
+        self._grid_widgets()
+
+    def _create_styles(self):
+        # TODO: expose this as a configurable option via public API
+        self.nutrition_table_results_style = ttk.Style()
+        self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')        
+    
+    def _create_widgets(self):
+        for header_lbl in self.header_labels:
+            lbl = ttk.Label(self.parent, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
+            self.label_widgets.append(lbl)
+    
+    def _grid_widgets(self):
+        for i, widget in enumerate(self.label_widgets):
+            widget.grid(row=0, column=i, sticky='we')
+
+
+class NutritionTableResultsFrame:
+    """"Frame for rendering nutrition table with result(s)
+    
+    The frame is composed of headers, e.g. Fat, Carbs, Calories..
+    and the table data associated with a particular food item.
+    """
+    text_constants = text_constants
+
+    def __init__(self, parent, table_headers):
+        self.table_headers = table_headers
+        self.col_count = len(table_headers)
+        self.all_rows = []
+        
+        self._create_styles()
+        self.frame = ttk.Frame(parent, style='NutritionTableResults.TFrame')
+        # enable resizing
+        for i in range(self.col_count):
+            self.frame.columnconfigure(i, weight=1)
+
+    def _create_styles(self):
+        # TODO: expose this as a configurable option via public API
+        self.nutrition_table_results_style = ttk.Style()
+        self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')
+    
+    def grid_frame(self, row, column, sticky):
+        self.frame.grid(row=row, column=column, sticky=sticky)
+        # NOTE: gridding the whole table implies gridding the table headers as well;
+        # gridding the table rows not though, due to the lazy loading architecture
+        self.render_headers()
+    
+    def destroy_rows(self):
+        """Destroy all widget rows"""
+        for row in self.all_rows:
+            row.destory_row()
+        self.all_rows = []
+    
+    def configure_style(self, style_name):
+        self.frame.configure(style=style_name)
+
+    def render_headers(self):
+        # NOTE: Do I need to save the instance of the table headers?
+        headers_frame = NutritionTableHeaders(self.frame, self.table_headers)
+    
+    def render_results(self, food_tables):
+        for i, food_table in enumerate(food_tables):
+            row_frame = NutritionTableResult(self.frame)
+            row_frame.render_row(i + 1, food_table)
+            self.all_rows.append(row_frame)
 
 
 class StoredFoodTablesFrame:
@@ -34,7 +134,7 @@ class StoredFoodTablesFrame:
 
         self._create_styles()
         # main frame
-        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame', borderwidth=2, relief='raised')
+        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame')
         self.frame.grid(row=0, column=0, sticky='news')
         self.frame.columnconfigure(0, weight=1)
 

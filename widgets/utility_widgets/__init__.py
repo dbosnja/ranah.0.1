@@ -1,1 +1,1 @@
-from .leaf_frames import ScrollBarWidget, NutritionTableResultsFrame, AddNewFoodItemFrame
+from .leaf_frames import ScrollBarWidget, AddNewFoodItemFrame
