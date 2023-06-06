@@ -32,6 +32,8 @@ class MainWindow:
         # enable resizing
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
+        # hardcoded values -> defined with trial and error method
+        self.root.minsize(width=1500, height=700)
     
     def mainloop(self):
         self.root.mainloop()

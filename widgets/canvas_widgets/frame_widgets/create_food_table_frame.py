@@ -162,7 +162,7 @@ class CreateFoodLabelFrame:
                                      command=self._create_new_record, padding=5, style='Create.TButton')
     
     def _grid_widgets(self):
-        self.topic_lbl.grid(row=0, column=0, pady=(20, 60), columnspan=4, sticky='we')
+        self.topic_lbl.grid(row=0, column=0, pady=(60, 100), columnspan=4, sticky='we')
         
         self.calory_lbl.grid(row=1, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
         self.calory_e.grid(row=1, column=1, sticky='wn')

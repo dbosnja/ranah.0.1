@@ -49,7 +49,7 @@ class StoredFoodTablesCanvas:
             self.canvas.itemconfigure(self.frame_id, height=self.canvas.winfo_height())
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_frame_height = self.screen_height + delta * 25
+            self.new_frame_height = self.screen_height + delta * 30
             self.canvas.itemconfigure(self.frame_id, height=self.new_frame_height)
     
     def _adjust_height(self):
@@ -61,7 +61,7 @@ class StoredFoodTablesCanvas:
             self.canvas.configure(scrollregion=(0, 0, 0, self.canvas.winfo_height() - 2))
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_canvas_height = self.screen_height + delta * 25
+            self.new_canvas_height = self.screen_height + delta * 30
             self.canvas.configure(height=self.new_canvas_height)
             self.canvas.configure(scrollregion=(0, 0, 0, self.new_canvas_height))
 
