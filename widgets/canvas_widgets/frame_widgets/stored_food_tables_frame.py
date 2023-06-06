@@ -16,11 +16,14 @@ class NutritionTableResult:
         # replace primary key with its number in the table
         row_data[0] = row
         for i, data in enumerate(row_data):
-            lbl = ttk.Label(self.parent, text=data, anchor='center', padding=(5), background=bckgrnd_color)
+            lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
             lbl.grid(row=row, column=i, sticky='we')
             self.all_row_data.append(lbl)
+        # change cursor for name dimension and attach an event to it
+        self.all_row_data[1]['cursor'] = 'hand2'
+        self.all_row_data[1].bind('<1>', lambda event: self.parent.parent._open_update_center(event))
     
-    def destory_row(self):
+    def destroy_row(self):
         for rd in self.all_row_data:
             rd.destroy()
         self.all_row_data = []
@@ -40,13 +43,13 @@ class NutritionTableHeaders:
         self._grid_widgets()
 
     def _create_styles(self):
-        # TODO: expose this as a configurable option via public API
+        # TODO: expose this as a configurablsearch_food_ee option via public API
         self.nutrition_table_results_style = ttk.Style()
         self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')        
     
     def _create_widgets(self):
         for header_lbl in self.header_labels:
-            lbl = ttk.Label(self.parent, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
+            lbl = ttk.Label(self.parent.frame, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
             self.label_widgets.append(lbl)
     
     def _grid_widgets(self):
@@ -63,12 +66,13 @@ class NutritionTableResultsFrame:
     text_constants = text_constants
 
     def __init__(self, parent, table_headers):
+        self.parent = parent
         self.table_headers = table_headers
         self.col_count = len(table_headers)
         self.all_rows = []
         
         self._create_styles()
-        self.frame = ttk.Frame(parent, style='NutritionTableResults.TFrame')
+        self.frame = ttk.Frame(parent.frame, style='NutritionTableResults.TFrame')
         # enable resizing
         for i in range(self.col_count):
             self.frame.columnconfigure(i, weight=1)
@@ -87,7 +91,7 @@ class NutritionTableResultsFrame:
     def destroy_rows(self):
         """Destroy all widget rows"""
         for row in self.all_rows:
-            row.destory_row()
+            row.destroy_row()
         self.all_rows = []
     
     def configure_style(self, style_name):
@@ -95,11 +99,11 @@ class NutritionTableResultsFrame:
 
     def render_headers(self):
         # NOTE: Do I need to save the instance of the table headers?
-        headers_frame = NutritionTableHeaders(self.frame, self.table_headers)
+        headers_frame = NutritionTableHeaders(self, self.table_headers)
     
     def render_results(self, food_tables):
         for i, food_table in enumerate(food_tables):
-            row_frame = NutritionTableResult(self.frame)
+            row_frame = NutritionTableResult(self)
             row_frame.render_row(i + 1, food_table)
             self.all_rows.append(row_frame)
 
@@ -158,6 +162,7 @@ class StoredFoodTablesFrame:
         self.search_food_e = ttk.Entry(self.frame, width=20, textvariable=self.search_food_e_var, font='15')
         self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food)
         
+        self.sort_options_lbl = ttk.Label(self.frame, text='Opcije sortiranja:')
         self.sort_options_cbox = ttk.Combobox(self.frame, values=self.HEADER_LABELS[1:], textvariable=self.selected_sort_option_var)
         self.sort_options_cbox.state(['readonly'])
         self.ascending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Uzlazno', variable=self.sort_option_direction_var, value='asc')
@@ -169,23 +174,25 @@ class StoredFoodTablesFrame:
         # this one is gridded only when a food result is actually present
         self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
         
-        self.nutrition_table_frame = NutritionTableResultsFrame(self.frame, self.HEADER_LABELS)
+        self.nutrition_table_frame = NutritionTableResultsFrame(self, self.HEADER_LABELS)
     
     def _grid_widgets(self):
         self.search_food_e.grid(row=0, column=0, sticky='w', padx=(20, 0), pady=10)
         self.search_food_lbl.grid(row=1, column=0, sticky='w', padx=(20, 0), pady=(0, 50))
         
-        self.sort_options_cbox.grid(row=2, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
-        self.ascending_sort_option_rbtn.grid(row=3, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
-        self.descending_sort_option_rbtn.grid(row=4, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
-        self.sort_btn.grid(row=5, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.sort_options_lbl.grid(row=2, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.sort_options_cbox.grid(row=3, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.ascending_sort_option_rbtn.grid(row=4, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.descending_sort_option_rbtn.grid(row=5, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
+        self.sort_btn.grid(row=6, column=0, sticky='w', padx=(20, 0), pady=(0, 10))
         
-        self.food_tables_tally_lbl.grid(row=6, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
+        self.food_tables_tally_lbl.grid(row=7, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
 
-        self.nutrition_table_frame.grid_frame(row=7, column=0, sticky='we')
+        self.nutrition_table_frame.grid_frame(row=8, column=0, sticky='we')
     
     def _bind_events(self):
         self.search_food_e.bind('<Return>', lambda _: self._search_food())
+        # self.frame.bind_all('<<LabelNameClicked>>', lambda event: self._open_update_center(event))
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
@@ -232,6 +239,9 @@ class StoredFoodTablesFrame:
             self.nutrition_table_frame.destroy_rows()
             # re-render them with the sorted list of food tables
             self.nutrition_table_frame.render_results(self.food_tables)
+    
+    def _open_update_center(self, event):
+        print(f'Noted, {event.widget["text"]}')
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)

@@ -38,6 +38,7 @@ class StoredFoodTablesCanvas:
     
     def _bind_events(self):
         self.canvas.bind_all('<Configure>', lambda _: self._configure_frame_surface())
+        # TODO: add arrow-up/down also for scrolling 
         self.canvas.bind_all('<Button-4>', lambda _: self.canvas.yview_scroll(-5, "units"))
         self.canvas.bind_all('<Button-5>', lambda _: self.canvas.yview_scroll(5, "units"))
         self.canvas.bind_all('<Map>', lambda _: self._adjust_height())
@@ -49,7 +50,7 @@ class StoredFoodTablesCanvas:
             self.canvas.itemconfigure(self.frame_id, height=self.canvas.winfo_height())
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_frame_height = self.screen_height + delta * 30
+            self.new_frame_height = self.screen_height + delta * 32
             self.canvas.itemconfigure(self.frame_id, height=self.new_frame_height)
     
     def _adjust_height(self):
@@ -61,7 +62,7 @@ class StoredFoodTablesCanvas:
             self.canvas.configure(scrollregion=(0, 0, 0, self.canvas.winfo_height() - 2))
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_canvas_height = self.screen_height + delta * 30
+            self.new_canvas_height = self.screen_height + delta * 32
             self.canvas.configure(height=self.new_canvas_height)
             self.canvas.configure(scrollregion=(0, 0, 0, self.new_canvas_height))
 
