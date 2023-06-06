@@ -1,6 +1,6 @@
 import re
 
-from tkinter import ttk, DoubleVar, StringVar, TclError, messagebox
+from tkinter import ttk, StringVar, messagebox
 
 from constants.constants import text_constants
 
@@ -11,12 +11,14 @@ class CreateFoodLabelFrame:
     This Frame consists of all widgets needed to implement UI for creating a new
     nutrition table of a food article. Those would be mostly Labels, Entries and Buttons.
     It also has access to database API in order to store changes permanently.
+
+    The necessary conditions to create a new food table is to have a non-empty, non-duplicated
+    food name and a price. Validations for float values are included.
     """
     
     text_constants = text_constants
 
     # has to be updated manually!
-    ROW_COUNT = 7
     COL_COUNT = 4
     
     def __init__(self, parent, db):
@@ -49,50 +51,46 @@ class CreateFoodLabelFrame:
         ttk.Style().configure('Create.TButton', font='10')
     
     def _create_widget_vars(self):
-        self.calory_var = DoubleVar(value='')
-        self.fat_var = DoubleVar(value='')
-        self.saturated_fat_var = DoubleVar(value='')
-        self.carbs_var = DoubleVar(value='')
-        self.sugar_var = DoubleVar(value='')
-        self.proteins_var = DoubleVar(value='')
-        self.fiber_var = DoubleVar(value='')
-        self.food_name_var = StringVar(value='')
-        self.food_price_var = StringVar(value='')
+        self.calory_var = StringVar()
+        self.fat_var = StringVar()
+        self.saturated_fat_var = StringVar()
+        self.carbs_var = StringVar()
+        self.sugar_var = StringVar()
+        self.proteins_var = StringVar()
+        self.fiber_var = StringVar()
+        self.food_name_var = StringVar()
+        self.food_price_var = StringVar()
         
-        self.widget_double_vars = [
+        self.entry_vars = [
             self.calory_var, self.fat_var, self.saturated_fat_var,
-            self.sugar_var, self.carbs_var, self.proteins_var,
-            self.fiber_var, self.food_price_var
-        ]
-        self.widget_string_vars = [
-            self.food_name_var,
+            self.carbs_var, self.sugar_var, self.proteins_var,
+            self.fiber_var, self.food_name_var, self.food_price_var,
         ]
     
     def _reset_widget_vars(self):
-        for var in self.widget_double_vars + self.widget_string_vars:
+        for var in self.entry_vars:
             var.set('')
     
     def _create_new_record(self, *args):
-        try:
-            self.food_price_var.get()
-        except TclError:
-            self.food_price_var.set(.0)
+        stripped_food_name = self.food_name_var.get().strip()
+        
+        # raise error if food name not defined
+        if not stripped_food_name:
+            messagebox.showerror(message='Ime artikla nije definirano!', title='Artikl bez imena')
+            return
+        
+        # raise error if food name already present in Ranah
+        if not self.db.is_food_name_unique(stripped_food_name):
+            messagebox.showerror(message=f'Naziv artikla već postoji!\n`{stripped_food_name}`', title='Duplicirano ime artikla')
+            return
+        
+        # raise error if food price not defined
         if not self.food_price_var.get():
             messagebox.showerror(message='Cijena artikla nije definirana!', title='Artikl bez cijene')
             return
         
-        if not self.db.is_food_name_unique(self.food_name_var.get()):
-            messagebox.showerror(message=f'Naziv artikla već postoji!\n`{self.food_name_var.get()}`', title='Duplicirano ime artikla')
-            return
-        
-        for var in self.widget_double_vars:
-            try:
-                var.get()
-            except TclError:
-                var.set(.0)
-        
         record = {
-            'label_name': self.food_name_var.get(),
+            'label_name': stripped_food_name,
             'calories': self.calory_var.get(),
             'fat': self.fat_var.get(),
             'saturated_fat': self.saturated_fat_var.get(),
@@ -103,9 +101,8 @@ class CreateFoodLabelFrame:
             'price': self.food_price_var.get(),
         }
         self.db.insert_new_food_item_record(**record)
-        temp_food_name = self.food_name_var.get()
         self._reset_widget_vars()
-        self._render_success_message(temp_food_name)
+        self._render_success_message(stripped_food_name)
     
     def _render_success_message(self, temp_food_name):
         messagebox.showinfo(title='Novi artikl kreiran',
@@ -191,3 +188,4 @@ class CreateFoodLabelFrame:
         self.food_name_e.grid(row=5, column=1, sticky='wn', columnspan=3)
         
         self.create_btn.grid(row=6, column=1, pady=5, columnspan=2)
+
