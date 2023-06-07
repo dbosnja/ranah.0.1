@@ -1,7 +1,75 @@
-from tkinter import ttk, StringVar
+from tkinter import ttk, StringVar, Toplevel, PhotoImage
 
 from constants.constants import text_constants
 from ...utility_widgets import AddNewFoodItemFrame
+
+
+class UpdateDialogTopLevel:
+    def __init__(self, db, label_name):
+        self.db = db
+        self.label_name = label_name
+
+        self._initialize_dialog_window()
+
+        # its children
+        self._create_styles()
+        self._create_images()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+        self._bind_events()
+    
+    def _initialize_dialog_window(self):
+        self.dialog_center = Toplevel()
+        self.dialog_center.title('Centar ažuriranja')
+        # Hardcoded values, but I'll live with it
+        self.dialog_center.geometry(f'600x400+2500+326')
+        self.dialog_center.minsize(500, 500)
+        self.dialog_center.columnconfigure(0, weight=1)
+        self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
+    
+    def _create_styles(self):
+        self.add_btn_style = ttk.Style()
+        self.add_btn_style.configure('Add.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 6, 0, 6))
+        
+        self.update_btn_style = ttk.Style()
+        self.update_btn_style.configure('Update.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+
+        self.delete_btn_style = ttk.Style()
+        self.delete_btn_style.configure('Delete.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+
+        self.close_btn_style = ttk.Style()
+        self.close_btn_style.configure('Close.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+    
+    def _create_images(self):
+        self.add_img = PhotoImage(file='./assets/images/add_icon.png')
+        self.update_img = PhotoImage(file='./assets/images/update_icon.png')
+        self.delete_img = PhotoImage(file='./assets/images/delete_icon.png')
+        self.close_img = PhotoImage(file='./assets/images/close_icon.png')
+    
+    def _create_widget_vars(self):
+        self.title_lbl_var = f'Odaberite što želite napraviti s proizvodom\n`{self.label_name}`'
+    
+    def _create_widgets(self):
+        self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
+                                   padding=10, font='15', anchor='center', borderwidth=2, relief='groove', background='#E57C2C', justify='center')
+        
+        self.add_btn = ttk.Button(self.dialog_center, text='Dodaj', image=self.add_img, compound='left', style='Add.TButton')
+        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', image=self.update_img, compound='left', style='Update.TButton')
+        self.delete_btn = ttk.Button(self.dialog_center, text='Izbriši', image=self.delete_img, compound='left', style='Delete.TButton')
+        self.close_btn = ttk.Button(self.dialog_center, text='Zatvori', image=self.close_img, compound='left',
+                                    style='Close.TButton', command=self.dialog_center.destroy)
+
+    def _grid_widgets(self):
+        self.title_lbl.grid(row=0, column=0, sticky='we')
+        
+        self.add_btn.grid(row=1, column=0, pady=(50, 20))
+        self.update_btn.grid(row=2, column=0, pady=(0, 20))
+        self.delete_btn.grid(row=3, column=0, pady=(0, 20))
+        self.close_btn.grid(row=4, column=0, pady=(0, 20))
+
+    def _bind_events(self):
+        pass
 
 
 class NutritionTableResult:
@@ -192,7 +260,6 @@ class StoredFoodTablesFrame:
     
     def _bind_events(self):
         self.search_food_e.bind('<Return>', lambda _: self._search_food())
-        # self.frame.bind_all('<<LabelNameClicked>>', lambda event: self._open_update_center(event))
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
@@ -241,7 +308,7 @@ class StoredFoodTablesFrame:
             self.nutrition_table_frame.render_results(self.food_tables)
     
     def _open_update_center(self, event):
-        print(f'Noted, {event.widget["text"]}')
+        UpdateDialogTopLevel(self.db, event.widget['text'])
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)
