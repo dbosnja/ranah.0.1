@@ -1,10 +1,76 @@
-from tkinter import ttk, StringVar, Toplevel, PhotoImage
+from tkinter import ttk, StringVar, Toplevel, PhotoImage, messagebox
 
 from constants.constants import text_constants
 from ...utility_widgets import AddNewFoodItemFrame
 
 
+class DeleteDialogTopLevel:
+    """Description"""
+    def __init__(self, parent, db, label_name):
+        self.parent = parent
+        self.db = db
+        self.label_name = label_name
+
+        self._initialize_dialog_window()
+
+        # its children
+        self._create_styles()
+        self._create_mutual_button_options()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+
+    def _initialize_dialog_window(self):
+        self.dialog_center = Toplevel()
+        self.dialog_center.title('Trajno brisanje prehrambenog artikla')
+        # Hardcoded values, but I'll live with it
+        self.dialog_center.geometry(f'600x200+2500+500')
+        self.dialog_center.minsize(500, 200)
+        self.dialog_center.columnconfigure(0, weight=1)
+        self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
+
+    def _create_styles(self):
+        self.yes_btn_style = ttk.Style()
+        self.yes_btn_style.configure('Yes.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.yes_btn_style.map('Yes.TButton', background=[('active', '#00994D')])
+
+        self.no_btn_style = ttk.Style()
+        self.no_btn_style.configure('No.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.yes_btn_style.map('No.TButton', background=[('active', '#FF0000')])
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.dialog_center,
+            'cursor': 'hand2',
+        }
+
+    def _create_widget_vars(self):
+        self.title_lbl_var = f'Jeste li sigurni da želite trajno izbrisati artikl\n`{self.label_name}`?'
+
+    def _create_widgets(self):
+        self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
+                                   padding=10, font='15', anchor='center', borderwidth=2,
+                                   relief='groove', background='#FFFFCC', justify='center')
+
+        self.yes_btn = ttk.Button(text='Da', **self.mutual_button_options, style='Yes.TButton', command=self._delete_food_name)
+        self.no_btn = ttk.Button(text='Ne', **self.mutual_button_options, style='No.TButton', command=self.dialog_center.destroy)
+
+    def _grid_widgets(self):
+        self.title_lbl.grid(row=0, column=0, sticky='we')
+
+        self.yes_btn.grid(row=1, column=0, pady=(20, 20))
+        self.no_btn.grid(row=2, column=0, pady=(0, 20))
+
+    def _delete_food_name(self):
+        self.db.delete_food_table(self.label_name)
+        self.dialog_center.destroy()
+        messagebox.showinfo(title='Artikl trajno izbrisan',
+                            message=f'Uspješno izbrisan `{self.label_name}`',
+                            parent=self.parent.dialog_center)
+
+
 class UpdateDialogTopLevel:
+    """Description"""
     def __init__(self, db, label_name):
         self.db = db
         self.label_name = label_name
@@ -14,6 +80,7 @@ class UpdateDialogTopLevel:
         # its children
         self._create_styles()
         self._create_images()
+        self._create_mutual_button_options()
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
@@ -46,6 +113,13 @@ class UpdateDialogTopLevel:
         self.update_img = PhotoImage(file='./assets/images/update_icon.png')
         self.delete_img = PhotoImage(file='./assets/images/delete_icon.png')
         self.close_img = PhotoImage(file='./assets/images/close_icon.png')
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.dialog_center,
+            'compound': 'left',
+            'cursor': 'hand2',
+        }
     
     def _create_widget_vars(self):
         self.title_lbl_var = f'Odaberite što želite napraviti s proizvodom\n`{self.label_name}`'
@@ -54,11 +128,12 @@ class UpdateDialogTopLevel:
         self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
                                    padding=10, font='15', anchor='center', borderwidth=2, relief='groove', background='#E57C2C', justify='center')
         
-        self.add_btn = ttk.Button(self.dialog_center, text='Dodaj', image=self.add_img, compound='left', style='Add.TButton')
-        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', image=self.update_img, compound='left', style='Update.TButton')
-        self.delete_btn = ttk.Button(self.dialog_center, text='Izbriši', image=self.delete_img, compound='left', style='Delete.TButton')
-        self.close_btn = ttk.Button(self.dialog_center, text='Zatvori', image=self.close_img, compound='left',
-                                    style='Close.TButton', command=self.dialog_center.destroy)
+        self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton', **self.mutual_button_options)
+        self.update_btn = ttk.Button(text='Ažuriraj', image=self.update_img, style='Update.TButton', **self.mutual_button_options)
+        self.delete_btn = ttk.Button(text='Izbriši', image=self.delete_img,
+                                     command=self._create_delete_dialog, style='Delete.TButton', **self.mutual_button_options)
+        self.close_btn = ttk.Button(text='Zatvori', image=self.close_img,style='Close.TButton',
+                                    command=self.dialog_center.destroy, **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, sticky='we')
@@ -70,6 +145,9 @@ class UpdateDialogTopLevel:
 
     def _bind_events(self):
         pass
+
+    def _create_delete_dialog(self):
+        DeleteDialogTopLevel(self, self.db, self.label_name)
 
 
 class NutritionTableResult:
@@ -267,22 +345,23 @@ class StoredFoodTablesFrame:
         If no name segment is given, return all nutrition tables in Ranah.
         """
         if not name_segment:
-            self.food_tables = self.db.all_food_label_tables
-            return
+            return self.db.all_food_label_tables
         name_segment = name_segment.lower()
-        self.food_tables = [self.db.get_food_item_table(food_lbl) 
+        food_tables = [self.db.get_food_item_table(food_lbl) 
                             for food_lbl in self.db.all_food_label_names 
                             if name_segment in food_lbl.lower()]
+        return food_tables
     
     def _search_food(self):
         """Read user's input and render nutrition table rows based on a match"""
         
         food_name_entry = self.search_food_e_var.get().strip()
         # input didn't change -> rows don't change
-        if self.current_entered_food_name == food_name_entry:
-            return
+        # TODO: this is bad when user wants to check for successful update/deletion; try to do better
+        # if self.current_entered_food_name == food_name_entry:
+        #     return
         self.current_entered_food_name = food_name_entry
-        self._get_food_results(food_name_entry)
+        self.food_tables = self._get_food_results(food_name_entry)
         
         # update the number of results label
         cnt = len(self.food_tables)

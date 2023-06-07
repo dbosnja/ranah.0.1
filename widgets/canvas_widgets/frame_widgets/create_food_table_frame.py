@@ -71,6 +71,15 @@ class CreateFoodLabelFrame:
         for var in self.entry_vars:
             var.set('')
     
+    def _parse_input_to_float(self, entry_input):
+        """Parses and creates a float from a string
+
+        If string is empty, returned value is .0.
+        Otherwise, float() function is used. Since entry inputs are
+        validated, the function must not raise an error.
+        """
+        return .0 if not entry_input else float(entry_input)
+
     def _create_new_record(self, *args):
         stripped_food_name = self.food_name_var.get().strip()
         
@@ -91,14 +100,14 @@ class CreateFoodLabelFrame:
         
         record = {
             'label_name': stripped_food_name,
-            'calories': self.calory_var.get(),
-            'fat': self.fat_var.get(),
-            'saturated_fat': self.saturated_fat_var.get(),
-            'carbs': self.carbs_var.get(),
-            'sugars': self.sugar_var.get(),
-            'proteins': self.proteins_var.get(),
-            'fiber': self.fiber_var.get(),
-            'price': self.food_price_var.get(),
+            'calories': self._parse_input_to_float(self.calory_var.get()),
+            'fat': self._parse_input_to_float(self.fat_var.get()),
+            'saturated_fat': self._parse_input_to_float(self.saturated_fat_var.get()),
+            'carbs': self._parse_input_to_float(self.carbs_var.get()),
+            'sugars': self._parse_input_to_float(self.sugar_var.get()),
+            'proteins': self._parse_input_to_float(self.proteins_var.get()),
+            'fiber': self._parse_input_to_float(self.fiber_var.get()),
+            'price': self._parse_input_to_float(self.food_price_var.get()),
         }
         self.db.insert_new_food_item_record(**record)
         self._reset_widget_vars()
