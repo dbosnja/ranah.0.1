@@ -14,7 +14,7 @@ Ranah2.0 Roadmap
 # ITERATION 2.2 #
 
 4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
-   Enable updating the rows and deleting them
+   Enable updating the rows, deleting and adding them
 
 ## ITERATION 2.2 ##
 
@@ -29,8 +29,9 @@ Ranah2.0 Roadmap
    	  are added in the list
    b) User should be able to read through all stored meal templates, add one of them as consumed, update and delete them.
 7. Add calories tab
-8. Use messageboxes for info/warning alerts/pop-ups.
+8. Use messageboxes for info/warning alerts/pop-ups. DONE
 9. Implement the Dependency Injection for database instance(instead of propagating it throughtout the app)
+10. Reorganize project tree structure -> current one does not make sense anylonger
    
 
 TABS:

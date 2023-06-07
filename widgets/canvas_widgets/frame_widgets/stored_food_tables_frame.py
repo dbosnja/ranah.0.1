@@ -1,7 +1,123 @@
+import re
+
 from tkinter import ttk, StringVar, Toplevel, PhotoImage, messagebox
 
 from constants.constants import text_constants
 from ...utility_widgets import AddNewFoodItemFrame
+
+
+class AddDialogTopLevel:
+    """Description"""
+
+    NORMATIVE = 100
+    # NOTE: Not really the best way, but I'll live with it
+    TABLE_DIMENSIONS = (
+        'food_name',
+        'food_weight',
+        'calories',
+        'fat',
+        'saturated_fat',
+        'carbs',
+        'sugars',
+        'fiber',
+        'proteins',
+        'price',
+    )
+    def __init__(self, parent, db, label_name):
+        self.parent = parent
+        self.db = db
+        self.label_name = label_name
+
+        self._initialize_dialog_window()
+
+        # define the validations
+        self.double_pattern = re.compile('^\d*\.?\d*$')
+        self._validate_double = self.dialog_center.register(self._validate_double_input), '%P'
+
+        # its children
+        self._create_styles()
+        self._create_mutual_button_options()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+
+    def _initialize_dialog_window(self):
+        self.dialog_center = Toplevel()
+        self.dialog_center.title('Dodaj konzumiranje prehrambenog artikla')
+        # Hardcoded values, but I'll live with it
+        self.dialog_center.geometry(f'600x250+2500+475')
+        self.dialog_center.minsize(500, 250)
+        self.dialog_center.columnconfigure(0, weight=1)
+        self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
+
+    def _create_styles(self):
+        self.add_btn_style = ttk.Style()
+        self.add_btn_style.configure('AddWeight.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.add_btn_style.map('AddWeight.TButton', background=[('active', '#00994D')])
+
+        self.cancel_btn_style = ttk.Style()
+        self.cancel_btn_style.configure('Cancel.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.cancel_btn_style.map('Cancel.TButton', background=[('active', '#FF0000')])
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.dialog_center,
+            'cursor': 'hand2',
+        }
+
+    def _create_widget_vars(self):
+        self.title_lbl_var = f'Unesite količinu konzumiranja za proizvod\n`{self.label_name}`'
+        self.weight_e_var = StringVar()
+
+    def _create_widgets(self):
+        self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
+                                   padding=10, font='15', anchor='center', borderwidth=2,
+                                   relief='groove', background='#FFFFCC', justify='center')
+
+        self.weight_e = ttk.Entry(self.dialog_center, textvariable=self.weight_e_var, validate='all',
+                                  validatecommand=self._validate_double, width=10, font='default 17', justify='center')
+        self.weight_e.focus()
+
+        self.add_btn = ttk.Button(text='Dodaj', style='AddWeight.TButton', command=self._add_consumed_weight, **self.mutual_button_options)
+        self.cancel_btn = ttk.Button(text='Odustani', style='Cancel.TButton', command=self.dialog_center.destroy, **self.mutual_button_options)
+
+    def _grid_widgets(self):
+        self.title_lbl.grid(row=0, column=0, sticky='we')
+
+        self.weight_e.grid(row=1, column=0, pady=(20, 0))
+
+        self.add_btn.grid(row=2, column=0, pady=(20, 20))
+        self.cancel_btn.grid(row=3, column=0, pady=(0, 20))
+
+    def _validate_double_input(self, entry_value):
+        if entry_value and self.double_pattern.match(entry_value) is None:
+            return False
+        return True
+
+    def _add_consumed_weight(self):
+        # scale the values according to the food_label and create new consumed food record
+        # destroy the current dialog
+        # show info msg
+        entered_weight = self.weight_e_var.get()
+        if not entered_weight:
+            return
+        entered_weight = float(entered_weight)
+        scale_factor = round(entered_weight / self.NORMATIVE, 2)
+        food_table = self.db.get_food_item_table(self.label_name)
+        # NOTE: this would look nicer If I've used SQLAlchemy ORM
+        food_table = food_table[1:-2]
+        food_table.insert(1, entered_weight)
+        food_table = food_table[0:2] + [d * scale_factor for d in food_table[2:]]
+
+        values = {
+            k: v
+            for k, v in zip(self.TABLE_DIMENSIONS, food_table)
+        }
+        self.db.create_new_consumed_food_item(**values)
+        self.dialog_center.destroy()
+        messagebox.showinfo(title='Konzumirana masa dodana',
+                            message=f'Uspješno dodano {entered_weight}g proizvoda',
+                            parent=self.parent.dialog_center)
 
 
 class DeleteDialogTopLevel:
@@ -36,7 +152,7 @@ class DeleteDialogTopLevel:
 
         self.no_btn_style = ttk.Style()
         self.no_btn_style.configure('No.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.yes_btn_style.map('No.TButton', background=[('active', '#FF0000')])
+        self.no_btn_style.map('No.TButton', background=[('active', '#FF0000')])
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {
@@ -52,8 +168,8 @@ class DeleteDialogTopLevel:
                                    padding=10, font='15', anchor='center', borderwidth=2,
                                    relief='groove', background='#FFFFCC', justify='center')
 
-        self.yes_btn = ttk.Button(text='Da', **self.mutual_button_options, style='Yes.TButton', command=self._delete_food_name)
-        self.no_btn = ttk.Button(text='Ne', **self.mutual_button_options, style='No.TButton', command=self.dialog_center.destroy)
+        self.yes_btn = ttk.Button(text='Da', style='Yes.TButton', command=self._delete_food_name, **self.mutual_button_options)
+        self.no_btn = ttk.Button(text='Ne', style='No.TButton', command=self.dialog_center.destroy, **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, sticky='we')
@@ -69,7 +185,7 @@ class DeleteDialogTopLevel:
                             parent=self.parent.dialog_center)
 
 
-class UpdateDialogTopLevel:
+class DialogPickerTopLevel:
     """Description"""
     def __init__(self, db, label_name):
         self.db = db
@@ -78,6 +194,7 @@ class UpdateDialogTopLevel:
         self._initialize_dialog_window()
 
         # its children
+        self._create_mutual_style_options()
         self._create_styles()
         self._create_images()
         self._create_mutual_button_options()
@@ -97,16 +214,16 @@ class UpdateDialogTopLevel:
     
     def _create_styles(self):
         self.add_btn_style = ttk.Style()
-        self.add_btn_style.configure('Add.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 6, 0, 6))
+        self.add_btn_style.configure('Add.TButton', **self.mutual_style_options)
         
         self.update_btn_style = ttk.Style()
-        self.update_btn_style.configure('Update.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+        self.update_btn_style.configure('Update.TButton', **self.mutual_style_options)
 
         self.delete_btn_style = ttk.Style()
-        self.delete_btn_style.configure('Delete.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+        self.delete_btn_style.configure('Delete.TButton', **self.mutual_style_options)
 
         self.close_btn_style = ttk.Style()
-        self.close_btn_style.configure('Close.TButton', font=(25), background='#FFE6F1', space=15, padding=(0, 5, 0, 5))
+        self.close_btn_style.configure('Close.TButton', **self.mutual_style_options)
     
     def _create_images(self):
         self.add_img = PhotoImage(file='./assets/images/add_icon.png')
@@ -120,6 +237,14 @@ class UpdateDialogTopLevel:
             'compound': 'left',
             'cursor': 'hand2',
         }
+
+    def _create_mutual_style_options(self):
+        self.mutual_style_options = {
+            'font': (25),
+            'background': '#FFE6F1',
+            'space': 15,
+            'padding': (0, 5, 0, 5),
+        }
     
     def _create_widget_vars(self):
         self.title_lbl_var = f'Odaberite što želite napraviti s proizvodom\n`{self.label_name}`'
@@ -128,7 +253,7 @@ class UpdateDialogTopLevel:
         self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
                                    padding=10, font='15', anchor='center', borderwidth=2, relief='groove', background='#E57C2C', justify='center')
         
-        self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton', **self.mutual_button_options)
+        self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton', command=self._create_add_dialog, **self.mutual_button_options)
         self.update_btn = ttk.Button(text='Ažuriraj', image=self.update_img, style='Update.TButton', **self.mutual_button_options)
         self.delete_btn = ttk.Button(text='Izbriši', image=self.delete_img,
                                      command=self._create_delete_dialog, style='Delete.TButton', **self.mutual_button_options)
@@ -148,6 +273,9 @@ class UpdateDialogTopLevel:
 
     def _create_delete_dialog(self):
         DeleteDialogTopLevel(self, self.db, self.label_name)
+
+    def _create_add_dialog(self):
+        AddDialogTopLevel(self, self.db, self.label_name)
 
 
 class NutritionTableResult:
@@ -266,8 +394,8 @@ class StoredFoodTablesFrame:
         text_constants['sat_fat_lbl'],
         text_constants['carb_lbl'],
         text_constants['sugar_lbl'],
-        text_constants['protein_lbl'],
         text_constants['fiber_lbl'],
+        text_constants['protein_lbl'],
         text_constants['food_price_lbl'],
         text_constants['food_created_on'],
         text_constants['food_updated_on'],
@@ -387,7 +515,7 @@ class StoredFoodTablesFrame:
             self.nutrition_table_frame.render_results(self.food_tables)
     
     def _open_update_center(self, event):
-        UpdateDialogTopLevel(self.db, event.widget['text'])
+        DialogPickerTopLevel(self.db, event.widget['text'])
     
     def _render_add_new_food_button(self):
         afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)

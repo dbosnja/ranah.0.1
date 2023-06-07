@@ -38,6 +38,7 @@ class MainNotebook:
         self.notebook.rowconfigure(0, weight=1)
     
     def _initialize_tabs(self):
+        # TODO: enable switching between the tabs with Ctrol+PageUp/PageDown
         for tab, tab_label in zip(self.TABS, self.TABS_LABELS):
             # create the tab
             canvas_tab = tab(self.notebook, self.db)

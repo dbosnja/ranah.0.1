@@ -72,7 +72,7 @@ class Database:
         return food_name not in self.all_food_label_names
     
     def get_food_item_table(self, food_name):
-        """Retrieve food item table based on its name
+        """Retrieve one food item table based on its name
         
         The API does also formatting of the fetched data. All floats are rounded to 2 decimals
         and datetime is formatted as `day full-mont-name year HH:MM`
