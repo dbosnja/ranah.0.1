@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, URL, select, and_, extract
+from sqlalchemy import create_engine, URL, select, and_, extract, delete
 
 from .connection_params import DB_URL_PARAMS
 from .schema import metadata, nutrition_labels_table, consumed_food_items_table
@@ -32,6 +32,7 @@ class Database:
     
     def _format_nutrition_table_row(self, row):
         # NOTE: this will look better once I switch to ORM Alchemy mode
+        # ignore primary_key and label_name dimensions
         row[2:-2] = [round(float(f), 2) for f in row[2:-2]]
         row[-2] = row[-2].strftime('%d-%m-%Y, %H:%M')
         row[-1] = row[-1].strftime('%d-%m-%Y, %H:%M')
@@ -49,13 +50,17 @@ class Database:
     
     @property
     def all_food_label_names(self):
-        sel = select(nutrition_labels_table.c.label_name)
-        with self.engine.connect() as conn:
-            rp = conn.execute(sel)
-            return [f_name for (f_name, ) in rp.fetchall()]
+        # fetch only data in the 1st dimension
+        return [ft[1] for ft in self.all_food_label_tables]
     
     @property
     def all_food_label_tables(self):
+        """Return all results from the food nutrition table
+        
+        The method does an immediate formatting.
+        Rationale: I'm not expecting to be using 5 digits after floating point
+        anywhere or miliseconds in timestamps in Ranah.
+        """
         sel = select(nutrition_labels_table)
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
@@ -102,4 +107,13 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
             return rp.fetchall()
+    
+    def delete_food_table(self, food_table_name):
+        """Description"""
+        # breakpoint()
+        del_stmt = delete(nutrition_labels_table)\
+                   .where(nutrition_labels_table.c.label_name == food_table_name)
+        with self.engine.connect() as conn:
+            conn.execute(del_stmt)
+            conn.commit()
 
