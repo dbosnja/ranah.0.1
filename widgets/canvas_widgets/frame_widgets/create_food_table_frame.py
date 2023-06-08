@@ -33,7 +33,7 @@ class CreateFoodLabelFrame:
             self.frame.columnconfigure(i, weight=1)
 
         # define the validations
-        self.double_pattern = re.compile('^\d*\.?\d*$')
+        self.double_pattern = re.compile('^\d{,4}\.?\d{,2}$')
         self._validate_double = self.frame.register(self._validate_double_input), '%P'
         
         # init and render widgets

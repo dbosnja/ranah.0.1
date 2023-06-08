@@ -9,8 +9,6 @@ from ...utility_widgets import AddNewFoodItemFrame
 class UpdateDialogTopLevel:
     """Description"""
 
-    text_constants = text_constants
-
     def __init__(self, parent, db, label_name):
         self.parent = parent
         self.db = db
@@ -21,12 +19,14 @@ class UpdateDialogTopLevel:
         self.predefined_food_table = self.db.get_food_item_table(self.label_name)
 
         # define the validations
-        self.double_pattern = re.compile('^\d*\.?\d*$')
+        self.double_pattern = re.compile('^\d{,4}\.?\d{,2}$')
         self._validate_double = self.dialog_center.register(self._validate_double_input), '%P'
 
         # its children
         self._create_styles()
         self._create_mutual_button_options()
+        self._create_mutual_label_options()
+        self._create_mutual_entry_options()
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
@@ -42,14 +42,13 @@ class UpdateDialogTopLevel:
         self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
 
     def _create_styles(self):
-        pass
-        # self.add_btn_style = ttk.Style()
-        # self.add_btn_style.configure('AddWeight.TButton', font=(25), padding=(0, 5, 0, 5))
-        # self.add_btn_style.map('AddWeight.TButton', background=[('active', '#00994D')])
+        self.add_btn_style = ttk.Style()
+        self.add_btn_style.configure('UpdateFoodTable.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.add_btn_style.    map('UpdateFoodTable.TButton', background=[('active', '#00994D')])
 
-        # self.cancel_btn_style = ttk.Style()
-        # self.cancel_btn_style.configure('Cancel.TButton', font=(25), padding=(0, 5, 0, 5))
-        # self.cancel_btn_style.map('Cancel.TButton', background=[('active', '#FF0000')])
+        self.cancel_btn_style = ttk.Style()
+        self.cancel_btn_style.configure('CancelUpdate.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.cancel_btn_style.map('CancelUpdate.TButton', background=[('active', '#FF0000')])
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {
@@ -57,79 +56,79 @@ class UpdateDialogTopLevel:
             'cursor': 'hand2',
         }
 
+    def _create_mutual_label_options(self):
+        self.mutual_label_options = {
+            'master': self.dialog_center,
+            'anchor': 'center',
+            'borderwidth': 2,
+            'relief': 'groove',
+            'padding': 5,
+            'font': '15',
+        }
+
+    def _create_mutual_entry_options(self):
+        self.mutual_entry_options = {
+            'master': self.dialog_center,
+            'validate': 'all',
+            'validatecommand': self._validate_double,
+            'width': 10,
+            'font': 'normal 17',
+            'justify': 'center',
+        }
+
     def _create_widget_vars(self):
         self.title_lbl_var = f'Unesite odgovarajuće izmjene za artikl\n`{self.label_name}`'
 
         self.calory_var = StringVar()
-        self.calory_var.set(self.predefined_food_table[nutrition_table_map['calories']])
         self.fat_var = StringVar()
-        self.fat_var.set(self.predefined_food_table[nutrition_table_map['fat']])
-        
         self.saturated_fat_var = StringVar()
-        self.saturated_fat_var.set(self.predefined_food_table[nutrition_table_map['saturated_fat']])
         self.carbs_var = StringVar()
-        self.carbs_var.set(self.predefined_food_table[nutrition_table_map['carbs']])
-
         self.sugar_var = StringVar()
-        self.sugar_var.set(self.predefined_food_table[nutrition_table_map['sugars']])
         self.fiber_var = StringVar()
-        self.fiber_var.set(self.predefined_food_table[nutrition_table_map['fiber']])
-
         self.proteins_var = StringVar()
-        self.proteins_var.set(self.predefined_food_table[nutrition_table_map['proteins']])
         self.food_price_var = StringVar()
-        self.food_price_var.set(self.predefined_food_table[nutrition_table_map['price']])
-
         self.food_name_var = StringVar()
-        self.food_name_var.set(self.predefined_food_table[nutrition_table_map['label_name']])
+
+        # NOTE: order is very important here
+        self.widget_vars = (
+            self.food_name_var, self.calory_var, self.fat_var, self.saturated_fat_var, self.carbs_var,
+            self.sugar_var, self.fiber_var, self.proteins_var, self.food_price_var
+        )
+        predefined_food_labels = list(nutrition_table_map.keys())[1:-2]
+
+        for w_var, map_key in zip(self.widget_vars, predefined_food_labels):
+            w_var.set(self.predefined_food_table[nutrition_table_map[map_key]])
 
     def _create_widgets(self):
         self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
                                    padding=10, font='15', anchor='center', borderwidth=2,
                                    relief='groove', background='#FFFFCC', justify='center')
 
-        self.calory_lbl = ttk.Label(self.dialog_center, text=self.text_constants['calory_lbl'],
-                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.calory_e = ttk.Entry(self.dialog_center, textvariable=self.calory_var, validate='all', validatecommand=self._validate_double,
-                                  width=10, font='default 17', justify='center')
-        self.fat_lbl = ttk.Label(self.dialog_center, text=self.text_constants['fat_lbl'], 
-                                 anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.fat_e = ttk.Entry(self.dialog_center, textvariable=self.fat_var, validate='all', validatecommand=self._validate_double,
-                               width=10, font='default 17', justify='center')
+        self.calory_lbl = ttk.Label(text=text_constants['calory_lbl'], **self.mutual_label_options)
+        self.calory_e = ttk.Entry(textvariable=self.calory_var, **self.mutual_entry_options)
+        self.fat_lbl = ttk.Label(text=text_constants['fat_lbl'], **self.mutual_label_options)
+        self.fat_e = ttk.Entry(textvariable=self.fat_var, **self.mutual_entry_options)
         
-        self.saturated_fat_lbl = ttk.Label(self.dialog_center, text=self.text_constants['sat_fat_lbl'],
-                                           anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.sat_fat_e = ttk.Entry(self.dialog_center, textvariable=self.saturated_fat_var, validate='all', validatecommand=self._validate_double,
-                                   width=10, font='default 17', justify='center')
-        self.carbs_lbl = ttk.Label(self.dialog_center, text=self.text_constants['carb_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.carbs_e = ttk.Entry(self.dialog_center, textvariable=self.carbs_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17', justify='center')
+        self.saturated_fat_lbl = ttk.Label(text=text_constants['sat_fat_lbl'], **self.mutual_label_options)
+        self.sat_fat_e = ttk.Entry(textvariable=self.saturated_fat_var, **self.mutual_entry_options)
+        self.carbs_lbl = ttk.Label(text=text_constants['carb_lbl'], **self.mutual_label_options)
+        self.carbs_e = ttk.Entry(textvariable=self.carbs_var, **self.mutual_entry_options)
 
-        self.sugar_lbl = ttk.Label(self.dialog_center, text=self.text_constants['sugar_lbl'], 
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.sugar_e = ttk.Entry(self.dialog_center, textvariable=self.sugar_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17', justify='center')
-        self.fiber_lbl = ttk.Label(self.dialog_center, text=self.text_constants['fiber_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.fiber_e = ttk.Entry(self.dialog_center, textvariable=self.fiber_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17', justify='center')
+        self.sugar_lbl = ttk.Label(text=text_constants['sugar_lbl'], **self.mutual_label_options)
+        self.sugar_e = ttk.Entry(textvariable=self.sugar_var, **self.mutual_entry_options)
+        self.fiber_lbl = ttk.Label(text=text_constants['fiber_lbl'], **self.mutual_label_options)
+        self.fiber_e = ttk.Entry(textvariable=self.fiber_var, **self.mutual_entry_options)
         
-        self.proteins_lbl = ttk.Label(self.dialog_center, text=self.text_constants['protein_lbl'],
-                                      anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.protein_e = ttk.Entry(self.dialog_center, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double,
-                                   width=10, font='default 17', justify='center')
-        self.food_price_lbl = ttk.Label(self.dialog_center, text=self.text_constants['food_price_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.food_price_e = ttk.Entry(self.dialog_center, textvariable=self.food_price_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17', justify='center')
+        self.proteins_lbl = ttk.Label(text=text_constants['protein_lbl'], **self.mutual_label_options)
+        self.protein_e = ttk.Entry(textvariable=self.proteins_var, **self.mutual_entry_options)
+        self.food_price_lbl = ttk.Label(text=text_constants['food_price_lbl'], **self.mutual_label_options)
+        self.food_price_e = ttk.Entry(textvariable=self.food_price_var, **self.mutual_entry_options)
         
-        self.food_name_lbl = ttk.Label(self.dialog_center, text=self.text_constants['food_name_lbl'],
-                                       anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
-        self.food_name_e = ttk.Entry(self.dialog_center, textvariable=self.food_name_var, width=20, font='default 17', justify='center', state='readonly')
+        self.food_name_lbl = ttk.Label(text=text_constants['food_name_lbl'], **self.mutual_label_options)
+        self.food_name_e = ttk.Entry(self.dialog_center, textvariable=self.food_name_var, width=20,font='default 17', justify='center', state='readonly')
 
-        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', command=self._update_food_table, padding=5)
-        self.cancel_btn = ttk.Button(self.dialog_center, text='Odustani', command=self.dialog_center.destroy, padding=5)
+        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', command=self._update_food_table, style='UpdateFoodTable.TButton')
+        self.cancel_btn = ttk.Button(self.dialog_center, text='Odustani', command=self.dialog_center.destroy, style='CancelUpdate.TButton')
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, sticky='we', columnspan=4)
@@ -224,7 +223,7 @@ class AddDialogTopLevel:
         self._initialize_dialog_window()
 
         # define the validations
-        self.double_pattern = re.compile('^\d*\.?\d{,2}$')
+        self.double_pattern = re.compile('^\d{,4}\.?\d{,2}$')
         self._validate_double = self.dialog_center.register(self._validate_double_input), '%P'
 
         # its children
@@ -283,7 +282,7 @@ class AddDialogTopLevel:
         self.cancel_btn.grid(row=3, column=0, pady=(0, 20))
 
     def _validate_double_input(self, entry_value):
-        # NOTE: I have decided that user can enter \d*.\d{,2} type of values
+        # NOTE: I have decided that user can enter \d*.\d{,2} type of values -> TODO: check for upper limit stuff
         if entry_value and self.double_pattern.match(entry_value) is None:
             return False
         return True
@@ -448,7 +447,8 @@ class DialogPickerTopLevel:
         self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
                                    padding=10, font='15', anchor='center', borderwidth=2, relief='groove', background='#E57C2C', justify='center')
         
-        self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton', command=self._create_add_dialog, **self.mutual_button_options)
+        self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton',
+                                  command=self._create_add_dialog, **self.mutual_button_options)
         self.update_btn = ttk.Button(text='Ažuriraj', image=self.update_img, style='Update.TButton',
                                      command=self._create_update_dialog, **self.mutual_button_options)
         self.delete_btn = ttk.Button(text='Izbriši', image=self.delete_img, style='Delete.TButton',
@@ -599,15 +599,12 @@ class StoredFoodTablesFrame:
         text_constants['food_created_on'],
         text_constants['food_updated_on'],
     )
-    # 100 grams is a normative
-    NORMATIVE = 100
 
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
         # container for storing the nutrition table results
         self.food_tables = []
-        self.current_entered_food_name = None
 
         self._create_styles()
         # main frame
@@ -642,10 +639,7 @@ class StoredFoodTablesFrame:
         self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno', variable=self.sort_option_direction_var, value='desc')
         self.sort_btn = ttk.Button(self.frame, text='Sortiraj', command=self._sort_results)
 
-        
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
-        # this one is gridded only when a food result is actually present
-        self.add_food_btn = ttk.Button(self.frame, text='Dodaj', padding=5, command=self._render_add_new_food_button)
         
         self.nutrition_table_frame = NutritionTableResultsFrame(self, self.HEADER_LABELS)
     
@@ -675,8 +669,8 @@ class StoredFoodTablesFrame:
             return self.db.all_food_label_tables
         name_segment = name_segment.lower()
         food_tables = [self.db.get_food_item_table(food_lbl) 
-                            for food_lbl in self.db.all_food_label_names 
-                            if name_segment in food_lbl.lower()]
+                       for food_lbl in self.db.all_food_label_names
+                       if name_segment in food_lbl.lower()]
         return food_tables
     
     def _search_food(self):
@@ -719,23 +713,4 @@ class StoredFoodTablesFrame:
     
     def _open_update_center(self, event):
         DialogPickerTopLevel(self.db, event.widget['text'])
-    
-    def _render_add_new_food_button(self):
-        afi_frame = AddNewFoodItemFrame(self.frame, food_name=self.selected_food_name, callback=self._add_new_food_item)
-        # TODO: I guess this should be part of public API
-        afi_frame.frame.grid(row=0, column=0, rowspan=5, columnspan=2, sticky='n')
-    
-    def _add_new_food_item(self, food_item_weight):
-        """Connect to db and create a new (eaten) food item"""
-
-        ratio = food_item_weight / self.NORMATIVE
-        # NOTE: quite ugly, should be better when I switch to sqlAlchemy ORM
-        food_name, *food_nutrition = self.db.get_food_item_table(self.selected_food_name)[0][1:]
-        # TODO: this is tightly coupled with the db schema,
-        # meaning if schema changes I need to change this list definition throughout the app
-        food_nutrition_column = ['calories', 'fat', 'saturated_fat', 'carbs', 'sugars', 'proteins', 'fiber']
-        record = {c: float(n) * ratio for c, n in zip(food_nutrition_column, food_nutrition)}
-        record['food_name'] = food_name
-        record['food_weight'] = food_item_weight
-        self.db.create_new_consumed_food_item(**record)
 
