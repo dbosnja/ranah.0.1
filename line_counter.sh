@@ -13,7 +13,7 @@ file_number=0;
 for py_file in $(find . -type f -iname '*.py'); do 
 	(( lines_sum += $(cat $py_file | wc -l) ));
 	(( file_number += 1 ));
-	printf "%-3d%s\n" $file_number $py_file; 
+	printf "%2d %s\n" $file_number $py_file; 
 done; 
 
 printf "\nTotal count: %d\n" $lines_sum;

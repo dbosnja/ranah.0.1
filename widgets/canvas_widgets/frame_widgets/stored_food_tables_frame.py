@@ -2,8 +2,201 @@ import re
 
 from tkinter import ttk, StringVar, Toplevel, PhotoImage, messagebox
 
-from constants.constants import text_constants
+from constants.constants import text_constants, nutrition_table_map
 from ...utility_widgets import AddNewFoodItemFrame
+
+
+class UpdateDialogTopLevel:
+    """Description"""
+
+    text_constants = text_constants
+
+    def __init__(self, parent, db, label_name):
+        self.parent = parent
+        self.db = db
+        self.label_name = label_name
+
+        self._initialize_dialog_window()
+
+        self.predefined_food_table = self.db.get_food_item_table(self.label_name)
+
+        # define the validations
+        self.double_pattern = re.compile('^\d*\.?\d*$')
+        self._validate_double = self.dialog_center.register(self._validate_double_input), '%P'
+
+        # its children
+        self._create_styles()
+        self._create_mutual_button_options()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+
+    def _initialize_dialog_window(self):
+        self.dialog_center = Toplevel()
+        self.dialog_center.title('Ažuriraj prehrambeni artikl')
+        # Hardcoded values, but I'll live with it
+        self.dialog_center.geometry(f'600x400+2500+370')
+        self.dialog_center.minsize(600, 400)
+        for col in range(4):
+            self.dialog_center.columnconfigure(col, weight=1)
+        self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
+
+    def _create_styles(self):
+        pass
+        # self.add_btn_style = ttk.Style()
+        # self.add_btn_style.configure('AddWeight.TButton', font=(25), padding=(0, 5, 0, 5))
+        # self.add_btn_style.map('AddWeight.TButton', background=[('active', '#00994D')])
+
+        # self.cancel_btn_style = ttk.Style()
+        # self.cancel_btn_style.configure('Cancel.TButton', font=(25), padding=(0, 5, 0, 5))
+        # self.cancel_btn_style.map('Cancel.TButton', background=[('active', '#FF0000')])
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.dialog_center,
+            'cursor': 'hand2',
+        }
+
+    def _create_widget_vars(self):
+        self.title_lbl_var = f'Unesite odgovarajuće izmjene za artikl\n`{self.label_name}`'
+
+        self.calory_var = StringVar()
+        self.calory_var.set(self.predefined_food_table[nutrition_table_map['calories']])
+        self.fat_var = StringVar()
+        self.fat_var.set(self.predefined_food_table[nutrition_table_map['fat']])
+        
+        self.saturated_fat_var = StringVar()
+        self.saturated_fat_var.set(self.predefined_food_table[nutrition_table_map['saturated_fat']])
+        self.carbs_var = StringVar()
+        self.carbs_var.set(self.predefined_food_table[nutrition_table_map['carbs']])
+
+        self.sugar_var = StringVar()
+        self.sugar_var.set(self.predefined_food_table[nutrition_table_map['sugars']])
+        self.fiber_var = StringVar()
+        self.fiber_var.set(self.predefined_food_table[nutrition_table_map['fiber']])
+
+        self.proteins_var = StringVar()
+        self.proteins_var.set(self.predefined_food_table[nutrition_table_map['proteins']])
+        self.food_price_var = StringVar()
+        self.food_price_var.set(self.predefined_food_table[nutrition_table_map['price']])
+
+        self.food_name_var = StringVar()
+        self.food_name_var.set(self.predefined_food_table[nutrition_table_map['label_name']])
+
+    def _create_widgets(self):
+        self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
+                                   padding=10, font='15', anchor='center', borderwidth=2,
+                                   relief='groove', background='#FFFFCC', justify='center')
+
+        self.calory_lbl = ttk.Label(self.dialog_center, text=self.text_constants['calory_lbl'],
+                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.calory_e = ttk.Entry(self.dialog_center, textvariable=self.calory_var, validate='all', validatecommand=self._validate_double,
+                                  width=10, font='default 17', justify='center')
+        self.fat_lbl = ttk.Label(self.dialog_center, text=self.text_constants['fat_lbl'], 
+                                 anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.fat_e = ttk.Entry(self.dialog_center, textvariable=self.fat_var, validate='all', validatecommand=self._validate_double,
+                               width=10, font='default 17', justify='center')
+        
+        self.saturated_fat_lbl = ttk.Label(self.dialog_center, text=self.text_constants['sat_fat_lbl'],
+                                           anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.sat_fat_e = ttk.Entry(self.dialog_center, textvariable=self.saturated_fat_var, validate='all', validatecommand=self._validate_double,
+                                   width=10, font='default 17', justify='center')
+        self.carbs_lbl = ttk.Label(self.dialog_center, text=self.text_constants['carb_lbl'],
+                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.carbs_e = ttk.Entry(self.dialog_center, textvariable=self.carbs_var, validate='all', validatecommand=self._validate_double,
+                                 width=10, font='default 17', justify='center')
+
+        self.sugar_lbl = ttk.Label(self.dialog_center, text=self.text_constants['sugar_lbl'], 
+                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.sugar_e = ttk.Entry(self.dialog_center, textvariable=self.sugar_var, validate='all', validatecommand=self._validate_double,
+                                 width=10, font='default 17', justify='center')
+        self.fiber_lbl = ttk.Label(self.dialog_center, text=self.text_constants['fiber_lbl'],
+                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.fiber_e = ttk.Entry(self.dialog_center, textvariable=self.fiber_var, validate='all', validatecommand=self._validate_double,
+                                 width=10, font='default 17', justify='center')
+        
+        self.proteins_lbl = ttk.Label(self.dialog_center, text=self.text_constants['protein_lbl'],
+                                      anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.protein_e = ttk.Entry(self.dialog_center, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double,
+                                   width=10, font='default 17', justify='center')
+        self.food_price_lbl = ttk.Label(self.dialog_center, text=self.text_constants['food_price_lbl'],
+                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.food_price_e = ttk.Entry(self.dialog_center, textvariable=self.food_price_var, validate='all', validatecommand=self._validate_double,
+                                 width=10, font='default 17', justify='center')
+        
+        self.food_name_lbl = ttk.Label(self.dialog_center, text=self.text_constants['food_name_lbl'],
+                                       anchor='center', borderwidth=2, relief='groove', padding=5, font='15')
+        self.food_name_e = ttk.Entry(self.dialog_center, textvariable=self.food_name_var, width=20, font='default 17', justify='center', state='readonly')
+
+        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', command=self._update_food_table, padding=5)
+        self.cancel_btn = ttk.Button(self.dialog_center, text='Odustani', command=self.dialog_center.destroy, padding=5)
+
+    def _grid_widgets(self):
+        self.title_lbl.grid(row=0, column=0, sticky='we', columnspan=4)
+
+        self.calory_lbl.grid(row=1, column=0, sticky='we', padx=(10, 5), pady=(20, 5))
+        self.calory_e.grid(row=1, column=1, sticky='we', padx=(5, 5), pady=(20, 5))
+        self.fat_lbl.grid(row=1, column=2, sticky='we', padx=(5, 5), pady=(20, 5))
+        self.fat_e.grid(row=1, column=3, sticky='we', padx=(5, 10), pady=(20, 5))
+
+        self.saturated_fat_lbl.grid(row=2, column=0, sticky='we', padx=(10, 5), pady=(10, 5))
+        self.sat_fat_e.grid(row=2, column=1, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.carbs_lbl.grid(row=2, column=2, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.carbs_e.grid(row=2, column=3, sticky='we', padx=(5, 10), pady=(10, 5))
+
+        self.sugar_lbl.grid(row=3, column=0, sticky='we', padx=(10, 5), pady=(10, 5))
+        self.sugar_e.grid(row=3, column=1, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.fiber_lbl.grid(row=3, column=2, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.fiber_e.grid(row=3, column=3, sticky='we', padx=(5, 10), pady=(10, 5))
+
+        self.proteins_lbl.grid(row=4, column=0, sticky='we', padx=(10, 5), pady=(10, 5))
+        self.protein_e.grid(row=4, column=1, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.food_price_lbl.grid(row=4, column=2, sticky='we', padx=(5, 5), pady=(10, 5))
+        self.food_price_e.grid(row=4, column=3, sticky='we', padx=(5, 10), pady=(10, 5))
+
+        self.food_name_lbl.grid(row=5, column=0, sticky='we', padx=(10, 5), pady=(10, 5))
+        self.food_name_e.grid(row=5, column=1, sticky='we', columnspan=3, padx=(5, 10), pady=(10, 5))
+
+        self.update_btn.grid(row=6, column=0, columnspan=2, sticky='e', padx=(0, 10), pady=(30, 10))
+        self.cancel_btn.grid(row=6, column=2, columnspan=2, sticky='w', padx=(10, 0), pady=(30, 10))
+
+    def _validate_double_input(self, entry_value):
+        if entry_value and self.double_pattern.match(entry_value) is None:
+            return False
+        return True
+
+    def _update_food_table(self):
+        # raise error if food price not defined
+        if not self.food_price_var.get():
+            messagebox.showerror(message='Cijena artikla nije definirana!',
+                                 title='Artikl bez cijene', parent=self.dialog_center)
+            return
+        
+        record = {
+            'label_name': self.food_name_var.get(),
+            'calories': self._parse_input_to_float(self.calory_var.get()),
+            'fat': self._parse_input_to_float(self.fat_var.get()),
+            'saturated_fat': self._parse_input_to_float(self.saturated_fat_var.get()),
+            'carbs': self._parse_input_to_float(self.carbs_var.get()),
+            'sugars': self._parse_input_to_float(self.sugar_var.get()),
+            'fiber': self._parse_input_to_float(self.fiber_var.get()),
+            'proteins': self._parse_input_to_float(self.proteins_var.get()),
+            'price': self._parse_input_to_float(self.food_price_var.get()),
+        }
+        self.db.update_food_item_table(**record)
+        self.dialog_center.destroy()
+        messagebox.showinfo(title='Artikl ažuriran',
+                            message=f'`{self.label_name}` uspješno ažuriran.',
+                            parent=self.parent.dialog_center)
+
+    def _parse_input_to_float(self, entry_input):
+        """Parses and creates a float from a string
+
+        If string is empty, returned value is .0.
+        Otherwise, float() function is used. Since entry inputs are
+        validated, the function must not raise an error.
+        """
+        return .0 if not entry_input else float(entry_input)
 
 
 class AddDialogTopLevel:
@@ -31,7 +224,7 @@ class AddDialogTopLevel:
         self._initialize_dialog_window()
 
         # define the validations
-        self.double_pattern = re.compile('^\d*\.?\d*$')
+        self.double_pattern = re.compile('^\d*\.?\d{,2}$')
         self._validate_double = self.dialog_center.register(self._validate_double_input), '%P'
 
         # its children
@@ -66,7 +259,7 @@ class AddDialogTopLevel:
         }
 
     def _create_widget_vars(self):
-        self.title_lbl_var = f'Unesite količinu konzumiranja za proizvod\n`{self.label_name}`'
+        self.title_lbl_var = f'Unesite količinu konzumiranja za artikl\n`{self.label_name}`'
         self.weight_e_var = StringVar()
 
     def _create_widgets(self):
@@ -90,18 +283,19 @@ class AddDialogTopLevel:
         self.cancel_btn.grid(row=3, column=0, pady=(0, 20))
 
     def _validate_double_input(self, entry_value):
+        # NOTE: I have decided that user can enter \d*.\d{,2} type of values
         if entry_value and self.double_pattern.match(entry_value) is None:
             return False
         return True
 
     def _add_consumed_weight(self):
-        # scale the values according to the food_label and create new consumed food record
-        # destroy the current dialog
-        # show info msg
+        # idempotent function(for consumed foods table) when entered weight is None or 0
         entered_weight = self.weight_e_var.get()
         if not entered_weight:
             return
         entered_weight = float(entered_weight)
+        if not entered_weight:
+            return
         scale_factor = round(entered_weight / self.NORMATIVE, 2)
         food_table = self.db.get_food_item_table(self.label_name)
         # NOTE: this would look nicer If I've used SQLAlchemy ORM
@@ -113,6 +307,7 @@ class AddDialogTopLevel:
             k: v
             for k, v in zip(self.TABLE_DIMENSIONS, food_table)
         }
+        entered_weight = entered_weight if entered_weight != int(entered_weight) else int(entered_weight)
         self.db.create_new_consumed_food_item(**values)
         self.dialog_center.destroy()
         messagebox.showinfo(title='Konzumirana masa dodana',
@@ -247,17 +442,18 @@ class DialogPickerTopLevel:
         }
     
     def _create_widget_vars(self):
-        self.title_lbl_var = f'Odaberite što želite napraviti s proizvodom\n`{self.label_name}`'
+        self.title_lbl_var = f'Odaberite što želite napraviti s artiklom\n`{self.label_name}`'
     
     def _create_widgets(self):
         self.title_lbl = ttk.Label(self.dialog_center, text=self.title_lbl_var,
                                    padding=10, font='15', anchor='center', borderwidth=2, relief='groove', background='#E57C2C', justify='center')
         
         self.add_btn = ttk.Button(text='Dodaj', image=self.add_img, style='Add.TButton', command=self._create_add_dialog, **self.mutual_button_options)
-        self.update_btn = ttk.Button(text='Ažuriraj', image=self.update_img, style='Update.TButton', **self.mutual_button_options)
-        self.delete_btn = ttk.Button(text='Izbriši', image=self.delete_img,
-                                     command=self._create_delete_dialog, style='Delete.TButton', **self.mutual_button_options)
-        self.close_btn = ttk.Button(text='Zatvori', image=self.close_img,style='Close.TButton',
+        self.update_btn = ttk.Button(text='Ažuriraj', image=self.update_img, style='Update.TButton',
+                                     command=self._create_update_dialog, **self.mutual_button_options)
+        self.delete_btn = ttk.Button(text='Izbriši', image=self.delete_img, style='Delete.TButton',
+                                     command=self._create_delete_dialog, **self.mutual_button_options)
+        self.close_btn = ttk.Button(text='Zatvori', image=self.close_img, style='Close.TButton',
                                     command=self.dialog_center.destroy, **self.mutual_button_options)
 
     def _grid_widgets(self):
@@ -276,6 +472,9 @@ class DialogPickerTopLevel:
 
     def _create_add_dialog(self):
         AddDialogTopLevel(self, self.db, self.label_name)
+    
+    def _create_update_dialog(self):
+        UpdateDialogTopLevel(self, self.db, self.label_name)
 
 
 class NutritionTableResult:
@@ -317,7 +516,7 @@ class NutritionTableHeaders:
         self._grid_widgets()
 
     def _create_styles(self):
-        # TODO: expose this as a configurablsearch_food_ee option via public API
+        # TODO: expose this as a configurable option via public API
         self.nutrition_table_results_style = ttk.Style()
         self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')        
     
@@ -508,7 +707,11 @@ class StoredFoodTablesFrame:
         sort_option = self.selected_sort_option_var.get()
         if sort_option:
             idx = self.HEADER_LABELS.index(sort_option)
-            self.food_tables.sort(key=lambda row: row[idx], reverse=rev)
+            if idx == 1:
+                # sort by name works based on ASCII -> compare with case insensitivity
+                self.food_tables.sort(key=lambda row: row[idx].lower(), reverse=rev)
+            else:
+                self.food_tables.sort(key=lambda row: row[idx], reverse=rev)
             # Clear all rendered rows
             self.nutrition_table_frame.destroy_rows()
             # re-render them with the sorted list of food tables

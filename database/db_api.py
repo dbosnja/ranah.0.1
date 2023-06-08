@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, URL, select, and_, extract, delete
+from sqlalchemy import create_engine, URL, select, and_, extract, delete, update
 
 from .connection_params import DB_URL_PARAMS
 from .schema import metadata, nutrition_labels_table, consumed_food_items_table
@@ -32,8 +32,13 @@ class Database:
     
     def _format_nutrition_table_row(self, row):
         # NOTE: this will look better once I switch to ORM Alchemy mode
-        # ignore primary_key and label_name dimensions
-        row[2:-2] = [round(float(f), 2) for f in row[2:-2]]
+        # row[2:-2] -> ignore primary_key and label_name dimensions
+        # if a value is actually int, then always return int(instead of float)
+        tmp_row = row[2:-2]
+        for i, f in enumerate(tmp_row):
+            rnd_f = round(float(f), 2)
+            tmp_row[i] = rnd_f if rnd_f != int(rnd_f) else int(rnd_f)
+        row[2:-2] = tmp_row
         row[-2] = row[-2].strftime('%d-%m-%Y, %H:%M')
         row[-1] = row[-1].strftime('%d-%m-%Y, %H:%M')
         return row
@@ -85,7 +90,20 @@ class Database:
             result = list(rp.first())
         
         return self._format_nutrition_table_row(result)
-    
+
+    def update_food_item_table(self, **values):
+        """Update one food item table."""
+
+        update_stmt = update(nutrition_labels_table)\
+                  .where(nutrition_labels_table.c.label_name == values['label_name'])\
+                  .values(values)
+        # update_stmt = update(nutrition_labels_table)\
+        #           .where(nutrition_labels_table.c.label_name == values['label_name'])\
+        #           .values(fat=3.14)
+        with self.engine.connect() as conn:
+            conn.execute(update_stmt)
+            conn.commit()
+
     def create_new_consumed_food_item(self, **values):
         """Create new consumed food item record"""
 

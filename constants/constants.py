@@ -20,3 +20,21 @@ text_constants = {
         'food_created_on': 'Kreirano',
         'food_updated_on': 'Ažurirano',
     }
+
+# back-patching between definitions of `nutrition_facts_labels` database schema and application codebase
+
+nutrition_table_map = {
+    'label_id': 0,
+    'label_name': 1,
+    'calories': 2,
+    'fat': 3,
+    'saturated_fat': 4,
+    'carbs': 5,
+    'sugars': 6,
+    'fiber': 7,
+    'proteins': 8,
+    'price': 9,
+    'created_on': 10,
+    'updated_on': 11,
+}
+

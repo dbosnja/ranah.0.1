@@ -56,10 +56,10 @@ class CreateFoodLabelFrame:
         self.saturated_fat_var = StringVar()
         self.carbs_var = StringVar()
         self.sugar_var = StringVar()
-        self.proteins_var = StringVar()
         self.fiber_var = StringVar()
-        self.food_name_var = StringVar()
+        self.proteins_var = StringVar()
         self.food_price_var = StringVar()
+        self.food_name_var = StringVar()
         
         self.entry_vars = [
             self.calory_var, self.fat_var, self.saturated_fat_var,
@@ -105,8 +105,8 @@ class CreateFoodLabelFrame:
             'saturated_fat': self._parse_input_to_float(self.saturated_fat_var.get()),
             'carbs': self._parse_input_to_float(self.carbs_var.get()),
             'sugars': self._parse_input_to_float(self.sugar_var.get()),
-            'proteins': self._parse_input_to_float(self.proteins_var.get()),
             'fiber': self._parse_input_to_float(self.fiber_var.get()),
+            'proteins': self._parse_input_to_float(self.proteins_var.get()),
             'price': self._parse_input_to_float(self.food_price_var.get()),
         }
         self.db.insert_new_food_item_record(**record)
@@ -115,7 +115,7 @@ class CreateFoodLabelFrame:
     
     def _render_success_message(self, temp_food_name):
         messagebox.showinfo(title='Novi artikl kreiran',
-                            message=f'Uspjesno kreirana nova nutritivna tablica u ranahu\n`{temp_food_name}`')
+                            message=f'Uspješno kreirana nova nutritivna tablica u ranahu\n`{temp_food_name}`')
 
     # TODO: bind ctrl+a event to every entry widget
     def _create_widgets(self):
@@ -147,16 +147,16 @@ class CreateFoodLabelFrame:
                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
         self.sugar_e = ttk.Entry(self.frame, textvariable=self.sugar_var, validate='all', validatecommand=self._validate_double,
                                  width=10, font='default 17')
-        
-        self.proteins_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'],
-                                      anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double,
-                                   width=10, font='default 17')
-        
+
         self.fiber_lbl = ttk.Label(self.frame, text=self.text_constants['fiber_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
         self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var, validate='all', validatecommand=self._validate_double,
                                  width=10, font='default 17')
+
+        self.proteins_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'],
+                                      anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
+        self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double,
+                                   width=10, font='default 17')
         
         self.food_price_lbl = ttk.Label(self.frame, text=self.text_constants['food_price_lbl'],
                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
@@ -185,11 +185,11 @@ class CreateFoodLabelFrame:
         
         self.sugar_lbl.grid(row=3, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
         self.sugar_e.grid(row=3, column=1, sticky='wn')
-        self.proteins_lbl.grid(row=3, column=2, sticky='en', padx=(0, 10))
-        self.protein_e.grid(row=3, column=3, sticky='wn')
-        
-        self.fiber_lbl.grid(row=4, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
-        self.fiber_e.grid(row=4, column=1, sticky='wn')
+        self.fiber_lbl.grid(row=3, column=2, sticky='en', padx=(0, 10), pady=(0, 10))
+        self.fiber_e.grid(row=3, column=3, sticky='wn')
+
+        self.proteins_lbl.grid(row=4, column=0, sticky='en', padx=(0, 10))
+        self.protein_e.grid(row=4, column=1, sticky='wn')
         self.food_price_lbl.grid(row=4, column=2, sticky='en', padx=(0, 10), pady=(0, 10))
         self.food_price_e.grid(row=4, column=3, sticky='wn')
         
