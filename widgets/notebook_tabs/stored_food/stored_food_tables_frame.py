@@ -105,11 +105,6 @@ class StoredFoodTablesFrame:
         """Read user's input and render nutrition table rows based on a match"""
         
         food_name_entry = self.search_food_e_var.get().strip()
-        # input didn't change -> rows don't change
-        # TODO: this is bad when user wants to check for successful update/deletion; try to do better
-        # if self.current_entered_food_name == food_name_entry:
-        #     return
-        self.current_entered_food_name = food_name_entry
         self.food_tables = self._get_food_results(food_name_entry)
         
         # update the number of results label

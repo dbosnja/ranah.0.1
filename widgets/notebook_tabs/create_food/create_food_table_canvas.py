@@ -28,3 +28,4 @@ class CreateFoodTableCanvas:
     def _configure_frame_surface(self):
         self.canvas.itemconfigure(self.frame_id, width=self.canvas.winfo_width())
         self.canvas.itemconfigure(self.frame_id, height=self.canvas.winfo_height())
+

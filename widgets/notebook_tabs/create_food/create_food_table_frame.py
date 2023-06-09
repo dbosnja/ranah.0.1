@@ -37,6 +37,8 @@ class CreateFoodLabelFrame:
         self._validate_double = self.frame.register(self._validate_double_input), '%P'
         
         # init and render widgets
+        self._create_mutual_label_options()
+        self._create_mutual_entry_options()
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
@@ -50,6 +52,25 @@ class CreateFoodLabelFrame:
         ttk.Style().configure('Main.TFrame', background='#CCFFCC')
         ttk.Style().configure('Create.TButton', font='10')
     
+    def _create_mutual_label_options(self):
+        self.mutual_label_options = {
+            'master': self.frame,
+            'anchor': 'center',
+            'borderwidth': 2,
+            'relief': 'groove',
+            'padding': 5,
+            'font': '10',
+        }
+
+    def _create_mutual_entry_options(self):
+        self.mutual_entry_options = {
+            'master': self.frame,
+            'validate': 'all',
+            'validatecommand': self._validate_double,
+            'width': 10,
+            'font': 'normal 17',
+        }
+
     def _create_widget_vars(self):
         self.calory_var = StringVar()
         self.fat_var = StringVar()
@@ -123,51 +144,30 @@ class CreateFoodLabelFrame:
 
         self.topic_lbl = ttk.Label(self.frame, text=self.text_constants['topic_lbl'], anchor='center', padding=15, width=500, font=8)
         
-        self.calory_lbl = ttk.Label(self.frame, text=self.text_constants['calory_lbl'],
-                                    anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.calory_e = ttk.Entry(self.frame, textvariable=self.calory_var, validate='all', validatecommand=self._validate_double,
-                                  width=10, font='default 17')
+        self.calory_lbl = ttk.Label(text=self.text_constants['calory_lbl'], **self.mutual_label_options)
+        self.calory_e = ttk.Entry(textvariable=self.calory_var, **self.mutual_entry_options)
+        self.fat_lbl = ttk.Label(text=self.text_constants['fat_lbl'], **self.mutual_label_options)
+        self.fat_e = ttk.Entry(textvariable=self.fat_var, **self.mutual_entry_options)
         
-        self.fat_lbl = ttk.Label(self.frame, text=self.text_constants['fat_lbl'], 
-                                 anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.fat_e = ttk.Entry(self.frame, textvariable=self.fat_var, validate='all', validatecommand=self._validate_double,
-                               width=10, font='default 17')
+        self.saturated_fat_lbl = ttk.Label(text=self.text_constants['sat_fat_lbl'], **self.mutual_label_options)
+        self.sat_fat_e = ttk.Entry(textvariable=self.saturated_fat_var, **self.mutual_entry_options)
+        self.carbs_lbl = ttk.Label(text=self.text_constants['carb_lbl'], **self.mutual_label_options)
+        self.carbs_e = ttk.Entry(textvariable=self.carbs_var, **self.mutual_entry_options)
         
-        self.saturated_fat_lbl = ttk.Label(self.frame, text=self.text_constants['sat_fat_lbl'],
-                                           anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.sat_fat_e = ttk.Entry(self.frame, textvariable=self.saturated_fat_var, validate='all', validatecommand=self._validate_double,
-                                   width=10, font='default 17')
-        
-        self.carbs_lbl = ttk.Label(self.frame, text=self.text_constants['carb_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.carbs_e = ttk.Entry(self.frame, textvariable=self.carbs_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17')
-        
-        self.sugar_lbl = ttk.Label(self.frame, text=self.text_constants['sugar_lbl'], 
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.sugar_e = ttk.Entry(self.frame, textvariable=self.sugar_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17')
+        self.sugar_lbl = ttk.Label(text=self.text_constants['sugar_lbl'], **self.mutual_label_options)
+        self.sugar_e = ttk.Entry(textvariable=self.sugar_var, **self.mutual_entry_options)
+        self.fiber_lbl = ttk.Label(text=self.text_constants['fiber_lbl'], **self.mutual_label_options)
+        self.fiber_e = ttk.Entry(textvariable=self.fiber_var, **self.mutual_entry_options)
 
-        self.fiber_lbl = ttk.Label(self.frame, text=self.text_constants['fiber_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.fiber_e = ttk.Entry(self.frame, textvariable=self.fiber_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17')
-
-        self.proteins_lbl = ttk.Label(self.frame, text=self.text_constants['protein_lbl'],
-                                      anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.protein_e = ttk.Entry(self.frame, textvariable=self.proteins_var, validate='all', validatecommand=self._validate_double,
-                                   width=10, font='default 17')
+        self.proteins_lbl = ttk.Label(text=self.text_constants['protein_lbl'], **self.mutual_label_options)
+        self.protein_e = ttk.Entry(textvariable=self.proteins_var, **self.mutual_entry_options)
+        self.food_price_lbl = ttk.Label(text=self.text_constants['food_price_lbl'], **self.mutual_label_options)
+        self.food_price_e = ttk.Entry(textvariable=self.food_price_var, **self.mutual_entry_options)
         
-        self.food_price_lbl = ttk.Label(self.frame, text=self.text_constants['food_price_lbl'],
-                                   anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
-        self.food_price_e = ttk.Entry(self.frame, textvariable=self.food_price_var, validate='all', validatecommand=self._validate_double,
-                                 width=10, font='default 17')
-        
-        self.food_name_lbl = ttk.Label(self.frame, text=self.text_constants['food_name_lbl'],
-                                       anchor='center', borderwidth=2, relief='groove', padding=5, font='10')
+        self.food_name_lbl = ttk.Label(text=self.text_constants['food_name_lbl'], **self.mutual_label_options)
         self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, width=50, font='default 17')
         
-        self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'],
+        self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'], cursor='hand2',
                                      command=self._create_new_record, padding=5, style='Create.TButton')
     
     def _grid_widgets(self):
@@ -177,12 +177,12 @@ class CreateFoodLabelFrame:
         self.calory_e.grid(row=1, column=1, sticky='wn')
         self.fat_lbl.grid(row=1, column=2, sticky='en', padx=(0, 10))
         self.fat_e.grid(row=1, column=3, sticky='wn')
-        
+
         self.saturated_fat_lbl.grid(row=2, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
         self.sat_fat_e.grid(row=2, column=1, sticky='wn')
         self.carbs_lbl.grid(row=2, column=2, sticky='en', padx=(0, 10))
         self.carbs_e.grid(row=2, column=3, sticky='wn')
-        
+
         self.sugar_lbl.grid(row=3, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
         self.sugar_e.grid(row=3, column=1, sticky='wn')
         self.fiber_lbl.grid(row=3, column=2, sticky='en', padx=(0, 10), pady=(0, 10))
@@ -192,9 +192,9 @@ class CreateFoodLabelFrame:
         self.protein_e.grid(row=4, column=1, sticky='wn')
         self.food_price_lbl.grid(row=4, column=2, sticky='en', padx=(0, 10), pady=(0, 10))
         self.food_price_e.grid(row=4, column=3, sticky='wn')
-        
+
         self.food_name_lbl.grid(row=5, column=0, sticky='en', padx=(0, 10), pady=(0, 10))
         self.food_name_e.grid(row=5, column=1, sticky='wn', columnspan=3)
-        
+
         self.create_btn.grid(row=6, column=1, pady=5, columnspan=2)
 
