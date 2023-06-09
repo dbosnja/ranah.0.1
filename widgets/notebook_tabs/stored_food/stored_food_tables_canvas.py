@@ -1,7 +1,7 @@
 from tkinter import Canvas
 
-from .frame_widgets import StoredFoodTablesFrame
-from .. utility_widgets import ScrollBarWidget
+from .stored_food_tables_frame import StoredFoodTablesFrame
+from ... utility_widgets.leaf_frames import ScrollBarWidget
 
 
 class StoredFoodTablesCanvas:

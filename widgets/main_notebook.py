@@ -1,6 +1,8 @@
 from tkinter import ttk
 
-from .canvas_widgets import CreateFoodTableCanvas, StoredFoodTablesCanvas, ConsumedFoodItemsCanvas
+from .notebook_tabs.create_food.create_food_table_canvas import CreateFoodTableCanvas
+from .notebook_tabs.stored_food.stored_food_tables_canvas import StoredFoodTablesCanvas
+from .notebook_tabs.consumed_food.consumed_food_items_canvas import ConsumedFoodItemsCanvas
 
 
 class MainNotebook:
@@ -43,3 +45,4 @@ class MainNotebook:
             # create the tab
             canvas_tab = tab(self.notebook, self.db)
             self.notebook.add(canvas_tab.canvas, text=tab_label)
+

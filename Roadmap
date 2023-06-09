@@ -18,6 +18,7 @@ Ranah2.0 Roadmap
 
    Clean up code -> basically crate a dictionary for shared init option values everywhere it makes sense.  DONE
 				 -> Reorganize project tree structure -> current one does not make sense anylonger
+				 -> create food frame -> create shared option maps
 
 ## ITERATION 2.2 ##
 

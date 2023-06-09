@@ -1,6 +1,6 @@
 from tkinter import Canvas
 
-from .frame_widgets import CreateFoodLabelFrame
+from .create_food_table_frame import CreateFoodLabelFrame
 
 
 class CreateFoodTableCanvas:
