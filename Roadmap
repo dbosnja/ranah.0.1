@@ -2,7 +2,7 @@ Ranah2.0 Roadmap
 
 0. Create new ranah2.0 database DONE
 
-# ITERATION 2.1 #
+# ITERATION 2.1 #  DONE
 
 1. Enable multiple tabs/windows option, ie obsolete one-window application DONE
 2. Make Frames scrollable wherever it makes sense to DONE
@@ -14,9 +14,9 @@ Ranah2.0 Roadmap
 # ITERATION 2.2 #
 
 4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
-   Enable updating the rows, deleting and adding them
+   Enable updating the rows, deleting and adding them  DONE
 
-   Clean up code -> basically crate a dictionary for shared init option values everywhere it makes sense.
+   Clean up code -> basically crate a dictionary for shared init option values everywhere it makes sense.  DONE
 				 -> Reorganize project tree structure -> current one does not make sense anylonger
 
 ## ITERATION 2.2 ##

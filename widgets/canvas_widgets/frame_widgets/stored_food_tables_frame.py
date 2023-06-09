@@ -480,8 +480,9 @@ class DialogPickerTopLevel:
 class NutritionTableResult:
     """Labels for rendering one nutrition table/row"""
     
-    def __init__(self, parent):
+    def __init__(self, parent, callback):
         self.parent = parent
+        self.callback = callback
         self.all_row_data = []
     
     def render_row(self, row, row_data):
@@ -494,7 +495,7 @@ class NutritionTableResult:
             self.all_row_data.append(lbl)
         # change cursor for name dimension and attach an event to it
         self.all_row_data[1]['cursor'] = 'hand2'
-        self.all_row_data[1].bind('<1>', lambda event: self.parent.parent._open_update_center(event))
+        self.all_row_data[1].bind('<1>', lambda event: self.callback(event))
     
     def destroy_row(self):
         for rd in self.all_row_data:
@@ -505,8 +506,6 @@ class NutritionTableResult:
 class NutritionTableHeaders:
     """Labels for rendering headers of nutrition tables"""
 
-    text_constants = text_constants
-
     def __init__(self, parent, header_labels):
         self.parent = parent
         self.header_labels = header_labels
@@ -515,11 +514,6 @@ class NutritionTableHeaders:
         self._create_widgets()
         self._grid_widgets()
 
-    def _create_styles(self):
-        # TODO: expose this as a configurable option via public API
-        self.nutrition_table_results_style = ttk.Style()
-        self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')        
-    
     def _create_widgets(self):
         for header_lbl in self.header_labels:
             lbl = ttk.Label(self.parent.frame, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
@@ -539,7 +533,6 @@ class NutritionTableResultsFrame:
     text_constants = text_constants
 
     def __init__(self, parent, table_headers):
-        self.parent = parent
         self.table_headers = table_headers
         self.col_count = len(table_headers)
         self.all_rows = []
@@ -551,10 +544,9 @@ class NutritionTableResultsFrame:
             self.frame.columnconfigure(i, weight=1)
 
     def _create_styles(self):
-        # TODO: expose this as a configurable option via public API
         self.nutrition_table_results_style = ttk.Style()
         self.nutrition_table_results_style.configure('NutritionTableResults.TFrame', background='#ade6e1')
-    
+
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky)
         # NOTE: gridding the whole table implies gridding the table headers as well;
@@ -576,9 +568,13 @@ class NutritionTableResultsFrame:
     
     def render_results(self, food_tables):
         for i, food_table in enumerate(food_tables):
-            row_frame = NutritionTableResult(self)
+            row_frame = NutritionTableResult(self, self.row_callback)
             row_frame.render_row(i + 1, food_table)
             self.all_rows.append(row_frame)
+
+    def set_row_callback(self, callback):
+        """Set which callback will be called when user clicks on the name field in a row"""
+        self.row_callback = callback
 
 
 class StoredFoodTablesFrame:
@@ -633,7 +629,8 @@ class StoredFoodTablesFrame:
         self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food)
         
         self.sort_options_lbl = ttk.Label(self.frame, text='Opcije sortiranja:')
-        self.sort_options_cbox = ttk.Combobox(self.frame, values=self.HEADER_LABELS[1:], textvariable=self.selected_sort_option_var)
+        self.sort_options_cbox = ttk.Combobox(self.frame, values=self.HEADER_LABELS[1:],
+                                              textvariable=self.selected_sort_option_var, height=len(self.HEADER_LABELS[1:]))
         self.sort_options_cbox.state(['readonly'])
         self.ascending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Uzlazno', variable=self.sort_option_direction_var, value='asc')
         self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno', variable=self.sort_option_direction_var, value='desc')
@@ -642,6 +639,7 @@ class StoredFoodTablesFrame:
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
         
         self.nutrition_table_frame = NutritionTableResultsFrame(self, self.HEADER_LABELS)
+        self.nutrition_table_frame.set_row_callback(self._open_update_center)
     
     def _grid_widgets(self):
         self.search_food_e.grid(row=0, column=0, sticky='w', padx=(20, 0), pady=10)

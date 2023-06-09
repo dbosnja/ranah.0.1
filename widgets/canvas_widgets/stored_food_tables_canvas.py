@@ -38,7 +38,7 @@ class StoredFoodTablesCanvas:
     
     def _bind_events(self):
         self.canvas.bind_all('<Configure>', lambda _: self._configure_frame_surface())
-        # TODO: add arrow-up/down also for scrolling 
+        # TODO: add arrow-up/down also for scrolling -> can't do at the moment since combobox is also handling these types of events
         self.canvas.bind_all('<Button-4>', lambda _: self.canvas.yview_scroll(-5, "units"))
         self.canvas.bind_all('<Button-5>', lambda _: self.canvas.yview_scroll(5, "units"))
         self.canvas.bind_all('<Map>', lambda _: self._adjust_height())
