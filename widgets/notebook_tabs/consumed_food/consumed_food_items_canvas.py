@@ -14,8 +14,6 @@ class ConsumedFoodItemsCanvas:
     if canvas itself ever becomes higher than the Notebook, ie the root window.
     """
 
-    CANVAS_ID = 3
-
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
@@ -27,10 +25,11 @@ class ConsumedFoodItemsCanvas:
     
     def _initialize_canvas(self):
         self.canvas = Canvas(self.parent, background='#f0dbdb')
+        # NOTE: For some reason the following line seems to be redundant
+        self.canvas.grid(row=0, column=0, sticky='news')
         # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
-        self.canvas.configure(scrollregion=(0, 0, 0, 2000))
         self.canvas.configure(yscrollincrement=5)
     
     def _initialize_frame(self):
@@ -41,38 +40,34 @@ class ConsumedFoodItemsCanvas:
         scrolly = ScrollBarWidget(self.canvas)
         scrolly.attach_to_scrollable(self.canvas)
         scrolly.grid(row=0, column=1, sticky='ns')
-    
-    def _handle_scroll_up(self, event):
-        # breakpoint()
-        # if any(f'canvas{self.CANVAS_ID}' in tag for tag in event.widget.bindtags()):
-        #     self.canvas.yview_scroll(-5, "units")
-        self.canvas.yview_scroll(-5, "units")
-    
-    def _handle_scroll_down(self, event):
-        # if any(f'canvas{self.CANVAS_ID}' in tag for tag in event.widget.bindtags()):
-        #     self.canvas.yview_scroll(5, "units")
-        self.canvas.yview_scroll(5, "units")
-    
+
     def _bind_events(self):
-        self.canvas.bind('<Map>', lambda _: self.canvas.itemconfigure(self.frame_id, width=self.canvas.winfo_width()))
-        self.canvas.bind('<Button-4>', lambda event: self._handle_scroll_up(event))
-        self.canvas.bind('<Button-5>', lambda event: self._handle_scroll_down(event))
-        pass
-    
+        # whenever canvas itself is configured, make sure the width of the child frame is the same as canvas'
+        # the reason why i need to do that is because the canvas now behaves as a geometry manager(create_window method)
+        # also, when the table size changes, the canvas size does not, i guess this is important for future reading
+        self.canvas.bind('<Configure>', lambda _: self.canvas.itemconfigure(self.frame_id, width=self.canvas.winfo_width()))
+        self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
+
+    def handle_scroll_up(self):
+        self.canvas.yview_scroll(-5, "units")
+
+    def handle_scroll_down(self):
+        self.canvas.yview_scroll(5, "units")
+
     def handle_resizing(self):
-        print(f'Canvas w: {self.canvas.winfo_width()}')
-        print(f'Canvas h: {self.canvas.winfo_height()}')
-        print(f'Frame w: {self.frame.frame.winfo_width()}')
-        print(f'Frame h: {self.frame.frame.winfo_height()}')
-        print(self.canvas.bbox('all'))
+        """Handle resizing of the scrollregion whenever the size of the table changes
+
+        NOTE: This whole thing with scrollregion is a bit weirdish. Whenever the table size exceeds
+        the window size, everything works as expected, but there were some problems with scrollregion
+        when the table size was small, ie the canvas height was larger than the frame height
+        """
         if self.frame.frame.winfo_height() > self.canvas.winfo_height():
             s_region = self.canvas.bbox('all')
+            # add some extra space at the bottom, s_region is a tuple!
+            s_region = s_region[:3] + (s_region[-1] + 50,)
         else:
+            # for some reason works well with -2 translation
             s_region = (0, 0, 0, self.canvas.winfo_height() - 2)
-            print(f'Canvas h: {self.canvas.winfo_height()}')
-            # print(self.screen_height)
         self.canvas.configure(scrollregion=s_region)
 
-    def handle_table_resizing(self):
-        print(f'Frame table w: {self.frame.consumed_food_table_frame.frame.winfo_width()}')
-        print(f'Frame table h: {self.frame.consumed_food_table_frame.frame.winfo_height()}')

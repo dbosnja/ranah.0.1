@@ -34,14 +34,16 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame = FoodTableResultsFrame(self, consumed_food_headers.values())
         self.consumed_food_table_frame.configure_style('ConsumedFoodItems.TFrame')
         self.consumed_food_table_frame.set_row_callback(lambda _: ...)
+        self.consumed_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
+        self.consumed_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
     def _grid_widgets(self):
         self.search_btn.grid(row=0, column=0)
         self.consumed_food_table_frame.grid_frame(row=1, column=0, sticky='we')
     
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda event: self.parent._handle_scroll_up(event))
-        self.frame.bind('<Button-5>', lambda event: self.parent._handle_scroll_down(event))
+        self.frame.bind('<Button-4>', lambda event: self.parent.handle_scroll_up(event))
+        self.frame.bind('<Button-5>', lambda event: self.parent.handle_scroll_down(event))
     
     def _search_foods(self):
         self.consumed_foods = self.db.get_consumed_food_on_date(datetime.datetime.strptime('01-06-23', '%d-%m-%y'))
