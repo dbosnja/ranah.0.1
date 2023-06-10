@@ -24,7 +24,7 @@ class ConsumedFoodItemsCanvas:
         self._bind_events()
     
     def _initialize_canvas(self):
-        self.canvas = Canvas(self.parent, background='#f0dbdb')
+        self.canvas = Canvas(self.parent, background='#F0DBDB')
         # NOTE: For some reason the following line seems to be redundant
         self.canvas.grid(row=0, column=0, sticky='news')
         # enable resizing
