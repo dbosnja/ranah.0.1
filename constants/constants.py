@@ -38,3 +38,34 @@ nutrition_table_map = {
     'updated_on': 11,
 }
 
+# back-patching between definitions of `consumed_food_items` database schema and application codebase
+
+consumed_food_map = {
+    'food_id': 0,
+    'food_name': 1,
+    'food_weight': 2,
+    'calories': 3,
+    'fat': 4,
+    'saturated_fat': 5,
+    'carbs': 6,
+    'sugars': 7,
+    'fiber': 8,
+    'proteins': 9,
+    'price': 10,
+    'created_on': 11,
+}
+
+consumed_food_headers = {
+    '#': '#',
+    'food_name': 'Ime',
+    'food_weight': 'Masa',
+    'calories': 'Kalorije',
+    'fat': 'Masti',
+    'saturated_fat': 'Zasićene masti',
+    'carbs': 'Ugljikohidrati',
+    'sugars': 'Šećeri',
+    'fiber': 'Vlakna',
+    'proteins': 'Bjelančevine',
+    'price': 'Cijena',
+    'created_on': 'Konzumirano',
+}

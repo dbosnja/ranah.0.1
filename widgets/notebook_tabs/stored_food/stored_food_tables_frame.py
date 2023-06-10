@@ -32,7 +32,7 @@ class StoredFoodTablesFrame:
 
         self._create_styles()
         # main frame
-        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame')
+        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame', class_='StoredFoodFrame')
         self.frame.grid(row=0, column=0, sticky='news')
         self.frame.columnconfigure(0, weight=1)
 
@@ -54,7 +54,7 @@ class StoredFoodTablesFrame:
     
     def _create_widgets(self):
         self.search_food_e = ttk.Entry(self.frame, width=20, textvariable=self.search_food_e_var, font='15')
-        self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food)
+        self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food, cursor='hand2')
         
         self.sort_options_lbl = ttk.Label(self.frame, text='Opcije sortiranja:')
         self.sort_options_cbox = ttk.Combobox(self.frame, values=self.HEADER_LABELS[1:],
@@ -62,13 +62,14 @@ class StoredFoodTablesFrame:
         self.sort_options_cbox.state(['readonly'])
         self.ascending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Uzlazno', variable=self.sort_option_direction_var, value='asc')
         self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno', variable=self.sort_option_direction_var, value='desc')
-        self.sort_btn = ttk.Button(self.frame, text='Sortiraj', command=self._sort_results)
+        self.sort_btn = ttk.Button(self.frame, text='Sortiraj', command=self._sort_results, cursor='hand2')
 
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
         
         # NOTE: FoodTableResultsFrame is generic enough to handle various use-cases
         # in this context I'm using it as a nutrition table frame, therefore the name
         self.nutrition_table_frame = FoodTableResultsFrame(self, self.HEADER_LABELS)
+        self.nutrition_table_frame.configure_style('StoredLabels.TFrame')
         self.nutrition_table_frame.set_row_callback(self._open_update_center)
     
     def _grid_widgets(self):

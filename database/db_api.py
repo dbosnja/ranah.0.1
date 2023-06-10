@@ -117,18 +117,18 @@ class Database:
         sel = select(consumed_food_items_table)
         sel = sel.where(
             and_(
-                extract('YEAR', consumed_food_items_table.c.timestamp) == date.year,
-                extract('MONTH', consumed_food_items_table.c.timestamp) == date.month,
-                extract('DAY', consumed_food_items_table.c.timestamp) == date.day,
+                extract('YEAR', consumed_food_items_table.c.created_on) == date.year,
+                # extract('MONTH', consumed_food_items_table.c.created_on) <= date.month,
+                # extract('DAY', consumed_food_items_table.c.created_on) <= date.day,
             )
         )
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
-            return rp.fetchall()
+            breakpoint
+            return [list(row) for row in rp.fetchall()]
     
     def delete_food_table(self, food_table_name):
         """Description"""
-        # breakpoint()
         del_stmt = delete(nutrition_labels_table)\
                    .where(nutrition_labels_table.c.label_name == food_table_name)
         with self.engine.connect() as conn:

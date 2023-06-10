@@ -18,7 +18,7 @@ class MainNotebook:
         ConsumedFoodItemsCanvas,
     )
 
-    TABS_LABELS = (
+    TAB_LABELS = (
         'Nova nutritivna tablica',
         'Sve nutritivne tablice',
         'Konzumirana hrana',
@@ -30,18 +30,17 @@ class MainNotebook:
 
         self._create_notebook(parent)
         self._initialize_tabs()
-        
-    
+
     def _create_notebook(self, parent):
         self.notebook = ttk.Notebook(parent, padding=5)
         self.notebook.grid(row=0, column=0, sticky='news')
         # enable resizing
         self.notebook.columnconfigure(0, weight=1)
         self.notebook.rowconfigure(0, weight=1)
-    
+
     def _initialize_tabs(self):
         # TODO: enable switching between the tabs with Ctrol+PageUp/PageDown
-        for tab, tab_label in zip(self.TABS, self.TABS_LABELS):
+        for tab, tab_label in zip(self.TABS, self.TAB_LABELS):
             # create the tab
             canvas_tab = tab(self.notebook, self.db)
             self.notebook.add(canvas_tab.canvas, text=tab_label)

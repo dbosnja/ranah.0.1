@@ -46,6 +46,8 @@ class FoodTableResult:
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
             lbl.grid(row=row, column=i, sticky='we')
+            lbl.bind('<Button-4>', lambda event: self.parent.parent.parent._handle_scroll_up(event))
+            lbl.bind('<Button-5>', lambda event: self.parent.parent.parent._handle_scroll_down(event))
             self.all_row_data.append(lbl)
         # change cursor for name dimension and attach an event to it
         self.all_row_data[1]['cursor'] = 'hand2'
@@ -86,6 +88,7 @@ class FoodTableResultsFrame:
     """
 
     def __init__(self, parent, table_headers):
+        self.parent = parent
         self.table_headers = table_headers
         self.col_count = len(table_headers)
         self.all_rows = []
@@ -95,10 +98,12 @@ class FoodTableResultsFrame:
         # enable resizing
         for i in range(self.col_count):
             self.frame.columnconfigure(i, weight=1)
+        
+        self._bind_events()
 
     def _create_styles(self):
         self.food_table_results_style = ttk.Style()
-        self.food_table_results_style.configure('FoodTableResultsFrame.TFrame', background='#ade6e1')
+        self.food_table_results_style.configure('FoodTableResultsFrame.TFrame', background='#FFE6FF')
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky)
@@ -128,4 +133,8 @@ class FoodTableResultsFrame:
     def set_row_callback(self, callback):
         """Set which callback will be called when user clicks on the name field in a row"""
         self.row_callback = callback
+    
+    def _bind_events(self):
+        self.frame.bind('<Button-4>', lambda event: self.parent.parent._handle_scroll_up(event))
+        self.frame.bind('<Button-5>', lambda event: self.parent.parent_handle_scroll_down(event))
 

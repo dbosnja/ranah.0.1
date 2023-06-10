@@ -7,6 +7,8 @@ from ... utility_widgets.leaf_frames import ScrollBarWidget
 class StoredFoodTablesCanvas:
     """Canvas widget for rendering StoredFoodTablesFrame and its assocciated widgets"""
 
+    CANVAS_ID = 2
+
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
@@ -18,7 +20,7 @@ class StoredFoodTablesCanvas:
 
     def _initialize_canvas(self):
         self.canvas = Canvas(self.parent, background='#ADE6E1')
-        self.canvas.grid(row=0, column=0, sticky='news')
+        # self.canvas.grid(row=0, column=0, sticky='news')
         # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
@@ -36,21 +38,32 @@ class StoredFoodTablesCanvas:
         scrolly.attach_to_scrollable(self.canvas)
         scrolly.grid(row=0, column=1, sticky='ns')
     
+    def _handle_scroll_up(self, event):
+        breakpoint()
+        if any(f'canvas{self.CANVAS_ID}' in tag for tag in event.widget.bindtags()):
+            self.canvas.yview_scroll(-5, "units")
+    
+    def _handle_scroll_down(self, event):
+        breakpoint()
+        if any(f'canvas{self.CANVAS_ID}' in tag for tag in event.widget.bindtags()):
+            self.canvas.yview_scroll(5, "units")
+    
     def _bind_events(self):
         self.canvas.bind_all('<Configure>', lambda _: self._configure_frame_surface())
         # TODO: add arrow-up/down also for scrolling -> can't do at the moment since combobox is also handling these types of events
-        self.canvas.bind_all('<Button-4>', lambda _: self.canvas.yview_scroll(-5, "units"))
-        self.canvas.bind_all('<Button-5>', lambda _: self.canvas.yview_scroll(5, "units"))
+        # self.canvas.bind_all('<Button-4>', lambda event: self._handle_scroll_up(event))
+        # self.canvas.bind_all('<Button-5>', lambda event: self._handle_scroll_down(event))
         self.canvas.bind_all('<Map>', lambda _: self._adjust_height())
     
     def _configure_frame_surface(self):
         # NOTE: not really sure why this event solves this task of resizing, but it does
         self.canvas.itemconfigure(self.frame_id, width=self.canvas.winfo_width())
+        # self.canvas.itemconfigure(self.frame_id, width=1500)
         if len(self.frame.food_tables) <= 25:
             self.canvas.itemconfigure(self.frame_id, height=self.canvas.winfo_height())
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_frame_height = self.screen_height + delta * 32
+            self.new_frame_height = self.screen_height + delta * 29 + 100
             self.canvas.itemconfigure(self.frame_id, height=self.new_frame_height)
     
     def _adjust_height(self):
@@ -62,7 +75,7 @@ class StoredFoodTablesCanvas:
             self.canvas.configure(scrollregion=(0, 0, 0, self.canvas.winfo_height() - 2))
         else:
             delta = len(self.frame.food_tables) - 25
-            self.new_canvas_height = self.screen_height + delta * 32
+            self.new_canvas_height = self.screen_height + delta * 29 + 100
             self.canvas.configure(height=self.new_canvas_height)
             self.canvas.configure(scrollregion=(0, 0, 0, self.new_canvas_height))
 

@@ -11,16 +11,17 @@ Ranah2.0 Roadmap
 ## ITERATION 2.1 ##
 
 
-# ITERATION 2.2 #
+# ITERATION 2.2 #   #DONE
 
 4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
    Enable updating the rows, deleting and adding them  DONE
 
    Clean up code -> basically crate a dictionary for shared init option values everywhere it makes sense.  DONE
-				 -> Reorganize project tree structure -> current one does not make sense anylonger
-				 -> create food frame -> create shared option maps
+				 -> Reorganize project tree structure -> current one does not make sense anylonger  DONE
 
 ## ITERATION 2.2 ##
+
+# ITERATION 2.3
 
 5. Enhance reading through the consumed food articles with:
 	a) all possible combinations of day, month, year inputs
@@ -28,6 +29,9 @@ Ranah2.0 Roadmap
 	c) it should be a drop-down list instead of user writing in the numbers
 	d) list all consumed food within the required time range together with their data
 	e) end the list with a final row which represents the total sum of all listed rows
+
+## ITERATION 2.3 ##
+
 6. Enable templates. For a start user has to be able to choose a set of food articles together with their weights and store it permanently under a unique name.
    a) There should be a tab for creating a new meal template, which should work in similar fashion to shopping cart, ie. user sees immediately which food articles
    	  are added in the list
