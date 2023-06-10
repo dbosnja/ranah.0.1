@@ -46,8 +46,8 @@ class FoodTableResult:
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
             lbl.grid(row=row, column=i, sticky='we')
-            lbl.bind('<Button-4>', lambda event: self.parent.parent.parent._handle_scroll_up(event))
-            lbl.bind('<Button-5>', lambda event: self.parent.parent.parent._handle_scroll_down(event))
+            lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
+            lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
             self.all_row_data.append(lbl)
         # change cursor for name dimension and attach an event to it
         self.all_row_data[1]['cursor'] = 'hand2'
@@ -73,6 +73,8 @@ class FoodTableHeaders:
     def _create_widgets(self):
         for header_lbl in self.header_labels:
             lbl = ttk.Label(self.parent.frame, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
+            lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
+            lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
             self.label_widgets.append(lbl)
     
     def _grid_widgets(self):
@@ -134,7 +136,12 @@ class FoodTableResultsFrame:
         """Set which callback will be called when user clicks on the name field in a row"""
         self.row_callback = callback
     
+    def set_scroll_up_handler(self, callback):
+        self.scroll_up_handler = callback
+    
+    def set_scroll_down_handler(self, callback):
+        self.scroll_down_handler = callback
+    
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda event: self.parent.parent._handle_scroll_up(event))
-        self.frame.bind('<Button-5>', lambda event: self.parent.parent_handle_scroll_down(event))
+        self.frame.bind('<Configure>', lambda _: self.parent.parent.handle_resizing())
 

@@ -32,7 +32,7 @@ class StoredFoodTablesFrame:
 
         self._create_styles()
         # main frame
-        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame', class_='StoredFoodFrame')
+        self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame')
         self.frame.grid(row=0, column=0, sticky='news')
         self.frame.columnconfigure(0, weight=1)
 
@@ -53,6 +53,7 @@ class StoredFoodTablesFrame:
         self.sort_option_direction_var = StringVar()
     
     def _create_widgets(self):
+        # TODO: make these widget all under one single Frame parent
         self.search_food_e = ttk.Entry(self.frame, width=20, textvariable=self.search_food_e_var, font='15')
         self.search_food_lbl = ttk.Button(self.frame, text='Pretraži', command=self._search_food, cursor='hand2')
         
@@ -71,6 +72,8 @@ class StoredFoodTablesFrame:
         self.nutrition_table_frame = FoodTableResultsFrame(self, self.HEADER_LABELS)
         self.nutrition_table_frame.configure_style('StoredLabels.TFrame')
         self.nutrition_table_frame.set_row_callback(self._open_update_center)
+        self.nutrition_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
+        self.nutrition_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
     
     def _grid_widgets(self):
         self.search_food_e.grid(row=0, column=0, sticky='w', padx=(20, 0), pady=10)
@@ -88,6 +91,8 @@ class StoredFoodTablesFrame:
     
     def _bind_events(self):
         self.search_food_e.bind('<Return>', lambda _: self._search_food())
+        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
     
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator

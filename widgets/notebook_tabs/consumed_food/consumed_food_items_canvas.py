@@ -59,8 +59,20 @@ class ConsumedFoodItemsCanvas:
         self.canvas.bind('<Button-5>', lambda event: self._handle_scroll_down(event))
         pass
     
-    def _handle_resize(self):
-        print(f'table size from canvas: {self.frame.consumed_food_table_frame.frame.winfo_height()}')
-        self.canvas.itemconfigure(self.frame_id, width=self.canvas.winfo_width())
-        self.canvas.itemconfigure(self.frame_id, height=2000)
-        print(f'frame size: {self.frame.frame.winfo_height()}')
+    def handle_resizing(self):
+        print(f'Canvas w: {self.canvas.winfo_width()}')
+        print(f'Canvas h: {self.canvas.winfo_height()}')
+        print(f'Frame w: {self.frame.frame.winfo_width()}')
+        print(f'Frame h: {self.frame.frame.winfo_height()}')
+        print(self.canvas.bbox('all'))
+        if self.frame.frame.winfo_height() > self.canvas.winfo_height():
+            s_region = self.canvas.bbox('all')
+        else:
+            s_region = (0, 0, 0, self.canvas.winfo_height() - 2)
+            print(f'Canvas h: {self.canvas.winfo_height()}')
+            # print(self.screen_height)
+        self.canvas.configure(scrollregion=s_region)
+
+    def handle_table_resizing(self):
+        print(f'Frame table w: {self.frame.consumed_food_table_frame.frame.winfo_width()}')
+        print(f'Frame table h: {self.frame.consumed_food_table_frame.frame.winfo_height()}')
