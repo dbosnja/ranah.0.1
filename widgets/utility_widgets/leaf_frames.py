@@ -34,7 +34,7 @@ class ScrollBarWidget:
 class FoodTableResult:
     """Labels for rendering one food table/row"""
     
-    def __init__(self, parent, callback):
+    def __init__(self, parent, callback=None):
         self.parent = parent
         self.callback = callback
         self.all_row_data = []
@@ -53,6 +53,14 @@ class FoodTableResult:
         self.all_row_data[1]['cursor'] = 'hand2'
         self.all_row_data[1].bind('<1>', lambda event: self.callback(event))
     
+    def render_tally_row(self, row, tally_row_data):
+        # TODO: decide on the color of the tally row
+        bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
+        for i, data in enumerate(tally_row_data):
+            lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
+            lbl.grid(row=row, column=i, sticky='we')
+            self.all_row_data.append(lbl)
+
     def destroy_row(self):
         for rd in self.all_row_data:
             rd.destroy()
@@ -128,9 +136,17 @@ class FoodTableResultsFrame:
     
     def render_results(self, food_tables):
         for i, food_table in enumerate(food_tables):
-            row_frame = FoodTableResult(self, self.row_callback)
-            row_frame.render_row(i + 1, food_table)
-            self.all_rows.append(row_frame)
+            row = FoodTableResult(self, self.row_callback)
+            row.render_row(i + 1, food_table)
+            self.all_rows.append(row)
+
+    def render_tally_row(self, tally_row):
+        if tally_row is None:
+            # idempotent operation
+            return
+        row = FoodTableResult(self)
+        self.all_rows.append(row)
+        row.render_tally_row(len(self.all_rows), tally_row)
 
     def set_row_callback(self, callback):
         """Set which callback will be called when user clicks on the name field in a row"""
