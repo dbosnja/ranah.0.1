@@ -104,24 +104,24 @@ class StoredFoodTablesFrame:
                        for food_lbl in self.db.all_food_label_names
                        if name_segment in food_lbl.lower()]
         return food_tables
-    
+
     def _search_food(self):
         """Read user's input and render nutrition table rows based on a match"""
-        
+
         food_name_entry = self.search_food_e_var.get().strip()
         self.food_tables = self._get_food_results(food_name_entry)
-        
+
         # update the number of results label
         cnt = len(self.food_tables)
         cnt_s = str(cnt).zfill(2)
         text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
         self.food_tables_tally_lbl_var.set(f'{cnt} {text}')
-        
+
         # Clear all rendered rows
         self.nutrition_table_frame.destroy_rows()
         # re-render them with the updated list of food tables
         self.nutrition_table_frame.render_results(self.food_tables)
-    
+
     def _sort_results(self):
         sort_direction = self.sort_option_direction_var.get()
         rev = True if sort_direction == 'desc' else False
@@ -137,9 +137,10 @@ class StoredFoodTablesFrame:
             self.nutrition_table_frame.destroy_rows()
             # re-render them with the sorted list of food tables
             self.nutrition_table_frame.render_results(self.food_tables)
-    
-    def _open_update_center(self, food_row):
-        # All operations can be done solely on the food name
-        label_name_widget = food_row[nutrition_table_map['label_name']]
-        DialogPickerTopLevel(self.db, label_name_widget['text'])
+
+    def _open_update_center(self, p_key):
+        # All operations can be done solely on the food table name
+        table_row = self.db.get_food_item_table_by_primary_key(p_key)
+        label_name = table_row[nutrition_table_map['label_name']]
+        DialogPickerTopLevel(self.db, label_name)
 

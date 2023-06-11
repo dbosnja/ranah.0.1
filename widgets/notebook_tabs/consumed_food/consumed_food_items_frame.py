@@ -4,6 +4,7 @@ from tkinter import ttk, StringVar
 
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame 
 from constants.constants import consumed_food_headers, consumed_food_map
+from .top_level_dialogs import DialogPickerTopLevel
 
 
 class ConsumedFoodSearchOptionsFrame:
@@ -202,7 +203,7 @@ class ConsumedFoodItemsFrame:
 
         self.consumed_food_table_frame = FoodTableResultsFrame(self, consumed_food_headers.values())
         self.consumed_food_table_frame.configure_style('ConsumedFoodItems.TFrame')
-        self.consumed_food_table_frame.set_row_callback(lambda _: ...)
+        self.consumed_food_table_frame.set_row_callback(self._open_update_center)
         self.consumed_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
         self.consumed_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
@@ -274,4 +275,9 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.render_results(self.consumed_foods)
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
+
+    def _open_update_center(self, p_key):
+        # Fetch the complete table row since consumed food name is not globally unique
+        consumed_food_row = self.db.get_consumed_food_by_primary_key(p_key)
+        DialogPickerTopLevel(self.db, consumed_food_row)
 

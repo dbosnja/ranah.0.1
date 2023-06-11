@@ -41,7 +41,9 @@ class FoodTableResult:
     
     def render_row(self, row, row_data):
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
-        # replace primary key with its number in the table
+        # save primary key since it's used in the callbacks to distinguish between the rows
+        self.p_key = row_data[0]
+        # replace primary key with its row number in the table
         row_data[0] = row
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
@@ -52,7 +54,7 @@ class FoodTableResult:
         # change cursor for name dimension and attach an event to it
         self.all_row_data[1]['cursor'] = 'hand2'
         if self.callback:
-            self.all_row_data[1].bind('<1>', lambda _: self.callback(self.all_row_data))
+            self.all_row_data[1].bind('<1>', lambda _: self.callback(self.p_key))
 
     def render_tally_row(self, row, tally_row_data):
         # TODO: decide on the color of the tally row
