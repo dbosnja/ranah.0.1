@@ -47,7 +47,6 @@ class Database:
     
     def insert_new_food_item_record(self, **values):
         """Insert a new nutrition table record of a food item"""
-        
         ins = nutrition_labels_table.insert().values(**values)
         with self.engine.connect() as conn:
             # TODO: handle exceptions, e.g. Integrity Error -> this could be a complex topic
@@ -59,11 +58,11 @@ class Database:
     def all_food_label_names(self):
         # fetch only data in the 1st dimension
         return [ft[1] for ft in self.all_food_label_tables]
-    
+
     @property
     def all_food_label_tables(self):
         """Return all results from the food nutrition table
-        
+
         The method does an immediate formatting.
         Rationale: I'm not expecting to be using 5 digits after floating point
         anywhere or miliseconds in timestamps in Ranah.
@@ -73,16 +72,16 @@ class Database:
             rp = conn.execute(sel)
             results = rp.fetchall()
         return [self._format_food_table_row(list(r)) for r in results]
-    
+
     def is_food_name_unique(self, food_name):
         # TODO: remove this interface segment, this is application code
         return food_name not in self.all_food_label_names
-    
+
     def get_food_item_table(self, food_name):
         """Retrieve one food item table based on its name
-        
+
         The API does also formatting of the fetched data. All floats are rounded to 2 decimals
-        and datetime is formatted as `day full-mont-name year HH:MM`
+        and datetime is formatted as `day full-month-name year HH:MM`
         """
         
         sel = select(nutrition_labels_table)
@@ -91,6 +90,20 @@ class Database:
             rp = conn.execute(sel)
             result = list(rp.first())
         
+        return self._format_food_table_row(result)
+
+    def get_food_item_table_by_primary_key(self, p_key):
+        """Retrieve one food item table based on its primary_key
+
+        The API does also formatting of the fetched data. All floats are rounded to 2 decimals
+        and datetime is formatted as `day full-month-name year HH:MM`
+        """
+        sel = select(nutrition_labels_table)
+        sel = sel.where(nutrition_labels_table.c.label_id == p_key)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            result = list(rp.first())
+
         return self._format_food_table_row(result)
 
     def update_food_item_table(self, **values):
@@ -133,9 +146,23 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
             return [self._format_food_table_row(list(row), False) for row in rp.fetchall()]
-    
+
+    def get_consumed_food_by_primary_key(self, p_key):
+        """Retrieve consumed food item based on its primary_key"""
+
+        sel = select(consumed_food_items_table)
+        sel = sel.where(consumed_food_items_table.c.food_id == p_key)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            result = list(rp.first())
+
+        return self._format_food_table_row(result, False)
+
     def delete_food_table(self, food_table_name):
-        """Description"""
+        """Delete row with the name `food_table_name`.
+
+        The operation is unambiguous since the name of a food table is globally unique.
+        """
         del_stmt = delete(nutrition_labels_table)\
                    .where(nutrition_labels_table.c.label_name == food_table_name)
         with self.engine.connect() as conn:
