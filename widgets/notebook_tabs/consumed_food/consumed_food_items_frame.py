@@ -14,7 +14,7 @@ class ConsumedFoodSearchOptionsFrame:
         self.parent = parent
         self._create_styles()
 
-        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(40, 30, 40, 60))
+        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(40, 30))
 
         self._create_mutual_combobox_options()
 
@@ -33,10 +33,10 @@ class ConsumedFoodSearchOptionsFrame:
 
     def _create_styles(self):
         ttk.Style().configure('CFoodSearchOptions.TFrame', background='#F8FCE8', borderwidth=3, relief='ridge')
-        ttk.Style().configure('CFoodTopic.TLabel', anchor='center', borderwidth=2, relief='ridge', background='#999999', font='default 12')
+        ttk.Style().configure('CFoodTopic.TLabel', anchor='center', borderwidth=2, relief='ridge', background='#BFBFBF', font='default 12')
         ttk.Style().configure('CFoodText.TLabel', anchor='center', padding=2, font='default 12', background='#F8FCE8')
         ttk.Style().configure('CFoodSearch.TButton', anchor='center', padding=5, font='default 11')
-        ttk.Style().configure('CFoodRadio.TRadiobutton', anchor='center', padding=5, font='default 10', background='#999999')
+        ttk.Style().configure('CFoodRadio.TRadiobutton', anchor='center', padding=5, font='default 10', background='#BFBFBF')
 
     def _create_widget_vars(self):
         today = datetime.datetime.now()
@@ -89,7 +89,7 @@ class ConsumedFoodSearchOptionsFrame:
         self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno',
                                                            variable=self.sort_option_direction_var, value='desc',
                                                            style='CFoodRadio.TRadiobutton', cursor='hand2')
-        self.sort_btn = ttk.Button(self.frame, text='Sortiraj', style='CFoodSearch.TButton', cursor='hand2')
+        self.sort_btn = ttk.Button(self.frame, text='Sortiraj', style='CFoodSearch.TButton', cursor='hand2', command=self._sort_results)
 
     def _grid_widgets(self):
         self.search_options_topic_lbl.grid(row=0, column=0, columnspan=6, pady=(0, 30))
@@ -112,7 +112,7 @@ class ConsumedFoodSearchOptionsFrame:
         self.sort_options_cbox.grid(row=1, column=7, columnspan=3, padx=(60, 15), pady=(0, 10))
         self.ascending_sort_option_rbtn.grid(row=1, column=10, padx=(0, 15), pady=(0, 10))
         self.descending_sort_option_rbtn.grid(row=1, column=11, pady=(0, 10))
-        self.sort_btn.grid(row=2, column=8, columnspan=5, pady=(30, 0))
+        self.sort_btn.grid(row=2, column=8, columnspan=5, pady=(20, 0))
     
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
@@ -143,6 +143,13 @@ class ConsumedFoodSearchOptionsFrame:
             self.time_to_year_var.set(to_y)
         food_name = self.search_name_e_var.get().strip()
         self.consumed_foods = self.parent.search_foods(start_time, end_time, food_name)
+
+    def _sort_results(self):
+        sort_option = self.selected_sort_option_var.get()
+        if sort_option:
+            sort_direction = self.sort_option_direction_var.get()
+            rev = True if sort_direction == 'desc' else False
+            self.parent.sort_results(sort_option, rev)
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky, padx=(20), pady=(0, 20))
@@ -247,4 +254,24 @@ class ConsumedFoodItemsFrame:
         tally_row = [int(i) if int(i) == round(i, 2) else round(i, 2) for i in tally_row]
         tally_row  = ['\u2211', 'Ukupno'] + tally_row + [tally_time]
         return tally_row
+
+    def sort_results(self, sort_option, rev):
+        """Sort current results by `sort_option` and reverse the results if `rev=True`"""
+
+        # Find the corresponding index from the centralized back-patching defintion
+        for k, v in consumed_food_headers.items():
+            if v == sort_option:
+                idx = consumed_food_map[k]
+                break
+        if idx == 1:
+            # sort by name works based on ASCII -> compare with case insensitivity
+            self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)
+        else:
+            self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
+        # Clear all rendered rows
+        self.consumed_food_table_frame.destroy_rows()
+        # re-render them with the sorted list of food tables
+        self.consumed_food_table_frame.render_results(self.consumed_foods)
+        # render the tally row
+        self.consumed_food_table_frame.render_tally_row(self.tally_row)
 

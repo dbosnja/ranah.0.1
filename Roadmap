@@ -39,6 +39,7 @@ Ranah2.0 Roadmap
 7. Add calories tab
 8. Use messageboxes for info/warning alerts/pop-ups. DONE
 9. Implement the Dependency Injection for database instance(instead of propagating it throughtout the app)
+10. Enhance all referenced file paths to be cross-platform.
    
 
 TABS:

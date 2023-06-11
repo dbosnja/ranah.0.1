@@ -4,6 +4,9 @@ If the app grows larger, it'd probably make sense to split
 this module into several modules within a (sub)package
 """
 
+# TODO: clean this file up a bit, some names are misleading,
+# also back-patching definitions should have same type for both Canvas
+
 text_constants = {
         'topic_lbl': 'Nutritivne vrijednosti na 100 grama/miliLitara artikla',
         'calory_lbl': 'Kalorije',
