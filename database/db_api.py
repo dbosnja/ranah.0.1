@@ -30,17 +30,19 @@ class Database:
     def _persist_schema(self):
         self.metadata.create_all(self.engine)
     
-    def _format_nutrition_table_row(self, row):
+    def _format_food_table_row(self, row, two_dates=True):
         # NOTE: this will look better once I switch to ORM Alchemy mode
-        # row[2:-2] -> ignore primary_key and label_name dimensions
+        # row[2:float_id] -> ignore primary_key and label_name dimensions
         # if a value is actually int, then always return int(instead of float)
-        tmp_row = row[2:-2]
+        float_id = -2 if two_dates else -1
+        tmp_row = row[2:float_id]
         for i, f in enumerate(tmp_row):
             rnd_f = round(float(f), 2)
             tmp_row[i] = rnd_f if rnd_f != int(rnd_f) else int(rnd_f)
-        row[2:-2] = tmp_row
-        row[-2] = row[-2].strftime('%d-%m-%Y, %H:%M')
+        row[2:float_id] = tmp_row
         row[-1] = row[-1].strftime('%d-%m-%Y, %H:%M')
+        if two_dates:
+            row[-2] = row[-2].strftime('%d-%m-%Y, %H:%M')
         return row
     
     def insert_new_food_item_record(self, **values):
@@ -70,7 +72,7 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
             results = rp.fetchall()
-        return [self._format_nutrition_table_row(list(r)) for r in results]
+        return [self._format_food_table_row(list(r)) for r in results]
     
     def is_food_name_unique(self, food_name):
         # TODO: remove this interface segment, this is application code
@@ -89,7 +91,7 @@ class Database:
             rp = conn.execute(sel)
             result = list(rp.first())
         
-        return self._format_nutrition_table_row(result)
+        return self._format_food_table_row(result)
 
     def update_food_item_table(self, **values):
         """Update one food item table."""
@@ -113,19 +115,24 @@ class Database:
             conn.execute(ins)
             conn.commit()
     
-    def get_consumed_food_on_date(self, date):
+    def get_consumed_food_on_date(self, start_time, end_time):
         sel = select(consumed_food_items_table)
-        sel = sel.where(
-            and_(
-                extract('YEAR', consumed_food_items_table.c.created_on) == date.year,
-                # extract('MONTH', consumed_food_items_table.c.created_on) <= date.month,
-                # extract('DAY', consumed_food_items_table.c.created_on) <= date.day,
+        if end_time is None:
+            sel = sel.where(
+                and_(
+                    extract('YEAR', consumed_food_items_table.c.created_on) == start_time.year,
+                    extract('MONTH', consumed_food_items_table.c.created_on) == start_time.month,
+                    extract('DAY', consumed_food_items_table.c.created_on) == start_time.day,
+                )
             )
-        )
+        else:
+            sel = sel.where(
+                consumed_food_items_table.c.created_on.between(start_time, end_time)
+            )
+
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
-            breakpoint
-            return [list(row) for row in rp.fetchall()]
+            return [self._format_food_table_row(list(row), False) for row in rp.fetchall()]
     
     def delete_food_table(self, food_table_name):
         """Description"""
