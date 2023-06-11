@@ -106,6 +106,17 @@ class Database:
 
         return self._format_food_table_row(result)
 
+    def delete_food_table(self, food_table_name):
+        """Delete row with the name `food_table_name`.
+
+        The operation is unambiguous since the name of a food table is globally unique.
+        """
+        del_stmt = delete(nutrition_labels_table)\
+                   .where(nutrition_labels_table.c.label_name == food_table_name)
+        with self.engine.connect() as conn:
+            conn.execute(del_stmt)
+            conn.commit()
+
     def update_food_item_table(self, **values):
         """Update one food item table."""
 
@@ -129,6 +140,10 @@ class Database:
             conn.commit()
     
     def get_consumed_food_on_date(self, start_time, end_time):
+        """Fetch all food consumed on `start_time`.
+
+        If `end_time` is defined then fetch all food consumed within the time segment.
+        """
         sel = select(consumed_food_items_table)
         if end_time is None:
             sel = sel.where(
@@ -158,13 +173,11 @@ class Database:
 
         return self._format_food_table_row(result, False)
 
-    def delete_food_table(self, food_table_name):
-        """Delete row with the name `food_table_name`.
+    def delete_consumed_food_by_primary_key(self, p_key):
+        """Delete consumed food with primary key `p_key`."""
 
-        The operation is unambiguous since the name of a food table is globally unique.
-        """
-        del_stmt = delete(nutrition_labels_table)\
-                   .where(nutrition_labels_table.c.label_name == food_table_name)
+        del_stmt = delete(consumed_food_items_table)
+        del_stmt = del_stmt.where(consumed_food_items_table.c.food_id == p_key)
         with self.engine.connect() as conn:
             conn.execute(del_stmt)
             conn.commit()
