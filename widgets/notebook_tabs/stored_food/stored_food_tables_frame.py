@@ -1,6 +1,6 @@
 from tkinter import ttk, StringVar
 
-from constants.constants import text_constants
+from constants.constants import text_constants, nutrition_table_map
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame
 from .top_level_dialogs import DialogPickerTopLevel
 
@@ -8,7 +8,6 @@ from .top_level_dialogs import DialogPickerTopLevel
 class StoredFoodTablesFrame:
     """Frame for rendering/filtering stored food labels/tables"""
 
-    text_constants = text_constants
     HEADER_LABELS = (
         '#',
         text_constants['food_name_lbl'],
@@ -139,6 +138,8 @@ class StoredFoodTablesFrame:
             # re-render them with the sorted list of food tables
             self.nutrition_table_frame.render_results(self.food_tables)
     
-    def _open_update_center(self, event):
-        DialogPickerTopLevel(self.db, event.widget['text'])
+    def _open_update_center(self, food_row):
+        # All operations can be done solely on the food name
+        label_name_widget = food_row[nutrition_table_map['label_name']]
+        DialogPickerTopLevel(self.db, label_name_widget['text'])
 

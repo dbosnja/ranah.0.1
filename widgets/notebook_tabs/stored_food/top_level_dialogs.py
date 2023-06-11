@@ -43,7 +43,7 @@ class UpdateDialogTopLevel:
     def _create_styles(self):
         self.add_btn_style = ttk.Style()
         self.add_btn_style.configure('UpdateFoodTable.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.add_btn_style.    map('UpdateFoodTable.TButton', background=[('active', '#00994D')])
+        self.add_btn_style.map('UpdateFoodTable.TButton', background=[('active', '#00994D')])
 
         self.cancel_btn_style = ttk.Style()
         self.cancel_btn_style.configure('CancelUpdate.TButton', font=(25), padding=(0, 5, 0, 5))
@@ -126,8 +126,8 @@ class UpdateDialogTopLevel:
         self.food_name_lbl = ttk.Label(text=text_constants['food_name_lbl'], **self.mutual_label_options)
         self.food_name_e = ttk.Entry(self.dialog_center, textvariable=self.food_name_var, width=20,font='default 17', justify='center', state='readonly')
 
-        self.update_btn = ttk.Button(self.dialog_center, text='Ažuriraj', command=self._update_food_table, style='UpdateFoodTable.TButton')
-        self.cancel_btn = ttk.Button(self.dialog_center, text='Odustani', command=self.dialog_center.destroy, style='CancelUpdate.TButton')
+        self.update_btn = ttk.Button(text='Ažuriraj', command=self._update_food_table, style='UpdateFoodTable.TButton', **self.mutual_button_options)
+        self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelUpdate.TButton', **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, sticky='we', columnspan=4)

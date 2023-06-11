@@ -51,8 +51,9 @@ class FoodTableResult:
             self.all_row_data.append(lbl)
         # change cursor for name dimension and attach an event to it
         self.all_row_data[1]['cursor'] = 'hand2'
-        self.all_row_data[1].bind('<1>', lambda event: self.callback(event))
-    
+        if self.callback:
+            self.all_row_data[1].bind('<1>', lambda _: self.callback(self.all_row_data))
+
     def render_tally_row(self, row, tally_row_data):
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
