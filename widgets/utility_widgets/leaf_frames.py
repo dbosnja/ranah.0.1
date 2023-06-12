@@ -33,6 +33,12 @@ class ScrollBarWidget:
 
 class FoodTableResult:
     """Labels for rendering one food table/row"""
+
+    MUTUAL_LABEL_OPTIONS = {
+        'anchor': 'center',
+        'padding': 5,
+        'cursor': 'hand2',
+    }
     
     def __init__(self, parent, callback=None):
         self.parent = parent
@@ -46,21 +52,18 @@ class FoodTableResult:
         # replace primary key with its row number in the table
         row_data[0] = row
         for i, data in enumerate(row_data):
-            lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
+            lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
             lbl.grid(row=row, column=i, sticky='we')
             lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
             lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
+            lbl.bind('<1>', lambda _: self.callback(self.p_key))
             self.all_row_data.append(lbl)
-        # change cursor for name dimension and attach an event to it
-        self.all_row_data[1]['cursor'] = 'hand2'
-        if self.callback:
-            self.all_row_data[1].bind('<1>', lambda _: self.callback(self.p_key))
 
     def render_tally_row(self, row, tally_row_data):
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
         for i, data in enumerate(tally_row_data):
-            lbl = ttk.Label(self.parent.frame, text=data, anchor='center', padding=(5), background=bckgrnd_color)
+            lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
             lbl.grid(row=row, column=i, sticky='we')
             self.all_row_data.append(lbl)
 
@@ -77,6 +80,7 @@ class FoodTableHeaders:
         self.parent = parent
         self.header_labels = header_labels
         self.label_widgets = []
+        self.marked_column = None
         
         self._create_widgets()
         self._grid_widgets()
@@ -91,6 +95,21 @@ class FoodTableHeaders:
     def _grid_widgets(self):
         for i, widget in enumerate(self.label_widgets):
             widget.grid(row=0, column=i, sticky='we')
+
+    def mark_column(self, col_id, col_color=None):
+        """Mark sorting column with a different color, ie. `col_color`"""
+
+        col_color = col_color if col_color is not None else 'red'
+
+        if self.marked_column is None:
+            self.marked_column = col_id
+            self.label_widgets[self.marked_column]['background'] = col_color
+
+        # If the current marked column is about to change, set that one to system's default.
+        elif self.marked_column is not None and self.marked_column != col_id:
+            self.label_widgets[self.marked_column]['background'] = ''
+            self.marked_column = col_id
+            self.label_widgets[self.marked_column]['background'] = col_color
 
 
 class FoodTableResultsFrame:
@@ -134,8 +153,7 @@ class FoodTableResultsFrame:
         self.frame.configure(style=style_name)
 
     def render_headers(self):
-        # NOTE: Do I need to save the instance of the table headers?
-        headers_frame = FoodTableHeaders(self, self.table_headers)
+        self.headers_frame = FoodTableHeaders(self, self.table_headers)
     
     def render_results(self, food_tables):
         for i, food_table in enumerate(food_tables):
@@ -150,6 +168,9 @@ class FoodTableResultsFrame:
         row = FoodTableResult(self)
         self.all_rows.append(row)
         row.render_tally_row(len(self.all_rows), tally_row)
+
+    def mark_column(self, col_id, col_color=None):
+        self.headers_frame.mark_column(col_id, col_color)
 
     def set_row_callback(self, callback):
         """Set which callback will be called when user clicks on the name field in a row"""

@@ -44,19 +44,16 @@ class ConsumedFoodSearchOptionsFrame:
 
         self.search_name_e_var = StringVar()
 
-        self.time_from_day_var = StringVar()
-        self.time_from_day_var.set(today.day)
-        self.time_from_month_var = StringVar()
-        self.time_from_month_var.set(today.month)
-        self.time_from_year_var = StringVar()
-        self.time_from_year_var.set(today.year)
+        self.time_from_day_var = StringVar(value=today.day)
+        self.time_from_month_var = StringVar(value=today.month)
+        self.time_from_year_var = StringVar(value=today.year)
 
         self.time_to_day_var = StringVar()
         self.time_to_month_var = StringVar()
         self.time_to_year_var = StringVar()
 
         self.selected_sort_option_var = StringVar()
-        self.sort_option_direction_var = StringVar()
+        self.sort_option_direction_var = StringVar(value='asc')
 
     def _create_widgets(self):
         self.search_options_topic_lbl = ttk.Label(self.frame, text='Opcije pretraživanja', style='CFoodTopic.TLabel', padding=6)
@@ -189,8 +186,7 @@ class ConsumedFoodItemsFrame:
     def _create_widget_vars(self):
         self.topic_lbl_text = 'Pretraži konzumiranu hranu'
 
-        self.consumed_food_tally_lbl_var = StringVar()
-        self.consumed_food_tally_lbl_var.set('0 rezultata')
+        self.consumed_food_tally_lbl_var = StringVar(value='0 rezultata')
 
     def _create_widgets(self):
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='ConsumedFoodTopic.TLabel')
@@ -264,6 +260,7 @@ class ConsumedFoodItemsFrame:
             if v == sort_option:
                 idx = consumed_food_map[k]
                 break
+        self.consumed_food_table_frame.mark_column(idx)
         if idx == 1:
             # sort by name works based on ASCII -> compare with case insensitivity
             self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)

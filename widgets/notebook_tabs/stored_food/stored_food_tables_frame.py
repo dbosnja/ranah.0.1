@@ -46,10 +46,9 @@ class StoredFoodTablesFrame:
     
     def _create_widget_vars(self):
         self.search_food_e_var = StringVar()
-        self.food_tables_tally_lbl_var = StringVar()
-        self.food_tables_tally_lbl_var.set('0 rezultata')
+        self.food_tables_tally_lbl_var = StringVar(value='0 rezultata')
         self.selected_sort_option_var = StringVar()
-        self.sort_option_direction_var = StringVar()
+        self.sort_option_direction_var = StringVar(value='asc')
     
     def _create_widgets(self):
         # TODO: make these widget all under one single Frame parent
@@ -123,20 +122,22 @@ class StoredFoodTablesFrame:
         self.nutrition_table_frame.render_results(self.food_tables)
 
     def _sort_results(self):
+        sort_option = self.selected_sort_option_var.get()
+        if not sort_option:
+            return
         sort_direction = self.sort_option_direction_var.get()
         rev = True if sort_direction == 'desc' else False
-        sort_option = self.selected_sort_option_var.get()
-        if sort_option:
-            idx = self.HEADER_LABELS.index(sort_option)
-            if idx == 1:
-                # sort by name works based on ASCII -> compare with case insensitivity
-                self.food_tables.sort(key=lambda row: row[idx].lower(), reverse=rev)
-            else:
-                self.food_tables.sort(key=lambda row: row[idx], reverse=rev)
-            # Clear all rendered rows
-            self.nutrition_table_frame.destroy_rows()
-            # re-render them with the sorted list of food tables
-            self.nutrition_table_frame.render_results(self.food_tables)
+        idx = self.HEADER_LABELS.index(sort_option)
+        self.nutrition_table_frame.mark_column(idx)
+        if idx == 1:
+            # sort by name works based on ASCII -> compare with case insensitivity
+            self.food_tables.sort(key=lambda row: row[idx].lower(), reverse=rev)
+        else:
+            self.food_tables.sort(key=lambda row: row[idx], reverse=rev)
+        # Clear all rendered rows
+        self.nutrition_table_frame.destroy_rows()
+        # re-render them with the sorted list of food tables
+        self.nutrition_table_frame.render_results(self.food_tables)
 
     def _open_update_center(self, p_key):
         # All operations can be done solely on the food table name
