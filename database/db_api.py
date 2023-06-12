@@ -182,3 +182,13 @@ class Database:
             conn.execute(del_stmt)
             conn.commit()
 
+    def update_consumed_food_item(self, p_key, **values):
+        """Update one consumed food item based on its primary key"""
+
+        update_stmt = update(consumed_food_items_table)
+        update_stmt = update_stmt.where(consumed_food_items_table.c.food_id == p_key)
+        update_stmt = update_stmt.values(values)
+        with self.engine.connect() as conn:
+            conn.execute(update_stmt)
+            conn.commit()
+

@@ -29,8 +29,9 @@ Ranah2.0 Roadmap
 	c) it should be a drop-down list instead of user writing in the numbers   DONE
 	d) list all consumed food within the required time range together with their data   DONE
 	e) end the list with a final row which represents the total sum of all listed rows  DONE
-	f) enable and implement update/delete/close operation on every consumed food row
+	f) enable and implement update/delete/close operation on every consumed food row  DONE
 	g) add callback everywhere in the row  DONE
+	i) search consumed food ONLY by name?
 
 ## ITERATION 2.3 ##
 
