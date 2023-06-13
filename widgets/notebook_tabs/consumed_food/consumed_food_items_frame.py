@@ -91,7 +91,7 @@ class ConsumedFoodSearchOptionsFrame:
 
     def _grid_widgets(self):
         self.search_options_topic_lbl.grid(row=0, column=0, columnspan=6, pady=(0, 30))
-        self.search_name_lbl.grid(row=1, column=0, columnspan=3, pady=(0, 10))
+        self.search_name_lbl.grid(row=1, column=0, columnspan=3, padx=(0, 5), pady=(0, 10))
         self.search_name_e.grid(row=1, column=3, columnspan=3, pady=(0, 10))
         
         self.time_lbl.grid(row=2, column=0, columnspan=6, pady=(5, 10))
@@ -140,7 +140,7 @@ class ConsumedFoodSearchOptionsFrame:
             self.time_to_month_var.set(to_m)
             self.time_to_year_var.set(to_y)
         food_name = self.search_name_e_var.get().strip()
-        self.consumed_foods = self.parent.search_foods(start_time, end_time, food_name)
+        self.parent.search_foods(start_time, end_time, food_name)
 
     def _sort_results(self):
         sort_option = self.selected_sort_option_var.get()

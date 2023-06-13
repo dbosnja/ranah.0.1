@@ -7,7 +7,9 @@ this module into several modules within a (sub)package
 # TODO: clean this file up a bit, some names are misleading,
 # also back-patching definitions should have same type for both Canvas
 
+# TODO: consider using Enum types here for the definitions
 
+# TODO: clean this operand -> it mixes values from two different tabs(create food and stored food)
 text_constants = {
         'topic_lbl': 'Nutritivne vrijednosti na 100 grama/miliLitara artikla',
         'calory_lbl': 'Kalorije',
@@ -40,6 +42,22 @@ nutrition_table_map = {
     'price': 9,
     'created_on': 10,
     'updated_on': 11,
+}
+
+
+nutrition_table_headers = {
+    '#': '#',
+    'label_name': 'Ime',
+    'calories': 'Kalorije',
+    'fat': 'Masti',
+    'saturated_fat': 'Zasićene masti',
+    'carbs': 'Ugljikohidrati',
+    'sugars': 'Šećeri',
+    'fiber': 'Vlakna',
+    'proteins': 'Bjelančevine',
+    'price': 'Cijena',
+    'created_on': 'Kreirano',
+    'updated_on': 'Ažurirano',
 }
 
 
