@@ -184,6 +184,8 @@ class StoredFoodTablesFrame:
         text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
         self.food_tables_tally_lbl_var.set(f'{cnt} {text}')
 
+        # uncolor the sorting column since it was present for the old results
+        self.nutrition_table_frame.unmark_column()
         # Clear all rendered rows
         self.nutrition_table_frame.destroy_rows()
         # re-render them with the updated list of food tables

@@ -232,6 +232,8 @@ class ConsumedFoodItemsFrame:
 
         self.tally_row = self._calculate_tally_row(start_time, end_time)
 
+        # uncolor the sorting column since it was present for the old results
+        self.consumed_food_table_frame.unmark_column()
         # Clear all rendered rows
         self.consumed_food_table_frame.destroy_rows()
         # re-render them with the updated list of food tables
