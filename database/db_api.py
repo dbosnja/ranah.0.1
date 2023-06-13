@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, URL, select, and_, extract, delete, update
+from sqlalchemy import create_engine, URL, select, and_, extract, delete, update, column
 
 from .connection_params import DB_URL_PARAMS
 from .schema import metadata, nutrition_labels_table, consumed_food_items_table
@@ -191,4 +191,23 @@ class Database:
         with self.engine.connect() as conn:
             conn.execute(update_stmt)
             conn.commit()
+
+    def get_all_consumed_food_names(self):
+        """Return a set of all consumed food names"""
+
+        food_name_c = column('food_name')
+        sel_stmt = select(food_name_c).select_from(consumed_food_items_table)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel_stmt)
+        food_names = {fn.food_name for fn in rp}
+        return food_names
+
+    def get_consumed_foods_by_name(self, food_name):
+        """Return all vectors with name `food_name`"""
+
+        sel_stmt = select(consumed_food_items_table)
+        sel_stmt = sel_stmt.where(consumed_food_items_table.c.food_name == food_name)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel_stmt)
+            return [self._format_food_table_row(list(r), False) for r in rp]
 
