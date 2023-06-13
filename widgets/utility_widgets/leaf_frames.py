@@ -50,7 +50,7 @@ class FoodTableResult:
         # save primary key since it's used in the callbacks to distinguish between the rows
         self.p_key = row_data[0]
         # replace primary key with its row number in the table
-        row_data[0] = row
+        row_data = [row] + row_data[1:]
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
             lbl.grid(row=row, column=i, sticky='we')
@@ -63,7 +63,7 @@ class FoodTableResult:
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
         for i, data in enumerate(tally_row_data):
-            lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
+            lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, anchor='center', padding=5)
             lbl.grid(row=row, column=i, sticky='we')
             self.all_row_data.append(lbl)
 
