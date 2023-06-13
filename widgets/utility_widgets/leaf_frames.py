@@ -111,6 +111,13 @@ class FoodTableHeaders:
             self.marked_column = col_id
             self.label_widgets[self.marked_column]['background'] = col_color
 
+    def unmark_column(self):
+        """Unmark sorting column, if any."""
+
+        if self.marked_column is not None:
+            self.label_widgets[self.marked_column]['background'] = ''
+            self.marked_column = None
+
 
 class FoodTableResultsFrame:
     """Frame for rendering food table with result(s)
@@ -171,6 +178,9 @@ class FoodTableResultsFrame:
 
     def mark_column(self, col_id, col_color=None):
         self.headers_frame.mark_column(col_id, col_color)
+
+    def unmark_column(self):
+        self.headers_frame.unmark_column()
 
     def set_row_callback(self, callback):
         """Set which callback will be called when user clicks on the name field in a row"""
