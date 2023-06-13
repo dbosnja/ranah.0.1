@@ -18,6 +18,7 @@ class ConsumedFoodSearchOptionsFrame:
         self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(40, 30))
 
         self._create_mutual_combobox_options()
+        self._create_mutual_button_options()
 
         self._create_widget_vars()
         self._create_widgets()
@@ -30,6 +31,13 @@ class ConsumedFoodSearchOptionsFrame:
             'height': 6,
             'state': 'readonly',
             'width': 5,
+        }
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.frame,
+            'style': 'CFoodSearch.TButton',
+            'cursor': 'hand2',
         }
 
     def _create_styles(self):
@@ -59,7 +67,8 @@ class ConsumedFoodSearchOptionsFrame:
         self.search_options_topic_lbl = ttk.Label(self.frame, text='Opcije pretraživanja', style='CFoodTopic.TLabel', padding=6)
         self.search_name_lbl = ttk.Label(self.frame, text='Naziv konzumiranog artikla', style='CFoodText.TLabel')
         self.search_name_e = ttk.Entry(self.frame, textvariable=self.search_name_e_var, font='default 12')
-        
+        self.search_name_btn = ttk.Button(text='Pretraži po imenu', command=self._search_by_name, **self.mutual_button_options)
+
         self.time_lbl = ttk.Label(self.frame, text='Vremenski raspon konzumiranja', style='CFoodText.TLabel')
         self.time_from_lbl = ttk.Label(self.frame, text='Od', style='CFoodText.TLabel')
         self.time_to_lbl = ttk.Label(self.frame, text='Do', style='CFoodText.TLabel')
@@ -75,7 +84,7 @@ class ConsumedFoodSearchOptionsFrame:
                                             **self.mutual_cbox_options, cursor='hand2')
         self.time_to_year_c = ttk.Combobox(values=[''] + list(range(2023, 2026)), textvariable=self.time_to_year_var,
                                            **self.mutual_cbox_options, cursor='hand2')
-        self.search_btn = ttk.Button(self.frame, text='Pretraži', command=self._search_foods, style='CFoodSearch.TButton', cursor='hand2')
+        self.search_btn = ttk.Button(text='Pretraži', command=self._search_foods, **self.mutual_button_options)
 
         self.vertical_separator = ttk.Separator(self.frame, orient='vertical')
         self.sort_options_topic_lbl = ttk.Label(self.frame, text='Opcije sortiranja', style='CFoodTopic.TLabel', padding=6)
@@ -87,25 +96,27 @@ class ConsumedFoodSearchOptionsFrame:
         self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno',
                                                            variable=self.sort_option_direction_var, value='desc',
                                                            style='CFoodRadio.TRadiobutton', cursor='hand2')
-        self.sort_btn = ttk.Button(self.frame, text='Sortiraj', style='CFoodSearch.TButton', cursor='hand2', command=self._sort_results)
+        self.sort_btn = ttk.Button(text='Sortiraj', command=self._sort_results, **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.search_options_topic_lbl.grid(row=0, column=0, columnspan=6, pady=(0, 30))
-        self.search_name_lbl.grid(row=1, column=0, columnspan=3, padx=(0, 5), pady=(0, 10))
-        self.search_name_e.grid(row=1, column=3, columnspan=3, pady=(0, 10))
-        
-        self.time_lbl.grid(row=2, column=0, columnspan=6, pady=(5, 10))
-        self.time_from_lbl.grid(row=3, column=0, columnspan=3, pady=(0, 5))
-        self.time_to_lbl.grid(row=3, column=3, columnspan=3, pady=(0, 5))
-        self.time_from_day_c.grid(row=4, column=0)
-        self.time_from_month_c.grid(row=4, column=1)
-        self.time_from_year_c.grid(row=4, column=2, padx=(0, 20))
-        self.time_to_day_c.grid(row=4, column=3)
-        self.time_to_month_c.grid(row=4, column=4)
-        self.time_to_year_c.grid(row=4, column=5)
-        self.search_btn.grid(row=5, column=0, columnspan=6, pady=(30, 0))
+        self.search_name_lbl.grid(row=1, column=0, columnspan=3, padx=(0, 5))
+        self.search_name_e.grid(row=1, column=3, columnspan=3)
+        self.search_name_btn.grid(row=2, column=0, columnspan=6)
 
-        self.vertical_separator.grid(row=0, column=6, rowspan=6, sticky='ns', padx=(60, 0))
+        self.time_lbl.grid(row=3, column=0, columnspan=6, pady=(5, 10))
+        self.time_from_lbl.grid(row=4, column=0, columnspan=3, pady=(0, 5))
+        self.time_to_lbl.grid(row=4, column=3, columnspan=3, pady=(0, 5))
+        self.time_from_day_c.grid(row=5, column=0)
+        self.time_from_month_c.grid(row=5, column=1)
+        self.time_from_year_c.grid(row=5, column=2, padx=(0, 20))
+        self.time_to_day_c.grid(row=5, column=3)
+        self.time_to_month_c.grid(row=5, column=4)
+        self.time_to_year_c.grid(row=5, column=5)
+        self.search_btn.grid(row=6, column=0, columnspan=6, pady=(30, 0))
+
+        self.vertical_separator.grid(row=0, column=6, rowspan=7, sticky='ns', padx=(60, 0))
+        
         self.sort_options_topic_lbl.grid(row=0, column=7, columnspan=5, padx=(60, 0), pady=(0, 30))
         self.sort_options_cbox.grid(row=1, column=7, columnspan=3, padx=(60, 15), pady=(0, 10))
         self.ascending_sort_option_rbtn.grid(row=1, column=10, padx=(0, 15), pady=(0, 10))
@@ -115,7 +126,7 @@ class ConsumedFoodSearchOptionsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
         self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
-        self.search_name_e.bind('<Return>', lambda _: self._search_foods())
+        self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
     
     def _search_foods(self):
         from_d, from_m, from_y = [v.get()
@@ -148,6 +159,10 @@ class ConsumedFoodSearchOptionsFrame:
             sort_direction = self.sort_option_direction_var.get()
             rev = True if sort_direction == 'desc' else False
             self.parent.sort_results(sort_option, rev)
+
+    def _search_by_name(self):
+        c_food_name = self.search_name_e_var.get().strip()
+        self.parent.search_by_name(c_food_name)
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky, padx=(20), pady=(0, 20))
@@ -231,7 +246,6 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
 
         self.tally_row = self._calculate_tally_row(start_time, end_time)
-
         # uncolor the sorting column since it was present for the old results
         self.consumed_food_table_frame.unmark_column()
         # Clear all rendered rows
@@ -274,6 +288,58 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.render_results(self.consumed_foods)
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
+
+    def search_by_name(self, food_name):
+        """Search all consumed foods based only on the given name
+
+        The filtering is based ond the `in` operator and case sensitivity is ignored.
+        """
+        consumed_food_names = self.db.get_all_consumed_food_names()
+        # if food_name is empty return all results, otherwise do the filtering
+        if food_name:
+            food_name = food_name.lower()
+            consumed_food_names = [fn for fn in consumed_food_names if food_name in fn.lower()]
+        self.consumed_foods = [fr
+                               for fn in consumed_food_names
+                               for fr in self.db.get_consumed_foods_by_name(fn)]
+
+        # update the number of results label
+        cnt = len(self.consumed_foods)
+        cnt_s = str(cnt).zfill(2)
+        text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
+        self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
+
+        # calculate earliest and latest timestamps
+        min_t, max_t = self._get_edge_timestamps()
+
+        self.tally_row = self._calculate_tally_row(min_t, max_t)
+        # uncolor the sorting column since it was present for the old results
+        self.consumed_food_table_frame.unmark_column()
+        # Clear all rendered rows
+        self.consumed_food_table_frame.destroy_rows()
+        # re-render them with the updated list of food tables
+        self.consumed_food_table_frame.render_results(self.consumed_foods)
+        # render the tally row
+        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+
+    def _get_edge_timestamps(self):
+        """Return earliest and latest from consumed food results
+
+        # NOTE: not the best design, but I'll live with it -> I had to adhere to `_calculate_tally_row` API
+        If timestamps is empty return dummy values(datetime.now()).
+        If earliest and latest timestamps are the same return only one and None
+        Otherwise return both of them.
+        """
+        time_idx = consumed_food_map['created_on']
+        timestamps = [cf[time_idx] for cf in self.consumed_foods]
+        if not timestamps:
+            return datetime.datetime.now(), datetime.datetime.now()
+        min_t, max_t = min(timestamps), max(timestamps)
+        start_time = datetime.datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
+        end_time = datetime.datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
+        if start_time == end_time:
+            return start_time, None
+        return start_time, end_time
 
     def _open_update_center(self, p_key):
         # Fetch the complete table row since consumed food name is not globally unique

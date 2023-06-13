@@ -31,9 +31,10 @@ Ranah2.0 Roadmap
 	e) end the list with a final row which represents the total sum of all listed rows  DONE
 	f) enable and implement update/delete/close operation on every consumed food row  DONE
 	g) add callback everywhere in the row  DONE
-	i) create search/sort options frame for stored food tab just like the one present for consumed food tab   DONE
-	j) search consumed food ONLY by name?
-	k) search button handler must turn off colored column off, ie style it like the rest of the column headers
+	h) create search/sort options frame for stored food tab just like the one present for consumed food tab   DONE
+	i) search consumed food ONLY by name?	DONE
+	j) search button handler must turn off colored column off, ie style it like the rest of the column headers  DONE
+	k) add option on stored food table has to include datetime option as well(besides the weight option)
 
 ## ITERATION 2.3 ##
 

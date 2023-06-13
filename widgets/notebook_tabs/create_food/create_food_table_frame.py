@@ -111,7 +111,7 @@ class CreateFoodLabelFrame:
         
         # raise error if food name already present in Ranah
         if not self.db.is_food_name_unique(stripped_food_name):
-            messagebox.showerror(message=f'Naziv artikla već postoji!\n`{stripped_food_name}`', title='Duplicirano ime artikla')
+            messagebox.showerror(message=f'Artikl s nazivom`{stripped_food_name}` već postoji!', title='Duplicirano ime artikla')
             return
         
         # raise error if food price not defined
