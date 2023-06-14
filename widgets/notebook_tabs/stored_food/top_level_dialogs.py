@@ -448,6 +448,7 @@ class UpdateDialogTopLevel:
             'price': self._parse_input_to_float(self.food_price_var.get()),
         }
         self.db.update_food_item_table(**record)
+        self.parent.press_serch_button()
         self.dialog_center.destroy()
         messagebox.showinfo(title='Artikl ažuriran',
                             message=f'`{self.label_name}` uspješno ažuriran.',
@@ -522,15 +523,18 @@ class DeleteDialogTopLevel:
 
     def _delete_food_name(self):
         self.db.delete_food_table(self.label_name)
+        self.parent.press_serch_button()
         self.dialog_center.destroy()
+        self.parent.dialog_center.destroy()
         messagebox.showinfo(title='Artikl trajno izbrisan',
                             message=f'Uspješno izbrisan `{self.label_name}`',
-                            parent=self.parent.dialog_center)
+                            parent=self.parent.parent.frame)
 
 
 class DialogPickerTopLevel:
     """Description"""
-    def __init__(self, db, food_row):
+    def __init__(self, parent, db, food_row):
+        self.parent = parent
         self.db = db
         self.label_name = food_row[nutrition_table_map['label_name']]
         self.food_row = food_row
@@ -626,3 +630,7 @@ class DialogPickerTopLevel:
     def _create_update_dialog(self):
         UpdateDialogTopLevel(self, self.db, self.label_name)
 
+    def set_serch_button(self, callback):
+        """Callback for invoking search button"""
+
+        self.press_serch_button = callback

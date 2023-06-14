@@ -210,5 +210,6 @@ class StoredFoodTablesFrame:
     def _open_update_center(self, p_key):
         # All operations can be done solely on the food table name
         table_row = self.db.get_food_item_table_by_primary_key(p_key)
-        DialogPickerTopLevel(self.db, table_row)
+        dialog_picker = DialogPickerTopLevel(self, self.db, table_row)
+        dialog_picker.set_serch_button(self.stored_food_search_options_frame._search_foods)
 
