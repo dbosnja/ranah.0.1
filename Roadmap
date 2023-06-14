@@ -34,7 +34,11 @@ Ranah2.0 Roadmap
 	h) create search/sort options frame for stored food tab just like the one present for consumed food tab   DONE
 	i) search consumed food ONLY by name?	DONE
 	j) search button handler must turn off colored column off, ie style it like the rest of the column headers  DONE
-	k) add option on stored food table has to include datetime option as well(besides the weight option)
+	k) add option on stored food table has to include datetime option as well(besides the weight option)  DONE
+	l) Update and Delete operations on food operands need to refresh the state of the application, and do the re-rendering.
+   	   Similar to broswer refreshing the page when an update operation is done. Otherwise clicking on deleted row is producing an error
+   	   and update operation are not visible until user clicks search button again, this should be automatic behaviour.  DONE
+	m) fix the sorting -> fails for timestamps key   DONE
 
 ## ITERATION 2.3 ##
 

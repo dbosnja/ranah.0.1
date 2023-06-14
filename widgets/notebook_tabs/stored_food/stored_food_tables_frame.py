@@ -1,3 +1,5 @@
+import datetime
+
 from tkinter import ttk, StringVar
 
 from constants.constants import nutrition_table_map, nutrition_table_headers
@@ -197,9 +199,12 @@ class StoredFoodTablesFrame:
                 idx = nutrition_table_map[k]
                 break
         self.nutrition_table_frame.mark_column(idx)
-        if idx == 1:
+        if idx == nutrition_table_map['label_name']:
             # sort by name works based on ASCII -> compare with case insensitivity
             self.food_tables.sort(key=lambda row: row[idx].lower(), reverse=rev)
+        elif idx in (nutrition_table_map['created_on'], nutrition_table_map['updated_on']):
+            # sort by datetime instances instead of strings representing datetime stamp
+            self.food_tables.sort(key=lambda row: datetime.datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
         else:
             self.food_tables.sort(key=lambda row: row[idx], reverse=rev)
         # Clear all rendered rows

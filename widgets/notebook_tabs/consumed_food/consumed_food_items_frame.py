@@ -280,9 +280,12 @@ class ConsumedFoodItemsFrame:
                 idx = consumed_food_map[k]
                 break
         self.consumed_food_table_frame.mark_column(idx)
-        if idx == 1:
+        if idx == consumed_food_map['food_name']:
             # sort by name works based on ASCII -> compare with case insensitivity
             self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)
+        elif idx == consumed_food_map['created_on']:
+            # sort by datetime instances instead of strings representing datetime stamp
+            self.consumed_foods.sort(key=lambda row: datetime.datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
         else:
             self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
         # Clear all rendered rows
