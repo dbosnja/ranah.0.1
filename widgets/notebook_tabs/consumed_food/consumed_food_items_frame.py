@@ -255,6 +255,9 @@ class ConsumedFoodItemsFrame:
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
+        # since there are 2 search operation, save the last one used by a user
+        self.last_search_operation = self.consumed_food_search_options_frame._search_foods
+
     def _calculate_tally_row(self, start_time, end_time):
         """Return the sum of all rows or None if no rows present"""
         if not self.consumed_foods:
@@ -322,6 +325,9 @@ class ConsumedFoodItemsFrame:
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
+        # since there are 2 search operation, save the last one used by a user
+        self.last_search_operation = self.consumed_food_search_options_frame._search_by_name
+
     def _get_edge_timestamps(self):
         """Return earliest and latest from consumed food results
 
@@ -344,5 +350,5 @@ class ConsumedFoodItemsFrame:
     def _open_update_center(self, p_key):
         # Fetch the complete table row since consumed food name is not globally unique
         consumed_food_row = self.db.get_consumed_food_by_primary_key(p_key)
-        DialogPickerTopLevel(self.db, consumed_food_row)
+        DialogPickerTopLevel(self, self.db, consumed_food_row)
 

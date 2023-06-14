@@ -248,7 +248,11 @@ class UpdateDialogTopLevel:
             for k in list(consumed_food_map.keys())[2:]
         }
         self.db.update_consumed_food_item(self.row_p_key, **record)
-        
+
+        # looks ugly but it's the best I got at the moment
+        # there's no way of knowing which search option was last pressed
+        # but Ranah has to update the state after update operation
+        self.parent.parent.last_search_operation()
         self.dialog_center.destroy()
         messagebox.showinfo(title='Konzumirani artikl ažuriran',
                             message=f'`{self.label_name}` uspješno ažuriran.',
@@ -327,15 +331,21 @@ class DeleteDialogTopLevel:
 
     def _delete_food_name(self):
         self.db.delete_consumed_food_by_primary_key(self.row_p_key)
+        # looks ugly but it's the best I got at the moment
+        # there's no way of knowing which search option was last pressed
+        # but Ranah has to update the state after delete operation
+        self.parent.parent.last_search_operation()
         self.dialog_center.destroy()
+        self.parent.dialog_center.destroy()
         messagebox.showinfo(title='Konzumirani artikl trajno izbrisan',
                             message=f'`{self.label_name}` uspješno izbrisan.',
-                            parent=self.parent.dialog_center)
+                            parent=self.parent.parent.frame)
 
 
 class DialogPickerTopLevel:
     """Description"""
-    def __init__(self, db, food_row):
+    def __init__(self, parent, db, food_row):
+        self.parent = parent
         self.db = db
         self.label_name = food_row[consumed_food_map['food_name']]
         self.food_row = food_row
