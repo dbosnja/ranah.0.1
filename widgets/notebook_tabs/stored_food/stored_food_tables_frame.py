@@ -210,6 +210,5 @@ class StoredFoodTablesFrame:
     def _open_update_center(self, p_key):
         # All operations can be done solely on the food table name
         table_row = self.db.get_food_item_table_by_primary_key(p_key)
-        label_name = table_row[nutrition_table_map['label_name']]
-        DialogPickerTopLevel(self.db, label_name)
+        DialogPickerTopLevel(self.db, table_row)
 

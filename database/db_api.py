@@ -47,6 +47,7 @@ class Database:
     
     def insert_new_food_item_record(self, **values):
         """Insert a new nutrition table record of a food item"""
+
         ins = nutrition_labels_table.insert().values(**values)
         with self.engine.connect() as conn:
             # TODO: handle exceptions, e.g. Integrity Error -> this could be a complex topic
@@ -123,9 +124,6 @@ class Database:
         update_stmt = update(nutrition_labels_table)\
                   .where(nutrition_labels_table.c.label_name == values['label_name'])\
                   .values(values)
-        # update_stmt = update(nutrition_labels_table)\
-        #           .where(nutrition_labels_table.c.label_name == values['label_name'])\
-        #           .values(fat=3.14)
         with self.engine.connect() as conn:
             conn.execute(update_stmt)
             conn.commit()
