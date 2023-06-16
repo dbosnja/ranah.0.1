@@ -5,6 +5,8 @@ from .notebook_tabs.stored_food.stored_food_tables_canvas import StoredFoodTable
 from .notebook_tabs.consumed_food.consumed_food_items_canvas import ConsumedFoodItemsCanvas
 from .notebook_tabs.create_meal_template.create_meal_template_canvas import CreateMealTemplateCanvas
 
+from constants.constants import NotebookTabLabels
+
 
 class MainNotebook:
     """Notebook which provides tabs for Ranah app
@@ -14,7 +16,7 @@ class MainNotebook:
     """
 
     # TODO: Try to use Enum types here
-    TABS = (
+    TAB_TYPES = (
         CreateFoodTableCanvas,
         StoredFoodTablesCanvas,
         ConsumedFoodItemsCanvas,
@@ -22,18 +24,18 @@ class MainNotebook:
     )
 
     TAB_LABELS = (
-        'Nova nutritivna tablica',
-        'Sve nutritivne tablice',
-        'Konzumirana hrana',
-        'Novi predložak objeda',
+        e.value for e in NotebookTabLabels
     )
 
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
+        self.canvas_map = {}
 
         self._create_notebook(parent)
         self._initialize_tabs()
+
+        self._bind_events()
 
     def _create_notebook(self, parent):
         self.notebook = ttk.Notebook(parent, padding=5)
@@ -44,8 +46,15 @@ class MainNotebook:
 
     def _initialize_tabs(self):
         # TODO: enable switching between the tabs with Ctrl+PageUp/PageDown
-        for tab, tab_label in zip(self.TABS, self.TAB_LABELS):
+        for tab, tab_label in zip(self.TAB_TYPES, self.TAB_LABELS):
             # create the tab
             canvas_tab = tab(self.notebook, self.db)
             self.notebook.add(canvas_tab.canvas, text=tab_label)
+            self.canvas_map[tab_label] = canvas_tab
 
+    def _bind_events(self):
+        self.notebook.bind('<<NotebookTabChanged>>', lambda event: self._handle_tab_change(event))
+
+    def _handle_tab_change(self, event):
+        if event.widget.tab('current')['text'] == NotebookTabLabels.new_meal_template:
+            self.canvas_map[NotebookTabLabels.new_meal_template].frame.update_food_label_names()

@@ -4,6 +4,16 @@ If the app grows larger, it'd probably make sense to split
 this module into several modules within a (sub)package
 """
 
+from enum import StrEnum
+
+
+class NotebookTabLabels(StrEnum):
+    new_nutrition_table = 'Nova nutritivna tablica'
+    all_nutrition_tables = 'Sve nutritivne tablice',
+    consumed_food = 'Konzumirana hrana',
+    new_meal_template = 'Novi predložak objeda',
+
+
 # TODO: clean this file up a bit, some names are misleading,
 # also back-patching definitions should have same type for both Canvas
 
@@ -101,3 +111,4 @@ consumed_food_timestamp_map = {
     'hour': 'Sat',
     'minute': 'Minuta',
 }
+
