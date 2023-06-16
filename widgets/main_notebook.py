@@ -3,6 +3,7 @@ from tkinter import ttk
 from .notebook_tabs.create_food.create_food_table_canvas import CreateFoodTableCanvas
 from .notebook_tabs.stored_food.stored_food_tables_canvas import StoredFoodTablesCanvas
 from .notebook_tabs.consumed_food.consumed_food_items_canvas import ConsumedFoodItemsCanvas
+from .notebook_tabs.create_meal_template.create_meal_template_canvas import CreateMealTemplateCanvas
 
 
 class MainNotebook:
@@ -12,16 +13,19 @@ class MainNotebook:
     which holds all widgets and logic needed to implement the UI.
     """
 
+    # TODO: Try to use Enum types here
     TABS = (
         CreateFoodTableCanvas,
         StoredFoodTablesCanvas,
         ConsumedFoodItemsCanvas,
+        CreateMealTemplateCanvas,
     )
 
     TAB_LABELS = (
         'Nova nutritivna tablica',
         'Sve nutritivne tablice',
         'Konzumirana hrana',
+        'Novi predložak objeda',
     )
 
     def __init__(self, parent, db):
@@ -39,7 +43,7 @@ class MainNotebook:
         self.notebook.rowconfigure(0, weight=1)
 
     def _initialize_tabs(self):
-        # TODO: enable switching between the tabs with Ctrol+PageUp/PageDown
+        # TODO: enable switching between the tabs with Ctrl+PageUp/PageDown
         for tab, tab_label in zip(self.TABS, self.TAB_LABELS):
             # create the tab
             canvas_tab = tab(self.notebook, self.db)
