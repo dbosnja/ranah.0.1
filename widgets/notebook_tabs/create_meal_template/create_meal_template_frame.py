@@ -1,21 +1,26 @@
 import datetime
 
-from tkinter import ttk, StringVar
+from tkinter import ttk, StringVar, Listbox
 
-from ...utility_widgets.leaf_frames import FoodTableResultsFrame 
+from ...utility_widgets.leaf_frames import FoodTableResultsFrame, ScrollBarWidget
 from constants.constants import consumed_food_headers, consumed_food_map
 from .top_level_dialogs import DialogPickerTopLevel
 
 
-class ConsumedFoodSearchOptionsFrame:
-    """Frame for rendering options of searching and sorting for consumed foods tab."""
+class CreateTemplateOptionsFrame:
+    """Frame for rendering options of searching and adding new meal template."""
     
     def __init__(self, parent, db):
         self.db = db
         self.parent = parent
+
+        self._create_mutual_label_options()
+
         self._create_styles()
 
-        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(40, 30))
+        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(200, 50))
+        for i in range(5):
+            self.frame.columnconfigure(i, weight=1)
 
         self._create_mutual_combobox_options()
         self._create_mutual_button_options()
@@ -40,132 +45,140 @@ class ConsumedFoodSearchOptionsFrame:
             'cursor': 'hand2',
         }
 
+    def _create_mutual_label_options(self):
+        self.mutual_label_options = {
+            'borderwidth': 2,
+            'relief': 'ridge',
+            'anchor': 'center',
+            'padding': 8,
+            'font': 'default 11',
+        }
+
     def _create_styles(self):
         ttk.Style().configure('CFoodSearchOptions.TFrame', background='#F8FCE8', borderwidth=3, relief='ridge')
         ttk.Style().configure('CFoodTopic.TLabel', anchor='center', borderwidth=2, relief='ridge', background='#BFBFBF', font='default 12')
         ttk.Style().configure('CFoodText.TLabel', anchor='center', padding=2, font='default 12', background='#F8FCE8')
         ttk.Style().configure('CFoodSearch.TButton', anchor='center', padding=5, font='default 11')
         ttk.Style().configure('CFoodRadio.TRadiobutton', anchor='center', padding=5, font='default 10', background='#BFBFBF')
+        ttk.Style().configure('CreateTemplateSearchLbl.TLabel', background='#bfff80', **self.mutual_label_options)
 
     def _create_widget_vars(self):
-        today = datetime.datetime.now()
-
         self.search_name_e_var = StringVar()
+        self.tally_results_var = StringVar()
 
-        self.time_from_day_var = StringVar(value=today.day)
-        self.time_from_month_var = StringVar(value=today.month)
-        self.time_from_year_var = StringVar(value=today.year)
+        self.food_results_lbox_values = []
+        self.food_results_lbox_var = StringVar(value=self.food_results_lbox_values)
 
-        self.time_to_day_var = StringVar()
-        self.time_to_month_var = StringVar()
-        self.time_to_year_var = StringVar()
-
-        self.selected_sort_option_var = StringVar()
-        self.sort_option_direction_var = StringVar(value='asc')
+        self.food_name_var = StringVar()
+        self.food_weight_var = StringVar()
 
     def _create_widgets(self):
-        self.search_options_topic_lbl = ttk.Label(self.frame, text='Opcije pretraživanja', style='CFoodTopic.TLabel', padding=6)
-        self.search_name_lbl = ttk.Label(self.frame, text='Naziv konzumiranog artikla', style='CFoodText.TLabel')
-        self.search_name_e = ttk.Entry(self.frame, textvariable=self.search_name_e_var, font='default 12')
-        self.search_name_btn = ttk.Button(text='Pretraži po imenu', command=self._search_by_name, **self.mutual_button_options)
-
-        self.time_lbl = ttk.Label(self.frame, text='Vremenski raspon konzumiranja', style='CFoodText.TLabel')
-        self.time_from_lbl = ttk.Label(self.frame, text='Od', style='CFoodText.TLabel')
-        self.time_to_lbl = ttk.Label(self.frame, text='Do', style='CFoodText.TLabel')
-        self.time_from_day_c = ttk.Combobox(values=list(range(1, 32)), textvariable=self.time_from_day_var,
-                                            **self.mutual_cbox_options, cursor='hand2')
-        self.time_from_month_c = ttk.Combobox(values=list(range(1, 13)), textvariable=self.time_from_month_var,
-                                              **self.mutual_cbox_options, cursor='hand2')
-        self.time_from_year_c = ttk.Combobox(values=list(range(2023, 2026)), textvariable=self.time_from_year_var,
-                                             **self.mutual_cbox_options, cursor='hand2')
-        self.time_to_day_c = ttk.Combobox(values=[''] + list(range(1, 32)), textvariable=self.time_to_day_var,
-                                          **self.mutual_cbox_options, cursor='hand2')
-        self.time_to_month_c = ttk.Combobox(values=[''] + list(range(1, 13)), textvariable=self.time_to_month_var,
-                                            **self.mutual_cbox_options, cursor='hand2')
-        self.time_to_year_c = ttk.Combobox(values=[''] + list(range(2023, 2026)), textvariable=self.time_to_year_var,
-                                           **self.mutual_cbox_options, cursor='hand2')
-        self.search_btn = ttk.Button(text='Pretraži', command=self._search_foods, **self.mutual_button_options)
+        self.search_name_lbl = ttk.Label(self.frame, text='Pretraži artikle', style='CreateTemplateSearchLbl.TLabel')
+        self.search_name_e = ttk.Entry(self.frame, textvariable=self.search_name_e_var, font='default 12', width=30)
 
         self.vertical_separator = ttk.Separator(self.frame, orient='vertical')
-        self.sort_options_topic_lbl = ttk.Label(self.frame, text='Opcije sortiranja', style='CFoodTopic.TLabel', padding=6)
-        self.sort_options_cbox = ttk.Combobox(self.frame, values=list(consumed_food_headers.values())[1:], state='readonly',
-                                              textvariable=self.selected_sort_option_var, cursor='hand2')
-        self.ascending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Uzlazno',
-                                                          variable=self.sort_option_direction_var, value='asc',
-                                                          style='CFoodRadio.TRadiobutton', cursor='hand2')
-        self.descending_sort_option_rbtn = ttk.Radiobutton(self.frame, text='Silazno',
-                                                           variable=self.sort_option_direction_var, value='desc',
-                                                           style='CFoodRadio.TRadiobutton', cursor='hand2')
-        self.sort_btn = ttk.Button(text='Sortiraj', command=self._sort_results, **self.mutual_button_options)
+
+        self.tally_results_lbl = ttk.Label(self.frame, textvariable=self.tally_results_var, style='CreateTemplateSearchLbl.TLabel')
+        self.food_results_lbox = Listbox(self.frame, listvariable=self.food_results_lbox_var, cursor='hand2', width=40, height=5)
+        self.food_results_scrolly = ScrollBarWidget(self.frame)
+        self.food_results_scrolly.attach_to_scrollable(self.food_results_lbox)
+
+        self.horizontal_separator = ttk.Separator(self.frame, orient='horizontal')
+
+        self.food_name_lbl = ttk.Label(self.frame, text='Naziv artikla', style='CFoodText.TLabel')
+        self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, font='default 12', width=40, justify='center', state='readonly')
+
+        self.food_weight_lbl = ttk.Label(self.frame, text='Masa artikla', style='CFoodText.TLabel')
+        self.food_weight_e = ttk.Entry(self.frame, textvariable=self.food_weight_var, font='default 12')
+
+        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', cursor='hand2')
 
     def _grid_widgets(self):
-        self.search_options_topic_lbl.grid(row=0, column=0, columnspan=6, pady=(0, 30))
-        self.search_name_lbl.grid(row=1, column=0, columnspan=3, padx=(0, 5))
-        self.search_name_e.grid(row=1, column=3, columnspan=3)
-        self.search_name_btn.grid(row=2, column=0, columnspan=6)
+        self.search_name_lbl.grid(row=0, column=0, columnspan=2, padx=(0, 10), pady=(0, 10))
+        self.search_name_e.grid(row=1, column=0, columnspan=2, padx=(0, 10), pady=(0, 30))
 
-        self.time_lbl.grid(row=3, column=0, columnspan=6, pady=(5, 10))
-        self.time_from_lbl.grid(row=4, column=0, columnspan=3, pady=(0, 5))
-        self.time_to_lbl.grid(row=4, column=3, columnspan=3, pady=(0, 5))
-        self.time_from_day_c.grid(row=5, column=0)
-        self.time_from_month_c.grid(row=5, column=1)
-        self.time_from_year_c.grid(row=5, column=2, padx=(0, 20))
-        self.time_to_day_c.grid(row=5, column=3)
-        self.time_to_month_c.grid(row=5, column=4)
-        self.time_to_year_c.grid(row=5, column=5)
-        self.search_btn.grid(row=6, column=0, columnspan=6, pady=(30, 0))
+        self.vertical_separator.grid(row=0, column=2, rowspan=5, sticky='ns')
 
-        self.vertical_separator.grid(row=0, column=6, rowspan=7, sticky='ns', padx=(60, 0))
-        
-        self.sort_options_topic_lbl.grid(row=0, column=7, columnspan=5, padx=(60, 0), pady=(0, 30))
-        self.sort_options_cbox.grid(row=1, column=7, columnspan=3, padx=(60, 15), pady=(0, 10))
-        self.ascending_sort_option_rbtn.grid(row=1, column=10, padx=(0, 15), pady=(0, 10))
-        self.descending_sort_option_rbtn.grid(row=1, column=11, pady=(0, 10))
-        self.sort_btn.grid(row=2, column=8, columnspan=5, pady=(20, 0))
+        self.tally_results_lbl.grid(row=0, column=3, columnspan=2, padx=(80, 0), pady=(0, 20))
+        self.food_results_lbox.grid(row=1, column=3, columnspan=2, padx=(80, 0), pady=(0, 30), sticky='we')
+        self.food_results_scrolly.scroll_bar.grid(row=1, column=4, sticky='ens', pady=(0, 30))
+        # self.food_results_scrolly.grid(row=1, column=5, columnspan=1)
+
+        self.horizontal_separator.grid(row=2, column=0, columnspan=6, sticky='we')
+
+        self.food_name_lbl.grid(row=3, column=0, columnspan=2, padx=(0, 10), pady=(100, 10))
+        self.food_name_e.grid(row=4, column=0, columnspan=2, padx=(0, 10), pady=(0, 50))
+
+        self.food_weight_lbl.grid(row=3, column=3, columnspan=2, padx=(10, 0), pady=(100, 10))
+        self.food_weight_e.grid(row=4, column=3, columnspan=2, padx=(10, 0), pady=(0, 50))
+
+        self.add_template_btn.grid(row=5, column=0, columnspan=5, pady=(50, 0))
     
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
-        self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
-        self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
+        self.food_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_food_name())
+        # self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
+        # self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
+        # self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
+
+    def _set_food_name(self):
+        if not self.food_results_lbox.curselection():
+            # NOTE: some weird error which I didn't debug yet
+            return
+        idx, = self.food_results_lbox.curselection()
+        self.food_name_var.set(self.food_results_lbox_values[idx])
     
     def _search_foods(self):
-        from_d, from_m, from_y = [v.get()
-                                  for v in (self.time_from_day_var,
-                                            self.time_from_month_var,
-                                            self.time_from_year_var)]
-        start_time = datetime.datetime.strptime(f'{from_d}-{from_m}-{from_y}', '%d-%m-%Y')
-        to_d, to_m, to_y = [v.get()
-                            for v in (self.time_to_day_var,
-                                      self.time_to_month_var,
-                                      self.time_to_year_var)]
-        if not any(x for x in (to_d, to_m, to_y)):
-            end_time = None
-        else:
-            # NOTE: subject to change in Future
-            to_d = to_d or '1'
-            to_m = to_m or '1'
-            to_y = to_y or start_time.year + 1
-            end_time = datetime.datetime.strptime(f'{to_d}-{to_m}-{to_y}', '%d-%m-%Y')
-            # make changes visible to the user
-            self.time_to_day_var.set(to_d)
-            self.time_to_month_var.set(to_m)
-            self.time_to_year_var.set(to_y)
-        food_name = self.search_name_e_var.get().strip()
-        self.parent.search_foods(start_time, end_time, food_name)
+        pass
+        # from_d, from_m, from_y = [v.get()
+        #                           for v in (self.time_from_day_var,
+        #                                     self.time_from_month_var,
+        #                                     self.time_from_year_var)]
+        # start_time = datetime.datetime.strptime(f'{from_d}-{from_m}-{from_y}', '%d-%m-%Y')
+        # to_d, to_m, to_y = [v.get()
+        #                     for v in (self.time_to_day_var,
+        #                               self.time_to_month_var,
+        #                               self.time_to_year_var)]
+        # if not any(x for x in (to_d, to_m, to_y)):
+        #     end_time = None
+        # else:
+        #     # NOTE: subject to change in Future
+        #     to_d = to_d or '1'
+        #     to_m = to_m or '1'
+        #     to_y = to_y or start_time.year + 1
+        #     end_time = datetime.datetime.strptime(f'{to_d}-{to_m}-{to_y}', '%d-%m-%Y')
+        #     # make changes visible to the user
+        #     self.time_to_day_var.set(to_d)
+        #     self.time_to_month_var.set(to_m)
+        #     self.time_to_year_var.set(to_y)
+        # food_name = self.search_name_e_var.get().strip()
+        # self.parent.search_foods(start_time, end_time, food_name)
 
     def _sort_results(self):
-        sort_option = self.selected_sort_option_var.get()
-        if sort_option:
-            sort_direction = self.sort_option_direction_var.get()
-            rev = True if sort_direction == 'desc' else False
-            self.parent.sort_results(sort_option, rev)
+        pass
+        # sort_option = self.selected_sort_option_var.get()
+        # if sort_option:
+        #     sort_direction = self.sort_option_direction_var.get()
+        #     rev = True if sort_direction == 'desc' else False
+        #     self.parent.sort_results(sort_option, rev)
 
     def _search_by_name(self):
-        c_food_name = self.search_name_e_var.get().strip()
-        self.parent.search_by_name(c_food_name)
+        pass
+        # c_food_name = self.search_name_e_var.get().strip()
+        # self.parent.search_by_name(c_food_name)
+
+    def _update_tally_cnt(self):
+        cnt = len(self.food_results_lbox_values)
+        cnt_s = str(cnt).zfill(2)
+        text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
+        self.tally_results_var.set(f'{cnt} {text}')
+
+    def _color_listbox_foods(self):
+        for i in range(len(self.food_results_lbox_values)):
+            clr = 'white' if i % 2 == 0 else '#E6E6E6'
+            self.food_results_lbox.itemconfigure(i, background=clr)
 
     def grid_frame(self, row, column, sticky):
-        self.frame.grid(row=row, column=column, sticky=sticky, padx=(20), pady=(0, 20))
+        self.frame.grid(row=row, column=column, sticky=sticky, padx=(300), pady=(0, 20))
     
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
@@ -176,6 +189,14 @@ class ConsumedFoodSearchOptionsFrame:
     def set_scroll_down_handler(self, callback):
         self.scroll_down_handler = callback
 
+    def update_food_label_names(self, food_names):
+        # TODO: make this work properly; ie. justify the text by center
+        # self.food_results_lbox_values = [x.rjust((120 - len(x)) // 2) for x in food_names]
+        self.food_results_lbox_values = food_names
+        self.food_results_lbox_var.set(self.food_results_lbox_values)
+        self._update_tally_cnt()
+        self._color_listbox_foods()
+
 
 class CreateMealTemplateFrame:
     """Frame representing UI and its logic for creating a new meal template."""
@@ -183,6 +204,8 @@ class CreateMealTemplateFrame:
     def __init__(self, parent, db):
         self.db = db
         self.parent = parent
+        # self.all_food_names = self.get_all_food_label_names()
+
         self._create_styles()
 
         self.frame = ttk.Frame(parent.canvas, style='CreateTemplate.TFrame')
@@ -206,11 +229,11 @@ class CreateMealTemplateFrame:
     def _create_widgets(self):
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='CreateTemplateTopic.TLabel')
         
-        # self.consumed_food_search_options_frame = ConsumedFoodSearchOptionsFrame(self, self.db)
-        # self.consumed_food_search_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        # self.consumed_food_search_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
+        self.create_meal_options_frame = CreateTemplateOptionsFrame(self, self.db)
+        self.create_meal_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
+        self.create_meal_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
-        # self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.consumed_food_tally_lbl_var, padding=5)
+        self.save_template_btn = ttk.Button(self.frame, text='Trajno pohrani predložak', command=lambda: ..., cursor='hand2')
 
         self.consumed_food_table_frame = FoodTableResultsFrame(self, consumed_food_headers.values())
         self.consumed_food_table_frame.configure_style('CreateTemplate.TFrame')
@@ -220,9 +243,9 @@ class CreateMealTemplateFrame:
 
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
-        # self.consumed_food_search_options_frame.grid_frame(row=1, column=0, sticky='w')
-        # self.food_tables_tally_lbl.grid(row=2, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
-        self.consumed_food_table_frame.grid_frame(row=1, column=0, sticky='we')
+        self.create_meal_options_frame.grid_frame(row=1, column=0, sticky='we')
+        self.save_template_btn.grid(row=2, column=0, pady=(0, 30))
+        self.consumed_food_table_frame.grid_frame(row=3, column=0, sticky='we')
 
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
@@ -256,7 +279,7 @@ class CreateMealTemplateFrame:
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
         # since there are 2 search operation, save the last one used by a user
-        self.last_search_operation = self.consumed_food_search_options_frame._search_foods
+        self.last_search_operation = self.create_meal_options_frame._search_foods
 
     def _calculate_tally_row(self, start_time, end_time):
         """Return the sum of all rows or None if no rows present"""
@@ -329,7 +352,7 @@ class CreateMealTemplateFrame:
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
         # since there are 2 search operation, save the last one used by a user
-        self.last_search_operation = self.consumed_food_search_options_frame._search_by_name
+        self.last_search_operation = self.create_meal_options_frame._search_by_name
 
     def _get_edge_timestamps(self):
         """Return earliest and latest from consumed food results
@@ -355,4 +378,8 @@ class CreateMealTemplateFrame:
         # Fetch the complete table row since consumed food name is not globally unique
         # consumed_food_row = self.db.get_consumed_food_by_primary_key(p_key)
         # DialogPickerTopLevel(self, self.db, consumed_food_row)
+
+    def update_food_label_names(self):
+        self.all_food_names = self.db.all_food_label_names
+        self.create_meal_options_frame.update_food_label_names(self.all_food_names)
 
