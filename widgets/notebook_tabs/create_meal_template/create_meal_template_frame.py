@@ -1,4 +1,6 @@
-import datetime
+import re
+
+from datetime import datetime, timedelta
 
 from tkinter import ttk, StringVar, Listbox
 
@@ -13,6 +15,8 @@ class CreateTemplateOptionsFrame:
     def __init__(self, parent, db):
         self.db = db
         self.parent = parent
+        self.last_pressed_button = datetime.now()
+        self.last_pressed_button_interval = timedelta(microseconds=1)
 
         self._create_mutual_label_options()
 
@@ -21,6 +25,10 @@ class CreateTemplateOptionsFrame:
         self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(200, 50))
         for i in range(5):
             self.frame.columnconfigure(i, weight=1)
+
+        # define validations
+        self.food_weight_re = re.compile('^[1-9]\d{,3}$')
+        self._validate_food_weight = self.frame.register(self._validate_food_weight_input), '%P'
 
         self._create_mutual_combobox_options()
         self._create_mutual_button_options()
@@ -60,7 +68,9 @@ class CreateTemplateOptionsFrame:
         ttk.Style().configure('CFoodText.TLabel', anchor='center', padding=2, font='default 12', background='#F8FCE8')
         ttk.Style().configure('CFoodSearch.TButton', anchor='center', padding=5, font='default 11')
         ttk.Style().configure('CFoodRadio.TRadiobutton', anchor='center', padding=5, font='default 10', background='#BFBFBF')
-        ttk.Style().configure('CreateTemplateSearchLbl.TLabel', background='#bfff80', **self.mutual_label_options)
+        ttk.Style().configure('CreateTemplateUpperLbl.TLabel', background='#bfff80', **self.mutual_label_options)
+        ttk.Style().configure('CreateTemplateBottomLbl.TLabel', background='#E882C8', **self.mutual_label_options)
+        ttk.Style().configure('CreateTemplateFoodEntry.TEntry', readonlybackground='white')
 
     def _create_widget_vars(self):
         self.search_name_e_var = StringVar()
@@ -73,25 +83,27 @@ class CreateTemplateOptionsFrame:
         self.food_weight_var = StringVar()
 
     def _create_widgets(self):
-        self.search_name_lbl = ttk.Label(self.frame, text='Pretraži artikle', style='CreateTemplateSearchLbl.TLabel')
+        self.search_name_lbl = ttk.Label(self.frame, text='Pretraži prehrambene artikle', style='CreateTemplateUpperLbl.TLabel')
         self.search_name_e = ttk.Entry(self.frame, textvariable=self.search_name_e_var, font='default 12', width=30)
 
         self.vertical_separator = ttk.Separator(self.frame, orient='vertical')
 
-        self.tally_results_lbl = ttk.Label(self.frame, textvariable=self.tally_results_var, style='CreateTemplateSearchLbl.TLabel')
+        self.tally_results_lbl = ttk.Label(self.frame, textvariable=self.tally_results_var, style='CreateTemplateUpperLbl.TLabel')
         self.food_results_lbox = Listbox(self.frame, listvariable=self.food_results_lbox_var, cursor='hand2', width=40, height=5)
         self.food_results_scrolly = ScrollBarWidget(self.frame)
         self.food_results_scrolly.attach_to_scrollable(self.food_results_lbox)
 
         self.horizontal_separator = ttk.Separator(self.frame, orient='horizontal')
 
-        self.food_name_lbl = ttk.Label(self.frame, text='Naziv artikla', style='CFoodText.TLabel')
-        self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, font='default 12', width=40, justify='center', state='readonly')
+        self.food_name_lbl = ttk.Label(self.frame, text='Naziv artikla', style='CreateTemplateBottomLbl.TLabel')
+        self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, font='default 12', width=40,
+                                     justify='center', state='readonly', style='CreateTemplateFoodEntry.TEntry')
 
-        self.food_weight_lbl = ttk.Label(self.frame, text='Masa artikla', style='CFoodText.TLabel')
-        self.food_weight_e = ttk.Entry(self.frame, textvariable=self.food_weight_var, font='default 12')
+        self.food_weight_lbl = ttk.Label(self.frame, text='Masa artikla', style='CreateTemplateBottomLbl.TLabel')
+        self.food_weight_e = ttk.Entry(self.frame, textvariable=self.food_weight_var, font='default 12', width=10,
+                                       justify='center', validate='key', validatecommand=self._validate_food_weight)
 
-        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', cursor='hand2')
+        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', cursor='hand2', state='disabled')
 
     def _grid_widgets(self):
         self.search_name_lbl.grid(row=0, column=0, columnspan=2, padx=(0, 10), pady=(0, 10))
@@ -106,19 +118,26 @@ class CreateTemplateOptionsFrame:
 
         self.horizontal_separator.grid(row=2, column=0, columnspan=6, sticky='we')
 
-        self.food_name_lbl.grid(row=3, column=0, columnspan=2, padx=(0, 10), pady=(100, 10))
+        self.food_name_lbl.grid(row=3, column=0, columnspan=2, padx=(0, 10), pady=(100, 20))
         self.food_name_e.grid(row=4, column=0, columnspan=2, padx=(0, 10), pady=(0, 50))
 
-        self.food_weight_lbl.grid(row=3, column=3, columnspan=2, padx=(10, 0), pady=(100, 10))
-        self.food_weight_e.grid(row=4, column=3, columnspan=2, padx=(10, 0), pady=(0, 50))
+        self.food_weight_lbl.grid(row=3, column=3, columnspan=2, padx=(80, 0), pady=(100, 20))
+        self.food_weight_e.grid(row=4, column=3, columnspan=2, padx=(80, 0), pady=(0, 50))
 
         self.add_template_btn.grid(row=5, column=0, columnspan=5, pady=(50, 0))
     
     def _bind_events(self):
         self.food_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_food_name())
-        # self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
-        # self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
-        # self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
+        self.food_weight_e.bind('<KeyRelease>', lambda _: self._handle_food_weight_keyreleased())
+        self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
+        self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
+        self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
+        self.search_name_e.bind('<KeyRelease>', lambda _: self._search_by_name_on_release())
+
+    def _validate_food_weight_input(self, entry_value):
+        if entry_value and self.food_weight_re.match(entry_value) is None:
+            return False
+        return True
 
     def _set_food_name(self):
         if not self.food_results_lbox.curselection():
@@ -126,32 +145,22 @@ class CreateTemplateOptionsFrame:
             return
         idx, = self.food_results_lbox.curselection()
         self.food_name_var.set(self.food_results_lbox_values[idx])
+
+        # check if necessary conditions are satisifed
+        if self.food_weight_var.get():
+            self.add_template_btn.state(['!disabled'])
+        else:
+            self.add_template_btn.state(['disabled'])
+
+    def _handle_food_weight_keyreleased(self):
+        # check if necessary conditions are satisifed
+        if self.food_weight_var.get() and self.food_name_var.get():
+            self.add_template_btn.state(['!disabled'])
+        else:
+            self.add_template_btn.state(['disabled'])
     
     def _search_foods(self):
         pass
-        # from_d, from_m, from_y = [v.get()
-        #                           for v in (self.time_from_day_var,
-        #                                     self.time_from_month_var,
-        #                                     self.time_from_year_var)]
-        # start_time = datetime.datetime.strptime(f'{from_d}-{from_m}-{from_y}', '%d-%m-%Y')
-        # to_d, to_m, to_y = [v.get()
-        #                     for v in (self.time_to_day_var,
-        #                               self.time_to_month_var,
-        #                               self.time_to_year_var)]
-        # if not any(x for x in (to_d, to_m, to_y)):
-        #     end_time = None
-        # else:
-        #     # NOTE: subject to change in Future
-        #     to_d = to_d or '1'
-        #     to_m = to_m or '1'
-        #     to_y = to_y or start_time.year + 1
-        #     end_time = datetime.datetime.strptime(f'{to_d}-{to_m}-{to_y}', '%d-%m-%Y')
-        #     # make changes visible to the user
-        #     self.time_to_day_var.set(to_d)
-        #     self.time_to_month_var.set(to_m)
-        #     self.time_to_year_var.set(to_y)
-        # food_name = self.search_name_e_var.get().strip()
-        # self.parent.search_foods(start_time, end_time, food_name)
 
     def _sort_results(self):
         pass
@@ -162,9 +171,20 @@ class CreateTemplateOptionsFrame:
         #     self.parent.sort_results(sort_option, rev)
 
     def _search_by_name(self):
-        pass
-        # c_food_name = self.search_name_e_var.get().strip()
-        # self.parent.search_by_name(c_food_name)
+        food_name = self.search_name_e_var.get().strip()
+        if not food_name:
+            self.update_food_label_names(self.all_food_names, parent_call=False)
+        food_name = food_name.lower()
+        food_names = [fn for fn in self.all_food_names if food_name in fn.lower()]
+        self.update_food_label_names(food_names, parent_call=False)
+
+    def _search_by_name_on_release(self):
+        press_time = datetime.now()
+        if press_time - self.last_pressed_button < self.last_pressed_button_interval:
+            self.last_pressed_button = press_time
+            return
+        self.last_pressed_button = press_time
+        self._search_by_name()
 
     def _update_tally_cnt(self):
         cnt = len(self.food_results_lbox_values)
@@ -189,9 +209,15 @@ class CreateTemplateOptionsFrame:
     def set_scroll_down_handler(self, callback):
         self.scroll_down_handler = callback
 
-    def update_food_label_names(self, food_names):
+    def update_food_label_names(self, food_names, parent_call=True):
         # TODO: make this work properly; ie. justify the text by center
-        # self.food_results_lbox_values = [x.rjust((120 - len(x)) // 2) for x in food_names]
+        # self.food_results_lbox_values = [x.rjust((60 - len(x)) // 2) for x in food_names]
+
+        # `self.all_food_names` is only changed by parent frame, it is a superset for `self.food_results_lbox_values`
+        if parent_call:
+            self.all_food_names = food_names
+            # emtpy the search bar since new results came
+            self.search_name_e_var.set('')
         self.food_results_lbox_values = food_names
         self.food_results_lbox_var.set(self.food_results_lbox_values)
         self._update_tally_cnt()
@@ -204,7 +230,6 @@ class CreateMealTemplateFrame:
     def __init__(self, parent, db):
         self.db = db
         self.parent = parent
-        # self.all_food_names = self.get_all_food_label_names()
 
         self._create_styles()
 
@@ -308,7 +333,7 @@ class CreateMealTemplateFrame:
             self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)
         elif idx == consumed_food_map['created_on']:
             # sort by datetime instances instead of strings representing datetime stamp
-            self.consumed_foods.sort(key=lambda row: datetime.datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
+            self.consumed_foods.sort(key=lambda row: datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
         else:
             self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
         # Clear all rendered rows
@@ -365,10 +390,10 @@ class CreateMealTemplateFrame:
         time_idx = consumed_food_map['created_on']
         timestamps = [cf[time_idx] for cf in self.consumed_foods]
         if not timestamps:
-            return datetime.datetime.now(), datetime.datetime.now()
+            return datetime.now(), datetime.now()
         min_t, max_t = min(timestamps), max(timestamps)
-        start_time = datetime.datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
-        end_time = datetime.datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
+        start_time = datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
+        end_time = datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
         if start_time == end_time:
             return start_time, None
         return start_time, end_time
