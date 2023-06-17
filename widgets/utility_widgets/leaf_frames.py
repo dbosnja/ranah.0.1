@@ -56,7 +56,8 @@ class FoodTableResult:
             lbl.grid(row=row, column=i, sticky='we')
             lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
             lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
-            lbl.bind('<1>', lambda _: self.callback(self.p_key))
+            if self.callback is not None:
+                lbl.bind('<1>', lambda _: self.callback(self.p_key))
             self.all_row_data.append(lbl)
 
     def render_tally_row(self, row, tally_row_data):
@@ -131,6 +132,7 @@ class FoodTableResultsFrame:
         self.table_headers = table_headers
         self.col_count = len(table_headers)
         self.all_rows = []
+        self.tally_row = None
         
         self._create_styles()
         self.frame = ttk.Frame(parent.frame, style='FoodTableResultsFrame.TFrame')
@@ -152,9 +154,19 @@ class FoodTableResultsFrame:
     
     def destroy_rows(self):
         """Destroy all widget rows"""
+
         for row in self.all_rows:
             row.destroy_row()
         self.all_rows = []
+
+    def destroy_tally_row(self):
+        """Destroy the tally row"""
+
+        if self.tally_row is None:
+            # idempotent operation
+            return
+        self.tally_row.destroy_row()
+        self.tally_row = None
     
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
@@ -168,13 +180,19 @@ class FoodTableResultsFrame:
             row.render_row(i + 1, food_table)
             self.all_rows.append(row)
 
+    def render_result(self, food_table):
+        """Render one result at the end of the table"""
+
+        row = FoodTableResult(self)
+        self.all_rows.append(row)
+        row.render_row(len(self.all_rows), food_table)
+
     def render_tally_row(self, tally_row):
         if tally_row is None:
             # idempotent operation
             return
-        row = FoodTableResult(self)
-        self.all_rows.append(row)
-        row.render_tally_row(len(self.all_rows), tally_row)
+        self.tally_row = FoodTableResult(self)
+        self.tally_row.render_tally_row(len(self.all_rows) + 1, tally_row)
 
     def mark_column(self, col_id, col_color=None):
         self.headers_frame.mark_column(col_id, col_color)

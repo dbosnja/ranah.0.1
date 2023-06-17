@@ -14,6 +14,9 @@ class NotebookTabLabels(StrEnum):
     new_meal_template = 'Novi predložak objeda',
 
 
+NORMATIVE = 100
+
+
 # TODO: clean this file up a bit, some names are misleading,
 # also back-patching definitions should have same type for both Canvas
 

@@ -1,10 +1,10 @@
 import re
 from datetime import datetime, timedelta
 
-from tkinter import ttk, StringVar, Listbox
+from tkinter import ttk, StringVar, Listbox, messagebox
 
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame, ScrollBarWidget
-from constants.constants import consumed_food_headers, consumed_food_map
+from constants.constants import consumed_food_headers, consumed_food_map, NORMATIVE, nutrition_table_map
 from .top_level_dialogs import DialogPickerTopLevel
 
 
@@ -107,7 +107,8 @@ class CreateTemplateOptionsFrame:
         self.food_weight_e = ttk.Entry(self.frame, textvariable=self.food_weight_var, font='default 12', width=10,
                                        justify='center', validate='key', validatecommand=self._validate_food_weight)
 
-        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', state='disabled', style='CreateTemplateActiveAddBtn.TButton')
+        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', state='disabled',
+                                           command=self._add_to_template, style='CreateTemplateActiveAddBtn.TButton')
 
     def _grid_widgets(self):
         self.search_name_lbl.grid(row=0, column=0, columnspan=2, padx=(0, 10), pady=(0, 10))
@@ -165,9 +166,11 @@ class CreateTemplateOptionsFrame:
         else:
             self.add_template_btn.state(['disabled'])
             self.add_template_btn['cursor'] = ''
-    
-    def _search_foods(self):
-        pass
+
+    def _add_to_template(self):
+        food_name = self.food_name_var.get()
+        food_weight = int(self.food_weight_var.get())
+        self.parent.add_to_template(food_name, food_weight)
 
     def _sort_results(self):
         pass
@@ -237,6 +240,8 @@ class CreateMealTemplateFrame:
     def __init__(self, parent, db):
         self.db = db
         self.parent = parent
+        self.template_foods = []
+        self.tally_row = None
 
         self._create_styles()
 
@@ -263,23 +268,78 @@ class CreateMealTemplateFrame:
         self.create_meal_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
         self.create_meal_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
-        self.save_template_btn = ttk.Button(self.frame, text='Trajno pohrani predložak', command=lambda: ..., cursor='hand2')
+        self.save_template_btn = ttk.Button(self.frame, text='Trajno pohrani predložak',
+                                            command=lambda: ..., state='disabled', style='CreateTemplateActiveAddBtn.TButton')
 
-        self.consumed_food_table_frame = FoodTableResultsFrame(self, consumed_food_headers.values())
-        self.consumed_food_table_frame.configure_style('CreateTemplate.TFrame')
-        self.consumed_food_table_frame.set_row_callback(self._open_update_center)
-        self.consumed_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.consumed_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
+        # define table headers without `consumed` timestamp
+        table_headers = list(consumed_food_headers.values())[:consumed_food_map['created_on']]
+        self.template_food_table_frame = FoodTableResultsFrame(self, table_headers)
+        self.template_food_table_frame.configure_style('CreateTemplate.TFrame')
+        self.template_food_table_frame.set_row_callback(self._open_update_center)
+        self.template_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
+        self.template_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
         self.create_meal_options_frame.grid_frame(row=1, column=0, sticky='we')
         self.save_template_btn.grid(row=2, column=0, pady=(0, 30))
-        self.consumed_food_table_frame.grid_frame(row=3, column=0, sticky='we')
+        self.template_food_table_frame.grid_frame(row=3, column=0, sticky='we')
 
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
+
+    def add_to_template(self, food_name, food_weight):
+        """Add rescaled food item to the template and render it.
+
+        If food name already present in the template, raise an error.
+        Every new addition recalculates the tally row
+        and enables the button to save the template permanently.
+        """
+        name_id = consumed_food_map['food_name']
+        # two same names can't co exist in a template -> I'm too lazy to merge them together
+        if food_name in {f[name_id] for f in self.template_foods}:
+            messagebox.showerror(title='Duplicirano ime artikla',
+                                 message=f'`{food_name}` već postoji u predlošku!')
+            return
+
+        # enable `save template` button
+        if not self.template_foods:
+            self.save_template_btn.state(['!disabled'])
+            self.save_template_btn['cursor'] = 'hand2'
+
+        # scale and update internal state
+        scaled_row = self._rescale_food_values(food_name, food_weight)
+        self.tally_row = self._calculate_tally_row(scaled_row)
+        self.template_foods.append(scaled_row)
+        scaled_row = [len(self.template_foods), food_name] + scaled_row
+
+        # rendering
+        self.template_food_table_frame.destroy_tally_row()
+        self.template_food_table_frame.render_result(scaled_row)
+        self.template_food_table_frame.render_tally_row(self.tally_row)
+
+    def _rescale_food_values(self, food_name, food_weight):
+        scale_factor = round(food_weight / NORMATIVE, 2)
+
+        # fetch the food table and scale the corresponding columns
+        food_table = self.db.get_food_item_table(food_name)
+        food_table = food_table[nutrition_table_map['calories']:nutrition_table_map['price'] + 1]
+        food_table = [round(x * scale_factor, 2) for x in food_table]
+        # cast to int wherever it makes sense to
+        food_table = [int(x) if int(x) == x else x for x in food_table]
+
+        return [food_weight] + food_table
+
+    def _calculate_tally_row(self, new_row):
+        if self.tally_row is None:
+            return ['\u2211', 'Ukupno'] + new_row
+        else:
+            tr = self.tally_row[consumed_food_map['food_weight']:consumed_food_map['price'] + 1]
+            tr = [round(tr_d + nr_d, 2) for tr_d, nr_d in zip(tr, new_row)]
+            # cast to int wherever it makes sense to
+            tr = [int(x) if int(x) == x else x for x in tr]
+            return ['\u2211', 'Ukupno'] + tr
 
     def search_foods(self, start_time, end_time, food_name):
         """Search food by start time and optionally by end time and food name
@@ -287,102 +347,108 @@ class CreateMealTemplateFrame:
         After filtering is done, update the total number of results, delete old
         and render new results.
         """
-        self.consumed_foods = self.db.get_consumed_food_on_date(start_time, end_time)
-        if food_name:
-            food_name = food_name.lower()
-            self.consumed_foods = [f for f in self.consumed_foods if food_name in f[1].lower()]
+        pass
+        # self.consumed_foods = self.db.get_consumed_food_on_date(start_time, end_time)
+        # if food_name:
+        #     food_name = food_name.lower()
+        #     self.consumed_foods = [f for f in self.consumed_foods if food_name in f[1].lower()]
 
-        # update the number of results label
-        cnt = len(self.consumed_foods)
-        cnt_s = str(cnt).zfill(2)
-        text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
-        self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
+        # # update the number of results label
+        # cnt = len(self.consumed_foods)
+        # cnt_s = str(cnt).zfill(2)
+        # text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
+        # self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
 
-        self.tally_row = self._calculate_tally_row(start_time, end_time)
-        # uncolor the sorting column since it was present for the old results
-        self.consumed_food_table_frame.unmark_column()
-        # Clear all rendered rows
-        self.consumed_food_table_frame.destroy_rows()
-        # re-render them with the updated list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
-        # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        # self.tally_row = self._calculate_tally_row(start_time, end_time)
+        # # uncolor the sorting column since it was present for the old results
+        # self.template_food_table_frame.unmark_column()
+        # # Clear all rendered rows
+        # self.template_food_table_frame.destroy_rows()
+        # # re-render them with the updated list of food tables
+        # self.template_food_table_frame.render_results(self.consumed_foods)
+        # # render the tally row
+        # self.template_food_table_frame.render_tally_row(self.tally_row)
 
-        # since there are 2 search operation, save the last one used by a user
-        self.last_search_operation = self.create_meal_options_frame._search_foods
+        # # since there are 2 search operation, save the last one used by a user
+        # self.last_search_operation = self.create_meal_options_frame._search_foods
 
-    def _calculate_tally_row(self, start_time, end_time):
+    def _calculate_tally_row1(self, start_time, end_time):
         """Return the sum of all rows or None if no rows present"""
-        if not self.consumed_foods:
-            return None
-        tally_time = f"{f'{start_time.day}'.zfill(2)}-{f'{start_time.month}'.zfill(2)}-{start_time.year}"
-        if end_time:
-            tally_time = tally_time + '  <-->  ' + f"{f'{end_time.day}'.zfill(2)}-{f'{end_time.month}'.zfill(2)}-{end_time.year}"
-        sorting_idx = list(consumed_food_map.values())[2:-1]
-        tally_row = [sum([row[i] for row in self.consumed_foods]) for i in sorting_idx]
-        tally_row = [int(i) if int(i) == round(i, 2) else round(i, 2) for i in tally_row]
-        tally_row  = ['\u2211', 'Ukupno'] + tally_row + [tally_time]
-        return tally_row
+        pass
+        
+        # if not self.consumed_foods:
+        #     return None
+        # tally_time = f"{f'{start_time.day}'.zfill(2)}-{f'{start_time.month}'.zfill(2)}-{start_time.year}"
+        # if end_time:
+        #     tally_time = tally_time + '  <-->  ' + f"{f'{end_time.day}'.zfill(2)}-{f'{end_time.month}'.zfill(2)}-{end_time.year}"
+        # sorting_idx = list(consumed_food_map.values())[2:-1]
+        # tally_row = [sum([row[i] for row in self.consumed_foods]) for i in sorting_idx]
+        # tally_row = [int(i) if int(i) == round(i, 2) else round(i, 2) for i in tally_row]
+        # tally_row  = ['\u2211', 'Ukupno'] + tally_row + [tally_time]
+        # return tally_row
 
     def sort_results(self, sort_option, rev):
         """Sort current results by `sort_option` and reverse the results if `rev=True`"""
 
         # Find the corresponding index from the centralized back-patching defintion
-        for k, v in consumed_food_headers.items():
-            if v == sort_option:
-                idx = consumed_food_map[k]
-                break
-        self.consumed_food_table_frame.mark_column(idx)
-        if idx == consumed_food_map['food_name']:
-            # sort by name works based on ASCII -> compare with case insensitivity
-            self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)
-        elif idx == consumed_food_map['created_on']:
-            # sort by datetime instances instead of strings representing datetime stamp
-            self.consumed_foods.sort(key=lambda row: datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
-        else:
-            self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
-        # Clear all rendered rows
-        self.consumed_food_table_frame.destroy_rows()
-        # re-render them with the sorted list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
-        # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        pass
+        
+        # for k, v in consumed_food_headers.items():
+        #     if v == sort_option:
+        #         idx = consumed_food_map[k]
+        #         break
+        # self.template_food_table_frame.mark_column(idx)
+        # if idx == consumed_food_map['food_name']:
+        #     # sort by name works based on ASCII -> compare with case insensitivity
+        #     self.consumed_foods.sort(key=lambda row: row[idx].lower(), reverse=rev)
+        # elif idx == consumed_food_map['created_on']:
+        #     # sort by datetime instances instead of strings representing datetime stamp
+        #     self.consumed_foods.sort(key=lambda row: datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=rev)
+        # else:
+        #     self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
+        # # Clear all rendered rows
+        # self.template_food_table_frame.destroy_rows()
+        # # re-render them with the sorted list of food tables
+        # self.template_food_table_frame.render_results(self.consumed_foods)
+        # # render the tally row
+        # self.template_food_table_frame.render_tally_row(self.tally_row)
 
     def search_by_name(self, food_name):
         """Search all consumed foods based only on the given name
 
         The filtering is based ond the `in` operator and case sensitivity is ignored.
         """
-        consumed_food_names = self.db.get_all_consumed_food_names()
-        # if food_name is empty return all results, otherwise do the filtering
-        if food_name:
-            food_name = food_name.lower()
-            consumed_food_names = [fn for fn in consumed_food_names if food_name in fn.lower()]
-        self.consumed_foods = [fr
-                               for fn in consumed_food_names
-                               for fr in self.db.get_consumed_foods_by_name(fn)]
+        pass
+        # consumed_food_names = self.db.get_all_consumed_food_names()
+        # # if food_name is empty return all results, otherwise do the filtering
+        # if food_name:
+        #     food_name = food_name.lower()
+        #     consumed_food_names = [fn for fn in consumed_food_names if food_name in fn.lower()]
+        # self.consumed_foods = [fr
+        #                        for fn in consumed_food_names
+        #                        for fr in self.db.get_consumed_foods_by_name(fn)]
 
-        # update the number of results label
-        cnt = len(self.consumed_foods)
-        cnt_s = str(cnt).zfill(2)
-        text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
-        self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
+        # # update the number of results label
+        # cnt = len(self.consumed_foods)
+        # cnt_s = str(cnt).zfill(2)
+        # text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
+        # self.consumed_food_tally_lbl_var.set(f'{cnt} {text}')
 
-        # calculate earliest and latest timestamps
-        min_t, max_t = self._get_edge_timestamps()
+        # # calculate earliest and latest timestamps
+        # min_t, max_t = self._get_edge_timestamps()
 
-        self.tally_row = self._calculate_tally_row(min_t, max_t)
-        # uncolor the sorting column since it was present for the old results
-        self.consumed_food_table_frame.unmark_column()
-        # Clear all rendered rows
-        self.consumed_food_table_frame.destroy_rows()
-        # re-render them with the updated list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
-        # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        # self.tally_row = self._calculate_tally_row(min_t, max_t)
+        # # uncolor the sorting column since it was present for the old results
+        # self.template_food_table_frame.unmark_column()
+        # # Clear all rendered rows
+        # self.template_food_table_frame.destroy_rows()
+        # # re-render them with the updated list of food tables
+        # self.template_food_table_frame.render_results(self.consumed_foods)
+        # # render the tally row
+        # self.template_food_table_frame.render_tally_row(self.tally_row)
 
-        # since there are 2 search operation, save the last one used by a user
-        self.last_search_operation = self.create_meal_options_frame._search_by_name
+        # # since there are 2 search operation, save the last one used by a user
+        # self.last_search_operation = self.create_meal_options_frame._search_by_name
 
     def _get_edge_timestamps(self):
         """Return earliest and latest from consumed food results
@@ -392,16 +458,17 @@ class CreateMealTemplateFrame:
         If earliest and latest timestamps are the same return only one and None
         Otherwise return both of them.
         """
-        time_idx = consumed_food_map['created_on']
-        timestamps = [cf[time_idx] for cf in self.consumed_foods]
-        if not timestamps:
-            return datetime.now(), datetime.now()
-        min_t, max_t = min(timestamps), max(timestamps)
-        start_time = datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
-        end_time = datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
-        if start_time == end_time:
-            return start_time, None
-        return start_time, end_time
+        pass
+        # time_idx = consumed_food_map['created_on']
+        # timestamps = [cf[time_idx] for cf in self.consumed_foods]
+        # if not timestamps:
+        #     return datetime.now(), datetime.now()
+        # min_t, max_t = min(timestamps), max(timestamps)
+        # start_time = datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
+        # end_time = datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
+        # if start_time == end_time:
+        #     return start_time, None
+        # return start_time, end_time
 
     def _open_update_center(self, p_key):
         pass

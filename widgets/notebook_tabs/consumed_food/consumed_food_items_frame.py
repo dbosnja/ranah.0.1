@@ -250,6 +250,7 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.unmark_column()
         # Clear all rendered rows
         self.consumed_food_table_frame.destroy_rows()
+        self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the updated list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods)
         # render the tally row
@@ -290,6 +291,7 @@ class ConsumedFoodItemsFrame:
             self.consumed_foods.sort(key=lambda row: row[idx], reverse=rev)
         # Clear all rendered rows
         self.consumed_food_table_frame.destroy_rows()
+        self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the sorted list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods)
         # render the tally row
@@ -323,6 +325,7 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.unmark_column()
         # Clear all rendered rows
         self.consumed_food_table_frame.destroy_rows()
+        self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the updated list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods)
         # render the tally row
