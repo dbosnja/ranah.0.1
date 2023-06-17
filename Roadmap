@@ -53,7 +53,7 @@ Ranah2.0 Roadmap
    c) Works in a similar fashion to shopping cart, ie. user sees immediately which food articles are added in the list
 	  Right/double-left click deletes the added food from the template
 	  If there's at least one food in a template enable `add-template` button and print out the tally row
-	  If there's 0 added food items in a template, disable `add-template` button and don't print out the tally row
+	  If there's 0 added food items in a template, disable `add-template` button and don't print out the tally row   DONE
 
    d) Clicking on `add-template` button spawns a new dialog center which takes one argument -> the template's name
       The templates name is stripped and checked if evaluates to True and if it is unique
@@ -62,6 +62,8 @@ Ranah2.0 Roadmap
    e) In order to save a template, DB has to be extended with the template model.
       Model consists of template's name(unique), it's content and potentialy created-on/updated-on timestamps
 	  DB API is extended as needed.
+
+   f) User should be able to sort template foods by any dimension in any direction with coloring of the sorting column
 
 ## ITERATION 2.4 ##
 
@@ -81,3 +83,6 @@ TABS:
 4. Create new meal template / Novi predlozak objeda
 5. Read through meal templates / Svi predlosci objeda
 6. Calories / Kalorije
+
+
+Demo Video: peanut butter + jelly sandwich?

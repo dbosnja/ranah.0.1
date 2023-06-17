@@ -299,6 +299,8 @@ class CreateMealTemplateFrame:
         self.template_foods = []
         self.tally_row = None
 
+        self._create_rendered_row_events()
+
         self._create_styles()
 
         self.frame = ttk.Frame(parent.canvas, style='CreateTemplate.TFrame')
@@ -344,6 +346,14 @@ class CreateMealTemplateFrame:
         self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
 
+    def _create_rendered_row_events(self):
+        """Define a mapping between event and their handlers for the rendered rows"""
+
+        self.rendered_row_events = {
+            '<Double-1>': self.delete_template_food,
+            '<Button-3>': self.delete_template_food,
+        }
+
     def add_to_template(self, food_name, food_weight):
         """Add rescaled food item to the template and render it.
 
@@ -368,7 +378,7 @@ class CreateMealTemplateFrame:
 
         # rendering
         self.template_food_table_frame.destroy_tally_row()
-        self.template_food_table_frame.render_result(scaled_row)
+        self.template_food_table_frame.render_result(scaled_row, **self.rendered_row_events)
         self.template_food_table_frame.render_tally_row(self.tally_row)
 
     def _rescale_food_values(self, food_name, food_weight):
@@ -402,6 +412,42 @@ class CreateMealTemplateFrame:
         self.tally_row = None
 
         self.template_action_frame.disable_buttons()
+
+    def delete_template_food(self, p_key):
+        """Delete one row from the template table and update the tally row
+
+        `p_key` is a number representing the row number in the table of the food being deleted.
+        """
+        for i, row in enumerate(self.template_foods):
+            if row[0] == p_key:
+                idx = i
+                break
+        row_to_delete = self.template_foods[idx]
+        self.tally_row = self._calculate_tally_row_thru_subtraction(row_to_delete)
+        data_to_rerender = self.template_foods[idx + 1:]
+
+        for row in self.template_foods[idx:]:
+            self.template_food_table_frame.destroy_row(row[0])
+        self.template_food_table_frame.destroy_tally_row()
+
+        # re-render latter part of rows and updated tally row
+        for row in data_to_rerender:
+            self.template_food_table_frame.render_result(row, **self.rendered_row_events)
+        self.template_food_table_frame.render_tally_row(self.tally_row)
+
+        self.template_foods = self.template_foods[:idx] + data_to_rerender
+        if not self.template_foods:
+            self.template_action_frame.disable_buttons()
+
+    def _calculate_tally_row_thru_subtraction(self, row):
+        if len(self.template_foods) == 1:
+            return None
+        start_id, end_id = consumed_food_map['food_weight'], consumed_food_map['price'] + 1
+        row = [round(tr_d - r_d, 2) for tr_d, r_d in zip(self.tally_row[start_id:end_id], row[start_id:end_id])]
+        # cast to int wherever it makes sense to
+        row = [int(x) if int(x) == x else x for x in row]
+
+        return ['\u2211', 'Ukupno'] + row
 
     def search_foods(self, start_time, end_time, food_name):
         """Search food by start time and optionally by end time and food name

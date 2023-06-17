@@ -45,7 +45,11 @@ class FoodTableResult:
         self.callback = callback
         self.all_row_data = []
     
-    def render_row(self, row, row_data):
+    def render_row(self, row, row_data, **kwargs):
+        """Render a row in the food table and attach specific event handler"""
+
+        # NOTE: This method is ripe for a refactor in future; ATM it should take a color
+        # positional arg together with optional callbacks for the events
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
         # save primary key since it's used in the callbacks to distinguish between the rows
         self.p_key = row_data[0]
@@ -60,6 +64,11 @@ class FoodTableResult:
                 lbl.bind('<1>', lambda _: self.callback(self.p_key))
             self.all_row_data.append(lbl)
 
+        # check for events and their handlers in the bag
+        for event, event_handler in kwargs.items():
+            for lbl in self.all_row_data:
+                lbl.bind(event, lambda _: event_handler(self.p_key))
+
     def render_tally_row(self, row, tally_row_data):
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
@@ -72,6 +81,10 @@ class FoodTableResult:
         for rd in self.all_row_data:
             rd.destroy()
         self.all_row_data = []
+
+    @property
+    def primary_key(self):
+        return self.p_key
 
 
 class FoodTableHeaders:
@@ -180,12 +193,22 @@ class FoodTableResultsFrame:
             row.render_row(i + 1, food_table)
             self.all_rows.append(row)
 
-    def render_result(self, food_table):
+    def render_result(self, food_table, **kwargs):
         """Render one result at the end of the table"""
 
         row = FoodTableResult(self)
         self.all_rows.append(row)
-        row.render_row(len(self.all_rows), food_table)
+        row.render_row(len(self.all_rows), food_table, **kwargs)
+
+    def destroy_row(self, p_key):
+        """Destroy the row with primary key corresponding with `p_key`"""
+
+        for i, row in enumerate(self.all_rows):
+            if row.primary_key == p_key:
+                idx = i
+                break
+        self.all_rows[idx].destroy_row()
+        self.all_rows.pop(idx)
 
     def render_tally_row(self, tally_row):
         if tally_row is None:
