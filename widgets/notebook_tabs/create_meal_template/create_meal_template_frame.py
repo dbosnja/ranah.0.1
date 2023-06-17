@@ -226,12 +226,68 @@ class CreateTemplateOptionsFrame:
         # `self.all_food_names` is only changed by parent frame, it is a superset for `self.food_results_lbox_values`
         if parent_call:
             self.all_food_names = food_names
-            # emtpy the search bar since new results came
-            self.search_name_e_var.set('')
+            # clear all entry values
+            for v in (self.search_name_e_var, self.food_name_var, self.food_weight_var):
+                v.set('')
         self.food_results_lbox_values = food_names
         self.food_results_lbox_var.set(self.food_results_lbox_values)
         self._update_tally_cnt()
         self._color_listbox_foods()
+
+
+class TemplateActionsFrame:
+    """Frame for rendering action options of a new meal template."""
+
+    def __init__(self, parent):
+        self.parent = parent
+
+        self.frame = ttk.Frame(parent.frame, style='CreateTemplate.TFrame')
+
+        self._create_mutual_button_options()
+        self._create_styles()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+        self._bind_events()
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.frame,
+            'state': 'disabled',
+            'style': 'CreateTemplateActiveAddBtn.TButton',
+        }
+
+    def _create_styles(self):
+        ...
+
+    def _create_widget_vars(self):
+        ...
+
+    def _create_widgets(self):
+        self.save_template_btn = ttk.Button(text='Trajno pohrani predložak', command=lambda: ..., **self.mutual_button_options)
+        self.clean_template_btn = ttk.Button(text='Očisti predložak', command=self.parent.clean_template, **self.mutual_button_options)
+
+    def _grid_widgets(self):
+        self.save_template_btn.grid(row=0, column=0, padx=(10, 20))
+        self.clean_template_btn.grid(row=0, column=1)
+
+    def _bind_events(self):
+        ...
+
+    def grid_frame(self, row, column, sticky):
+        self.frame.grid(row=row, column=column, sticky=sticky, padx=0, pady=(0, 10))
+
+    def enable_buttons(self):
+        self.save_template_btn.state(['!disabled'])
+        self.save_template_btn['cursor'] = 'hand2'
+        self.clean_template_btn.state(['!disabled'])
+        self.clean_template_btn['cursor'] = 'hand2'
+
+    def disable_buttons(self):
+        self.save_template_btn.state(['disabled'])
+        self.save_template_btn['cursor'] = ''
+        self.clean_template_btn.state(['disabled'])
+        self.clean_template_btn['cursor'] = ''
 
 
 class CreateMealTemplateFrame:
@@ -268,8 +324,7 @@ class CreateMealTemplateFrame:
         self.create_meal_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
         self.create_meal_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
-        self.save_template_btn = ttk.Button(self.frame, text='Trajno pohrani predložak',
-                                            command=lambda: ..., state='disabled', style='CreateTemplateActiveAddBtn.TButton')
+        self.template_action_frame = TemplateActionsFrame(self)
 
         # define table headers without `consumed` timestamp
         table_headers = list(consumed_food_headers.values())[:consumed_food_map['created_on']]
@@ -282,7 +337,7 @@ class CreateMealTemplateFrame:
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
         self.create_meal_options_frame.grid_frame(row=1, column=0, sticky='we')
-        self.save_template_btn.grid(row=2, column=0, pady=(0, 30))
+        self.template_action_frame.grid_frame(row=2, column=0, sticky='w')
         self.template_food_table_frame.grid_frame(row=3, column=0, sticky='we')
 
     def _bind_events(self):
@@ -293,8 +348,6 @@ class CreateMealTemplateFrame:
         """Add rescaled food item to the template and render it.
 
         If food name already present in the template, raise an error.
-        Every new addition recalculates the tally row
-        and enables the button to save the template permanently.
         """
         name_id = consumed_food_map['food_name']
         # two same names can't co exist in a template -> I'm too lazy to merge them together
@@ -305,14 +358,13 @@ class CreateMealTemplateFrame:
 
         # enable `save template` button
         if not self.template_foods:
-            self.save_template_btn.state(['!disabled'])
-            self.save_template_btn['cursor'] = 'hand2'
+            self.template_action_frame.enable_buttons()
 
         # scale and update internal state
         scaled_row = self._rescale_food_values(food_name, food_weight)
         self.tally_row = self._calculate_tally_row(scaled_row)
+        scaled_row = [len(self.template_foods) + 1, food_name] + scaled_row
         self.template_foods.append(scaled_row)
-        scaled_row = [len(self.template_foods), food_name] + scaled_row
 
         # rendering
         self.template_food_table_frame.destroy_tally_row()
@@ -340,6 +392,16 @@ class CreateMealTemplateFrame:
             # cast to int wherever it makes sense to
             tr = [int(x) if int(x) == x else x for x in tr]
             return ['\u2211', 'Ukupno'] + tr
+
+    def clean_template(self):
+        """Delete all data from the template"""
+
+        self.template_food_table_frame.destroy_rows()
+        self.template_food_table_frame.destroy_tally_row()
+        self.template_foods = []
+        self.tally_row = None
+
+        self.template_action_frame.disable_buttons()
 
     def search_foods(self, start_time, end_time, food_name):
         """Search food by start time and optionally by end time and food name
