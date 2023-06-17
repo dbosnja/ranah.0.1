@@ -57,8 +57,13 @@ class Database:
     
     @property
     def all_food_label_names(self):
-        # fetch only data in the 1st dimension
-        return [ft[1] for ft in self.all_food_label_tables]
+        # fetch all vectors' name dimension
+
+        food_name_c = column('label_name')
+        sel_stmt = select(food_name_c).select_from(nutrition_labels_table)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel_stmt)
+        return [fn.label_name for fn in rp]
 
     @property
     def all_food_label_tables(self):
@@ -71,8 +76,8 @@ class Database:
         sel = select(nutrition_labels_table)
         with self.engine.connect() as conn:
             rp = conn.execute(sel)
-            results = rp.fetchall()
-        return [self._format_food_table_row(list(r)) for r in results]
+
+        return [self._format_food_table_row(list(r)) for r in rp]
 
     def is_food_name_unique(self, food_name):
         # TODO: remove this interface segment, this is application code

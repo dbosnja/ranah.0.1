@@ -14,8 +14,6 @@ class MainNotebook:
     Each Tab implies a Canvas widget implying a Frame child
     which holds all widgets and logic needed to implement the UI.
     """
-
-    # TODO: Try to use Enum types here
     TAB_TYPES = (
         CreateFoodTableCanvas,
         StoredFoodTablesCanvas,

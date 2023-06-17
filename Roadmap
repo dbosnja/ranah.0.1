@@ -48,7 +48,7 @@ Ranah2.0 Roadmap
       together with their weights and store it permanently under a unique name.
 
    b) Whenever user opens up the create meal template, corresponding frame needs to
-      update the total number of food results and the dropdown list with ALL of the food names
+      update the total number of food results and the dropdown list with ALL of the food names   DONE
 
    c) Works in a similar fashion to shopping cart, ie. user sees immediately which food articles are added in the list
 	  Right/double-left click deletes the added food from the template

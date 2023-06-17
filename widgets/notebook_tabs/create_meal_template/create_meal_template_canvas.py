@@ -7,7 +7,7 @@ from ...utility_widgets.leaf_frames import ScrollBarWidget
 class CreateMealTemplateCanvas:
     """Canvas for creating a new meal template in Ranah.
 
-    Meal template consists of unique food names paired with their weights.
+    Meal template consists of 2-dim vectors of unique food names paired with their weights.
     
     Canvas is holding a Frame and a scroll-bar widget.
     The Frame is in the 0th column and consists of a couple of sub-frames

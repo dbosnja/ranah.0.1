@@ -1,5 +1,4 @@
 import re
-
 from datetime import datetime, timedelta
 
 from tkinter import ttk, StringVar, Listbox
@@ -22,7 +21,7 @@ class CreateTemplateOptionsFrame:
 
         self._create_styles()
 
-        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(200, 50))
+        self.frame = ttk.Frame(parent.frame, style='CFoodSearchOptions.TFrame', padding=(200, 20))
         for i in range(5):
             self.frame.columnconfigure(i, weight=1)
 
@@ -72,6 +71,10 @@ class CreateTemplateOptionsFrame:
         ttk.Style().configure('CreateTemplateBottomLbl.TLabel', background='#E882C8', **self.mutual_label_options)
         ttk.Style().configure('CreateTemplateFoodEntry.TEntry', readonlybackground='white')
 
+        self.add_btn_style = ttk.Style()
+        self.add_btn_style.configure('CreateTemplateActiveAddBtn.TButton', font='default 11', padding=10)
+        self.add_btn_style.map('CreateTemplateActiveAddBtn.TButton', background=[('active', '#00994D')])
+
     def _create_widget_vars(self):
         self.search_name_e_var = StringVar()
         self.tally_results_var = StringVar()
@@ -94,6 +97,7 @@ class CreateTemplateOptionsFrame:
         self.food_results_scrolly.attach_to_scrollable(self.food_results_lbox)
 
         self.horizontal_separator = ttk.Separator(self.frame, orient='horizontal')
+        self.horizontal_separator.lower()
 
         self.food_name_lbl = ttk.Label(self.frame, text='Naziv artikla', style='CreateTemplateBottomLbl.TLabel')
         self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, font='default 12', width=40,
@@ -103,7 +107,7 @@ class CreateTemplateOptionsFrame:
         self.food_weight_e = ttk.Entry(self.frame, textvariable=self.food_weight_var, font='default 12', width=10,
                                        justify='center', validate='key', validatecommand=self._validate_food_weight)
 
-        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', cursor='hand2', state='disabled')
+        self.add_template_btn = ttk.Button(self.frame, text='Dodaj u predložak', state='disabled', style='CreateTemplateActiveAddBtn.TButton')
 
     def _grid_widgets(self):
         self.search_name_lbl.grid(row=0, column=0, columnspan=2, padx=(0, 10), pady=(0, 10))
@@ -113,8 +117,7 @@ class CreateTemplateOptionsFrame:
 
         self.tally_results_lbl.grid(row=0, column=3, columnspan=2, padx=(80, 0), pady=(0, 20))
         self.food_results_lbox.grid(row=1, column=3, columnspan=2, padx=(80, 0), pady=(0, 30), sticky='we')
-        self.food_results_scrolly.scroll_bar.grid(row=1, column=4, sticky='ens', pady=(0, 30))
-        # self.food_results_scrolly.grid(row=1, column=5, columnspan=1)
+        self.food_results_scrolly.grid(row=1, column=4, sticky='ens', pady=(0, 30))
 
         self.horizontal_separator.grid(row=2, column=0, columnspan=6, sticky='we')
 
@@ -124,7 +127,7 @@ class CreateTemplateOptionsFrame:
         self.food_weight_lbl.grid(row=3, column=3, columnspan=2, padx=(80, 0), pady=(100, 20))
         self.food_weight_e.grid(row=4, column=3, columnspan=2, padx=(80, 0), pady=(0, 50))
 
-        self.add_template_btn.grid(row=5, column=0, columnspan=5, pady=(50, 0))
+        self.add_template_btn.grid(row=5, column=0, columnspan=5, pady=(10, 0))
     
     def _bind_events(self):
         self.food_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_food_name())
@@ -149,15 +152,19 @@ class CreateTemplateOptionsFrame:
         # check if necessary conditions are satisifed
         if self.food_weight_var.get():
             self.add_template_btn.state(['!disabled'])
+            self.add_template_btn['cursor'] = 'hand2'
         else:
             self.add_template_btn.state(['disabled'])
+            self.add_template_btn['cursor'] = ''
 
     def _handle_food_weight_keyreleased(self):
         # check if necessary conditions are satisifed
         if self.food_weight_var.get() and self.food_name_var.get():
             self.add_template_btn.state(['!disabled'])
+            self.add_template_btn['cursor'] = 'hand2'
         else:
             self.add_template_btn.state(['disabled'])
+            self.add_template_btn['cursor'] = ''
     
     def _search_foods(self):
         pass
@@ -194,7 +201,7 @@ class CreateTemplateOptionsFrame:
 
     def _color_listbox_foods(self):
         for i in range(len(self.food_results_lbox_values)):
-            clr = 'white' if i % 2 == 0 else '#E6E6E6'
+            clr = 'white' if i % 2 == 0 else '#f7d4ec'
             self.food_results_lbox.itemconfigure(i, background=clr)
 
     def grid_frame(self, row, column, sticky):
@@ -248,8 +255,6 @@ class CreateMealTemplateFrame:
 
     def _create_widget_vars(self):
         self.topic_lbl_text = 'Kreiraj novi predložak objeda'
-
-        # self.consumed_food_tally_lbl_var = StringVar(value='0 rezultata')
 
     def _create_widgets(self):
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='CreateTemplateTopic.TLabel')
