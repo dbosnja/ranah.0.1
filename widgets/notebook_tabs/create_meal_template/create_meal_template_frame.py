@@ -500,12 +500,18 @@ class CreateMealTemplateFrame:
         self.template_food_table_frame.render_tally_row(self.tally_row)
 
     def open_save_center(self):
-        SaveTemplateCenterTopLevel(self, self.save_template)
+        self.save_template_center = SaveTemplateCenterTopLevel(self, self.save_template)
 
     def update_food_label_names(self):
         self.all_food_names = self.db.all_food_label_names
         self.create_meal_options_frame.update_food_label_names(self.all_food_names)
 
-    def save_template(self):
-        print('saving...')
+    def save_template(self, template_name):
+        print(f'saving {template_name}...')
+        # first check if name is unique
+        # if not raise an error pop-up
+        # prepare the content -> dictionary
+        # call the db API and store new meal template vector
+        # close the save template center dialog
+        # render successfull creationg msg
 

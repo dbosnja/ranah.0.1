@@ -74,7 +74,7 @@ class SaveTemplateCenterTopLevel:
 
         self.template_name_e = ttk.Entry(textvariable=self.template_name_e_var, **self.mutual_entry_options)
 
-        self.create_template_btn = ttk.Button(self.dialog_center, text='Spremi', command=self.save_callback,
+        self.create_template_btn = ttk.Button(self.dialog_center, text='Spremi', command=self._save_template,
                                               style='SaveMealTemplate.TButton', state='disabled')
         self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelMealTemplate.TButton', **self.mutual_button_options)
 
@@ -95,3 +95,6 @@ class SaveTemplateCenterTopLevel:
             self.create_template_btn['state'] = 'disabled'
             self.create_template_btn['cursor'] = ''
 
+    def _save_template(self):
+        template_name = self.template_name_e_var.get()
+        self.save_callback(template_name)

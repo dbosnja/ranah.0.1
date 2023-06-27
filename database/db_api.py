@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, URL, select, and_, extract, delete, update, column
 
 from .connection_params import DB_URL_PARAMS
-from .schema import metadata, nutrition_labels_table, consumed_food_items_table
+from .schema import metadata, nutrition_labels_table, consumed_food_items_table, meal_templates_table
 
 class Database:
     """Database Interface
@@ -213,4 +213,13 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel_stmt)
             return [self._format_food_table_row(list(r), False) for r in rp]
+
+
+    def create_new_meal_template(self, values):
+        """Create new vector in meal templates space"""
+
+        ins_stmt = meal_templates_table.insert().values(**values)
+        with self.engine.connect() as conn:
+            conn.execute(ins_stmt)
+            conn.commit()
 
