@@ -19,6 +19,7 @@ class SaveTemplateCenterTopLevel:
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
+        self._bind_events()
 
     def _initialize_dialog_window(self):
         self.dialog_center = Toplevel()
@@ -31,13 +32,13 @@ class SaveTemplateCenterTopLevel:
         self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
 
     def _create_styles(self):
-        self.add_btn_style = ttk.Style()
-        self.add_btn_style.configure('UpdateFoodTable.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.add_btn_style.map('UpdateFoodTable.TButton', background=[('active', '#00994D')])
+        self.save_btn_style = ttk.Style()
+        self.save_btn_style.configure('SaveMealTemplate.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.save_btn_style.map('SaveMealTemplate.TButton', background=[('active', '#00994D')])
 
         self.cancel_btn_style = ttk.Style()
-        self.cancel_btn_style.configure('CancelUpdate.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.cancel_btn_style.map('CancelUpdate.TButton', background=[('active', '#FF0000')])
+        self.cancel_btn_style.configure('CancelMealTemplate.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.cancel_btn_style.map('CancelMealTemplate.TButton', background=[('active', '#FF0000')])
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {
@@ -73,12 +74,24 @@ class SaveTemplateCenterTopLevel:
 
         self.template_name_e = ttk.Entry(textvariable=self.template_name_e_var, **self.mutual_entry_options)
 
-        self.update_btn = ttk.Button(text='Spremi', command=self.save_callback, style='UpdateFoodTable.TButton', **self.mutual_button_options)
-        self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelUpdate.TButton', **self.mutual_button_options)
+        self.create_template_btn = ttk.Button(self.dialog_center, text='Spremi', command=self.save_callback,
+                                              style='SaveMealTemplate.TButton', state='disabled')
+        self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelMealTemplate.TButton', **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, columnspan=2, sticky='we')
         self.template_name_e.grid(row=1, column=0, columnspan=2, sticky='we', pady=(10, 5))
-        self.update_btn.grid(row=2, column=0, sticky='e', padx=(0, 10), pady=(30, 0))
+        self.create_template_btn.grid(row=2, column=0, sticky='e', padx=(0, 10), pady=(30, 0))
         self.cancel_btn.grid(row=2, column=1, sticky='w', padx=(10, 0), pady=(30, 0))
+
+    def _bind_events(self):
+        self.template_name_e.bind('<KeyRelease>', lambda _: self._handle_template_name())
+
+    def _handle_template_name(self):
+        if self.template_name_e_var.get():
+            self.create_template_btn['state'] = 'active'
+            self.create_template_btn['cursor'] = 'hand2'
+        else:
+            self.create_template_btn['state'] = 'disabled'
+            self.create_template_btn['cursor'] = ''
 

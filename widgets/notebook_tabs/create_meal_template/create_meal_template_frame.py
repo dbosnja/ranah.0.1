@@ -480,8 +480,6 @@ class CreateMealTemplateFrame:
         """Sort current results by `sort_option` and reverse the results if `rev=True`"""
 
         # Find the corresponding index from the centralized back-patching defintion
-        pass
-        
         for k, v in consumed_food_headers.items():
             if v == sort_option:
                 idx = consumed_food_map[k]
