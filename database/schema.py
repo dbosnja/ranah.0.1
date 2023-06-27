@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, Numeric, DateTime
+from sqlalchemy import MetaData, Table, Column, Integer, String, Numeric, DateTime, PickleType
+
+from constants.constants import MealTemplatesTableLabels
 
 
 metadata = MetaData()
@@ -39,5 +41,16 @@ consumed_food_items_table = Table(
     Column('proteins', Numeric(10, 5), nullable=False),
     Column('price', Numeric(10, 5), nullable=False),
     Column('created_on', DateTime, default=datetime.now, nullable=False),
+)
+
+
+meal_templates_table = Table(
+    MealTemplatesTableLabels.table_name.value,
+    metadata,
+    Column(MealTemplatesTableLabels.template_id.value, Integer, primary_key=True),
+    Column(MealTemplatesTableLabels.name.value, String, nullable=False, unique=True),
+    Column(MealTemplatesTableLabels.content.value, PickleType, nullable=False),
+    Column(MealTemplatesTableLabels.created_on.value, DateTime, default=datetime.now),
+    Column(MealTemplatesTableLabels.updated_on.value, DateTime, default=datetime.now, onupdate=datetime.now),
 )
 

@@ -14,6 +14,15 @@ class NotebookTabLabels(StrEnum):
     new_meal_template = 'Novi predložak objeda',
 
 
+class MealTemplatesTableLabels(StrEnum):
+    table_name = 'meal_templates'
+    template_id = 'template_id'
+    name = 'name'
+    content = 'content'
+    created_on = 'created_on'
+    updated_on = 'updated_on'
+
+
 NORMATIVE = 100
 
 
