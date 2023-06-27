@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from tkinter import ttk, StringVar, Listbox, messagebox
 
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame, ScrollBarWidget
-from constants.constants import consumed_food_headers, consumed_food_map, NORMATIVE, nutrition_table_map
+from constants.constants import consumed_food_headers, consumed_food_map, NORMATIVE, nutrition_table_map, MealTemplatesTableLabels
 from .top_level_dialogs import SaveTemplateCenterTopLevel
 
 
@@ -507,11 +507,32 @@ class CreateMealTemplateFrame:
         self.create_meal_options_frame.update_food_label_names(self.all_food_names)
 
     def save_template(self, template_name):
-        print(f'saving {template_name}...')
-        # first check if name is unique
-        # if not raise an error pop-up
-        # prepare the content -> dictionary
-        # call the db API and store new meal template vector
-        # close the save template center dialog
-        # render successfull creationg msg
+        """Save meal template permanently."""
+
+        # If meal template's name already present, raise an error.
+        template_name = template_name.strip()
+        meal_template_names = self.db.all_meal_templates_names
+        if template_name.lower() in [n.lower() for n in meal_template_names]:
+            messagebox.showerror(title='Duplicirano ime predloška!',
+                                 message=f'Predložak s imenom `{template_name}` već postoji!',
+                                 parent=self.save_template_center.dialog_center)
+            return
+
+        # prepare and store new template
+        st_idx, end_idx = consumed_food_map['food_name'], consumed_food_map['price'] + 1
+        columns = list(consumed_food_map.keys())[st_idx:end_idx]
+        content_map = {}
+        for food in self.template_foods:
+            food_name = food[consumed_food_map['food_name']]
+            content_map[food_name] = {c: food[consumed_food_map[c]] for c in columns}
+        values = {
+            MealTemplatesTableLabels.name.value: template_name,
+            MealTemplatesTableLabels.content.value: content_map,
+        }
+        self.db.create_new_meal_template(**values)
+
+        # close dialog center and render successful message
+        self.save_template_center.dialog_center.destroy()
+        messagebox.showinfo(title='Uspješno pohranjivanje predloška',
+                            message=f'Predložak `{template_name}` uspješno pohranjen u Ranahu.')
 

@@ -88,7 +88,7 @@ class SaveTemplateCenterTopLevel:
         self.template_name_e.bind('<KeyRelease>', lambda _: self._handle_template_name())
 
     def _handle_template_name(self):
-        if self.template_name_e_var.get():
+        if self.template_name_e_var.get().strip():
             self.create_template_btn['state'] = 'active'
             self.create_template_btn['cursor'] = 'hand2'
         else:
@@ -98,3 +98,4 @@ class SaveTemplateCenterTopLevel:
     def _save_template(self):
         template_name = self.template_name_e_var.get()
         self.save_callback(template_name)
+
