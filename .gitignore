@@ -4,3 +4,9 @@ __pycache__
 # libre office
 *.ods
 *.ods#
+
+# figma designs
+*.fig
+
+# PDF files
+*.pdf

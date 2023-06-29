@@ -4,6 +4,7 @@ from .notebook_tabs.create_food.create_food_table_canvas import CreateFoodTableC
 from .notebook_tabs.stored_food.stored_food_tables_canvas import StoredFoodTablesCanvas
 from .notebook_tabs.consumed_food.consumed_food_items_canvas import ConsumedFoodItemsCanvas
 from .notebook_tabs.create_meal_template.create_meal_template_canvas import CreateMealTemplateCanvas
+from .notebook_tabs.stored_meal_templates.stored_meal_templates_canvas import StoredMealTemplatesCanvas
 
 from constants.constants import NotebookTabLabels
 
@@ -19,6 +20,7 @@ class MainNotebook:
         StoredFoodTablesCanvas,
         ConsumedFoodItemsCanvas,
         CreateMealTemplateCanvas,
+        StoredMealTemplatesCanvas,
     )
 
     TAB_LABELS = (

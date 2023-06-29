@@ -12,6 +12,7 @@ class NotebookTabLabels(StrEnum):
     all_nutrition_tables = 'Sve nutritivne tablice',
     consumed_food = 'Konzumirana hrana',
     new_meal_template = 'Novi predložak objeda',
+    stored_meal_templates = 'Svi predlošci objedâ',
 
 
 class MealTemplatesTableLabels(StrEnum):
