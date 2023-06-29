@@ -21,13 +21,13 @@ class MainTitleFrame:
         self._bind_events()
     
     def _create_styles(self):
-        ttk.Style().configure('MainTitleFrame.TFrame', background='#ffd900')
+        ttk.Style().configure('MainTitleFrame.TFrame', background='#FFD900')
     
     def _create_widget_vars(self):
         self.title_label_text = 'Pregledaj sve predloške objedâ'
     
     def _create_widgets(self):
-        self.title_lbl = ttk.Label(self.frame, text=self.title_label_text, background='#ffd900', font='Helvetica 25')
+        self.title_lbl = ttk.Label(self.frame, text=self.title_label_text, background='#FFD900', font='Helvetica 25')
     
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0)

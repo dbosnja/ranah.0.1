@@ -1,27 +1,15 @@
 from tkinter import Canvas
 
-from .main_title_frame import MainTitleFrame
-from .search_meal_templates_canvas import SearchMealTemplatesCanvas
 # from ...utility_widgets.leaf_frames import ScrollBarWidget
 
 
-class StoredMealTemplatesCanvas:
-    """Canvas for rendering stored meal templates in Ranah.
+class SearchMealTemplatesCanvas:
+    """Canvas for searching stored meal templates in StoredMealTemaplates Canvas.
 
-    Canvas is holding a trivial Frame which simply renders the Canvas' title.
+    Canvas is holding one Frame which handles all UI and logic needed.
 
-    Its next child is a Canvas(!) which is responsible for searching all
-    of the stored meal templates and options for sortin/adding/deleting them.
-
-    The next child is a Frame which simply renders the ingredients list
-    of a selected meal template. It also provides option for
-    sorting/updating/deleting an ingredient from the meal.
-
-    All abovementioned children are contained in the Canvas' 0th column.
-
-    Its last child is a scrollbar widget.
-    Scroll-bar widget is contained in the 1st column and is vertically scrollable
-    if canvas itself ever becomes higher than the Notebook, ie the root window.
+    Its 2nd child is a scrollbar widget.
+    Scroll-bar widget is contained in the 1st column and is vertically scrollable.
     """
 
     def __init__(self, parent, db):
@@ -33,30 +21,23 @@ class StoredMealTemplatesCanvas:
         self._initialize_canvas()
         
         self._initialize_title_frame()
-        self._initialize_search_templates_canvas()
         self._initialize_scrollbar()
-
-        self._bind_events()
+        # self._bind_events()
     
     def _initialize_styles(self):
         ...
     
     def _initialize_canvas(self):
-        self.canvas = Canvas(self.parent, background='#5F27F1')
+        self.canvas = Canvas(self.parent.canvas, background='#FFD900')
         # NOTE: For some reason the following line seems to be redundant
-        self.canvas.grid(row=0, column=0, sticky='news')
+        self.canvas.grid(row=1, column=0, sticky='news')
         # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
         # self.canvas.configure(yscrollincrement=5)
     
     def _initialize_title_frame(self):
-        self.main_title_frame = MainTitleFrame(self)
-        self.main_title_frame_id = self.canvas.create_window(50, 60, window=self.main_title_frame.frame, anchor='w')
-
-    def _initialize_search_templates_canvas(self):
-        self.search_templates_canvas = SearchMealTemplatesCanvas(self, self.db)
-        self.search_templates_canvas_id = self.canvas.create_window(50, 400, window=self.search_templates_canvas.canvas, anchor='w')
+        ...
 
     def _initialize_scrollbar(self):
         ...
@@ -65,14 +46,9 @@ class StoredMealTemplatesCanvas:
         # whenever canvas itself is configured, make sure the width of the child frame is the same as canvas'
         # the reason why i need to do that is because the canvas now behaves as a geometry manager(create_window method)
         # also, when the table size changes, the canvas size does not, i guess this is important for future reading
-        self.canvas.bind('<Configure>', lambda _: self._configure_canvas())
+        self.canvas.bind('<Configure>', lambda _: self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 100))
         # self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
         # self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
-
-    def _configure_canvas(self):
-        self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 100)
-        self.canvas.itemconfigure(self.search_templates_canvas_id, width=self.canvas.winfo_width() - 100)
-        self.canvas.itemconfigure(self.search_templates_canvas_id, height=500)
 
     def handle_scroll_up(self):
         self.canvas.yview_scroll(-5, "units")
