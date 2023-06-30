@@ -39,7 +39,7 @@ class SearchMealTemplatesCanvas:
     
     def _initialize_search_meal_templates_frame(self):
         self.search_meal_templates_frame = SearchMealTemplatesFrame(self, self.db)
-        self.search_meal_templates_frame_id = self.canvas.create_window(0, 5,
+        self.search_meal_templates_frame_id = self.canvas.create_window(0, 0,
                                                                         window=self.search_meal_templates_frame.frame, anchor='nw')
 
     def _initialize_scrollbar(self):

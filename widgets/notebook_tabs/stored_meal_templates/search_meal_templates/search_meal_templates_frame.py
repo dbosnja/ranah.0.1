@@ -22,7 +22,7 @@ class SearchMealTemplatesFrame:
 
         self._create_styles()
 
-        self.frame = ttk.Frame(parent.canvas, style='SearchMealTemplates.TFrame', borderwidth=10, relief='flat', padding=20)
+        self.frame = ttk.Frame(parent.canvas, style='SearchMealTemplates.TFrame')
         self.frame.columnconfigure(0, weight=1)
 
         self._create_widget_vars()
@@ -32,6 +32,7 @@ class SearchMealTemplatesFrame:
     
     def _create_styles(self):
         ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
+        # ttk.Style().configure('SearchMealTemplates.TFrame', background='black')
     
     def _create_widget_vars(self):
         ...
