@@ -4,7 +4,7 @@ from .. .. utility_widgets.leaf_frames import ScrollBarWidget
 
 
 class SearchOptionsFrame:
-    """Description"""
+    """Frame which is in charge of searching through meal templates with UI and reactive logic."""
 
     def __init__(self, parent):
         self.parent = parent
