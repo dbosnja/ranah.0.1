@@ -49,8 +49,10 @@ class SearchOptionsFrame:
         self.tmplt_lbox_scrolly.attach_to_scrollable(self.tmplt_results_lbox)
         self.selected_tmplt_name_e = ttk.Entry(textvariable=self.selected_tmplt_name_var, state='readonly', **self.mutual_entry_options)
 
-        self.render_ingredients_btn = ttk.Button(text='Pregledaj sastojke predloška', state='disabled', **self.mutual_button_options)
-        self.render_template_btn = ttk.Button(text='Pregledaj predložak', cursor='hand2', **self.mutual_button_options)
+        self.render_ingredients_btn = ttk.Button(text='Pregledaj sastojke predloška', state='disabled',
+                                                 command=self._render_ingredients, **self.mutual_button_options)
+        self.render_template_btn = ttk.Button(text='Pregledaj predložak', cursor='hand2',
+                                              command=self._render_templates, **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.search_lbl.grid(row=0, column=1, pady=(0, 10))
@@ -136,6 +138,17 @@ class SearchOptionsFrame:
         self.selected_tmplt_name_var.set(self.tmplt_results_lbox_values[idx])
         self.render_ingredients_btn['state'] = ''
         self.render_ingredients_btn['cursor'] = 'hand2'
+
+    def _render_ingredients(self):
+        template_name = self.selected_tmplt_name_var.get()
+        # print(template_name)
+        # this has to be propagated to the main Canvas which will handle this event
+
+    def _render_templates(self):
+        template_names = self.tmplt_results_lbox_values
+        # for n in template_names:
+        #     print(n)
+        # this list of template name has to be propagated to the parent Frame to render the table results
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)
