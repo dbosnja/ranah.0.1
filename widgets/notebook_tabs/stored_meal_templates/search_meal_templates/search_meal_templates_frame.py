@@ -31,7 +31,7 @@ class SearchMealTemplatesFrame:
         self._bind_events()
     
     def _create_styles(self):
-        ttk.Style().configure('SearchMealTemplates.TFrame', background='black')
+        ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
     
     def _create_widget_vars(self):
         ...
