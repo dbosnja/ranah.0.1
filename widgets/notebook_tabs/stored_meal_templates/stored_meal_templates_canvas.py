@@ -96,3 +96,6 @@ class StoredMealTemplatesCanvas:
             s_region = (0, 0, 0, self.canvas.winfo_height() - 2)
         self.canvas.configure(scrollregion=s_region)
 
+    def set_meal_template_names(self):
+        self.search_templates_canvas.set_meal_template_names()
+

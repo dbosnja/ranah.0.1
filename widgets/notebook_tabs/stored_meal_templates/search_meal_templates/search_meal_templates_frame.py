@@ -32,16 +32,19 @@ class SearchMealTemplatesFrame:
     
     def _create_styles(self):
         ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
-        # ttk.Style().configure('SearchMealTemplates.TFrame', background='black')
     
     def _create_widget_vars(self):
         ...
     
     def _create_widgets(self):
-        self.search_options_frame = SearchOptionsFrame(self, self.db)
+        self.search_options_frame = SearchOptionsFrame(self)
     
     def _grid_widgets(self):
         self.search_options_frame.grid(row=0, column=0, sticky='we')
     
     def _bind_events(self):
         ...
+
+    def set_meal_template_names(self):
+        self.search_options_frame.set_meal_template_names(self.db.all_meal_templates_names)
+

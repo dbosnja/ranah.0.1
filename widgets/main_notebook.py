@@ -58,3 +58,7 @@ class MainNotebook:
     def _handle_tab_change(self, event):
         if event.widget.tab('current')['text'] == NotebookTabLabels.new_meal_template:
             self.canvas_map[NotebookTabLabels.new_meal_template].frame.update_food_label_names()
+
+        elif event.widget.tab('current')['text'] == NotebookTabLabels.stored_meal_templates:
+            self.canvas_map[NotebookTabLabels.stored_meal_templates].set_meal_template_names()
+
