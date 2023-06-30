@@ -1,7 +1,7 @@
 from tkinter import Canvas
 
 from .main_title_frame import MainTitleFrame
-from .search_meal_templates_canvas import SearchMealTemplatesCanvas
+from .search_meal_templates.search_meal_templates_canvas import SearchMealTemplatesCanvas
 # from ...utility_widgets.leaf_frames import ScrollBarWidget
 
 

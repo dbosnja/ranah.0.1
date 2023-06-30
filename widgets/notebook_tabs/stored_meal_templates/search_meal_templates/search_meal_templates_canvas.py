@@ -1,10 +1,11 @@
 from tkinter import Canvas
 
+from .search_meal_templates_frame import SearchMealTemplatesFrame
 # from ...utility_widgets.leaf_frames import ScrollBarWidget
 
 
 class SearchMealTemplatesCanvas:
-    """Canvas for searching stored meal templates in StoredMealTemaplates Canvas.
+    """Canvas for searching stored meal templates in Ranah.
 
     Canvas is holding one Frame which handles all UI and logic needed.
 
@@ -20,9 +21,9 @@ class SearchMealTemplatesCanvas:
 
         self._initialize_canvas()
         
-        self._initialize_title_frame()
+        self._initialize_search_meal_templates_frame()
         self._initialize_scrollbar()
-        # self._bind_events()
+        self._bind_events()
     
     def _initialize_styles(self):
         ...
@@ -36,8 +37,10 @@ class SearchMealTemplatesCanvas:
         self.canvas.columnconfigure(0, weight=1)
         # self.canvas.configure(yscrollincrement=5)
     
-    def _initialize_title_frame(self):
-        ...
+    def _initialize_search_meal_templates_frame(self):
+        self.search_meal_templates_frame = SearchMealTemplatesFrame(self, self.db)
+        self.search_meal_templates_frame_id = self.canvas.create_window(0, 5,
+                                                                        window=self.search_meal_templates_frame.frame, anchor='nw')
 
     def _initialize_scrollbar(self):
         ...
@@ -46,7 +49,7 @@ class SearchMealTemplatesCanvas:
         # whenever canvas itself is configured, make sure the width of the child frame is the same as canvas'
         # the reason why i need to do that is because the canvas now behaves as a geometry manager(create_window method)
         # also, when the table size changes, the canvas size does not, i guess this is important for future reading
-        self.canvas.bind('<Configure>', lambda _: self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 100))
+        self.canvas.bind('<Configure>', lambda _: self.canvas.itemconfigure(self.search_meal_templates_frame_id, width=self.canvas.winfo_width()))
         # self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
         # self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
 
