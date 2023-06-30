@@ -93,6 +93,8 @@ class SearchOptionsFrame:
     def _bind_events(self):
         self.tmplt_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_selected_template_name())
         self.search_e.bind('<KeyRelease>', lambda _: self._filter_template_names())
+        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
 
     def _filter_template_names(self):
         name = self.search_e_var.get().strip()

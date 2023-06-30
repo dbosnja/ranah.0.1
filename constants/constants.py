@@ -156,7 +156,7 @@ meal_templates_headers = {
     'fiber': 'Vlakna',
     'proteins': 'Bjelančevine',
     'price': 'Cijena',
-    'created_on': 'Konzumirano',
+    'created_on': 'Kreirano',
     'updated_on': 'Ažurirano',
 }
 

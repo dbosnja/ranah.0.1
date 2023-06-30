@@ -56,7 +56,7 @@ class StoredMealTemplatesCanvas:
 
     def _initialize_search_templates_canvas(self):
         self.search_templates_canvas = SearchMealTemplatesCanvas(self, self.db)
-        self.search_templates_canvas_id = self.canvas.create_window(50, 400, window=self.search_templates_canvas.canvas, anchor='w')
+        self.search_templates_canvas_id = self.canvas.create_window(50, 150, window=self.search_templates_canvas.canvas, anchor='nw')
 
     def _initialize_scrollbar(self):
         ...
@@ -72,7 +72,7 @@ class StoredMealTemplatesCanvas:
     def _configure_canvas(self):
         self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 100)
         self.canvas.itemconfigure(self.search_templates_canvas_id, width=self.canvas.winfo_width() - 100)
-        self.canvas.itemconfigure(self.search_templates_canvas_id, height=500)
+        self.canvas.itemconfigure(self.search_templates_canvas_id, height=600)
 
     def handle_scroll_up(self):
         self.canvas.yview_scroll(-5, "units")

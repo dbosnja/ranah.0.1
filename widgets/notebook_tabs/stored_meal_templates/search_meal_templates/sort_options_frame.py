@@ -9,7 +9,7 @@ class SortOptionsFrame:
     def __init__(self, parent):
         self.parent = parent
 
-        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(30, 50, 0, 0))
+        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(30, 70, 0, 10))
 
         self._create_mutual_label_options()
         # self._create_mutual_entry_options()
@@ -61,7 +61,8 @@ class SortOptionsFrame:
         self.sort_btn.grid(row=0, column=6, sticky='w')
 
     def _bind_events(self):
-        ...
+        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
 
     def _create_mutual_label_options(self):
         self.mutual_label_options = {
