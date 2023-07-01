@@ -87,11 +87,10 @@ class SortOptionsFrame:
         if sort_option:
             sort_direction = self.sort_option_direction_var.get()
             rev = True if sort_direction == 'desc' else False
-            # call parent to sort with the sorting option values
-    
+            self.parent.sort_table(sort_option, rev)
+
     def _clean_table(self):
-        ...
-        # instruct parent frame to clean all rendered results
+        self.parent.clean_table()
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)

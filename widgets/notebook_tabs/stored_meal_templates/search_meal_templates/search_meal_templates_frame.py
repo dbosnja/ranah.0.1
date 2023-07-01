@@ -1,10 +1,11 @@
+from datetime import datetime
 from tkinter import ttk
 
 from .search_options_frame import SearchOptionsFrame
 from .sort_options_frame import SortOptionsFrame
 
 from .. .. utility_widgets.leaf_frames import FoodTableResultsFrame
-from constants.constants import meal_templates_headers, MealTemplatesTableLabels
+from constants.constants import meal_templates_headers, MealTemplatesTableLabels, meal_templates_headers_map
 
 
 class SearchMealTemplatesFrame:
@@ -49,12 +50,12 @@ class SearchMealTemplatesFrame:
         self.templates_table_frame = FoodTableResultsFrame(self, meal_templates_headers.values())
         self.templates_table_frame.set_scroll_up_handler(self.handle_scroll_up)
         self.templates_table_frame.set_scroll_down_handler(self.handle_scroll_down)
-    
+
     def _grid_widgets(self):
         self.search_options_frame.grid(row=0, column=0, sticky='we')
         self.sort_options_frame.grid(row=1, column=0, sticky='we')
         self.templates_table_frame.grid_frame(row=2, column=0, sticky='we')
-    
+
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
@@ -99,5 +100,36 @@ class SearchMealTemplatesFrame:
                   + [created, updated]
             self.meal_templates.append(row)
             # TODO: add events definitions and handlers
+            self.templates_table_frame.render_result(row)
+
+    def clean_table(self):
+        """Clean all rows from the table"""
+
+        self.sort_options_frame.rerender_templates_count(0)
+        self.sort_options_frame.disable_buttons()
+        self.templates_table_frame.unmark_column()
+        self.meal_templates = []
+        self.templates_table_frame.destroy_rows()
+
+    def sort_table(self, key, reverse):
+        """Sort rows from the table based on key"""
+
+        for k, v in meal_templates_headers.items():
+            if v == key:
+                idx = meal_templates_headers_map[k]
+        self.templates_table_frame.mark_column(idx)
+
+        if idx == meal_templates_headers_map['food_name']:
+            # sort by name works based on ASCII -> compare with case insensitivity
+            self.meal_templates.sort(key=lambda row: row[idx].lower(), reverse=reverse)
+        elif idx in (meal_templates_headers_map['created_on'], meal_templates_headers_map['updated_on']):
+            # sort by datetime instances instead of strings representing datetime stamp
+            self.meal_templates.sort(key=lambda row: datetime.strptime(row[idx], '%d-%m-%Y, %H:%M'), reverse=reverse)
+        else:
+            self.meal_templates.sort(key=lambda row: row[idx], reverse=reverse)
+
+        self.templates_table_frame.destroy_rows()
+        for row in self.meal_templates:
+            # TODO: add events/handlers
             self.templates_table_frame.render_result(row)
 
