@@ -224,7 +224,11 @@ class FoodTableResultsFrame:
         self.headers_frame.unmark_column()
 
     def set_row_callback(self, callback):
-        """Set which callback will be called when user clicks on the name field in a row"""
+        """Set which callback will be called when user clicks on the name field in a row
+
+        NOTE: this API was a mistake, maybe its existence is alright but assumption that
+        there is one(singular!) callback for each row in the table is simply wrong.
+        """
         self.row_callback = callback
     
     def set_scroll_up_handler(self, callback):

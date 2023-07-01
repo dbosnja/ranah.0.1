@@ -4,7 +4,7 @@ from .search_options_frame import SearchOptionsFrame
 from .sort_options_frame import SortOptionsFrame
 
 from .. .. utility_widgets.leaf_frames import FoodTableResultsFrame
-from constants.constants import meal_templates_headers
+from constants.constants import meal_templates_headers, MealTemplatesTableLabels
 
 
 class SearchMealTemplatesFrame:
@@ -23,6 +23,7 @@ class SearchMealTemplatesFrame:
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
+        self.meal_templates = []
 
         self._create_styles()
 
@@ -68,7 +69,35 @@ class SearchMealTemplatesFrame:
         self.parent.handle_scroll_down()
 
     def render_templates(self, template_names):
+        """Render templates stats
+
+        The function always evalutes on a non-empty operand.
+        It deletes the old values in the table and enables sortin/cleaning
+        options.
+        """
         self.sort_options_frame.rerender_templates_count(len(template_names))
         self.sort_options_frame.enable_buttons()
-        print(template_names)
+
+        # delete the old results and unmark sorting column(if any)
+        self.templates_table_frame.destroy_rows()
+        self.templates_table_frame.unmark_column()
+        self.meal_templates = []
+
+        # NOTE: this might be better suited on the instance operand
+        mt_id = MealTemplatesTableLabels.template_id.value
+        mt_name = MealTemplatesTableLabels.name.value
+        mt_tally_row = MealTemplatesTableLabels.tally_row.value
+        mt_created_on = MealTemplatesTableLabels.created_on.value
+        mt_updated_on = MealTemplatesTableLabels.updated_on.value
+        # render rows
+        for mt in template_names:
+            row = self.db.get_meal_template_by_name(mt)
+            created, updated = [d.strftime('%d-%m-%Y, %H:%M')
+                                for d in (getattr(row, mt_created_on), getattr(row, mt_updated_on))]
+            row = [getattr(row, mt_id), getattr(row, mt_name)] \
+                  + list(getattr(row, mt_tally_row).values()) \
+                  + [created, updated]
+            self.meal_templates.append(row)
+            # TODO: add events definitions and handlers
+            self.templates_table_frame.render_result(row)
 
