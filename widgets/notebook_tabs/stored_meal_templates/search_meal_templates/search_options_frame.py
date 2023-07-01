@@ -51,7 +51,7 @@ class SearchOptionsFrame:
 
         self.render_ingredients_btn = ttk.Button(text='Pregledaj sastojke predloška', state='disabled',
                                                  command=self._render_ingredients, **self.mutual_button_options)
-        self.render_template_btn = ttk.Button(text='Pregledaj predložak', cursor='hand2',
+        self.render_template_btn = ttk.Button(text='Pregledaj predloške', cursor='hand2',
                                               command=self._render_templates, **self.mutual_button_options)
 
     def _grid_widgets(self):
@@ -105,6 +105,11 @@ class SearchOptionsFrame:
             self.tmplt_results_lbox_values = [n for n in self.all_meal_template_names if name in n.lower()]
         self.tmplt_results_lbox_var.set(self.tmplt_results_lbox_values)
 
+        if self.tmplt_results_lbox_values:
+            self.enable_render_template_btn()
+        else:
+            self.disable_render_template_btn()
+
         self._rerender_templates_count()
         self._recolor_lbox_values()
 
@@ -118,8 +123,11 @@ class SearchOptionsFrame:
         # clean entry values
         self.search_e_var.set('')
         self.selected_tmplt_name_var.set('')
-        self.render_ingredients_btn['state'] = 'disabled'
-        self.render_ingredients_btn['cursor'] = ''
+        self.disable_render_ingredients_btn()
+        if self.tmplt_results_lbox_values:
+            self.enable_render_template_btn()
+        else:
+            self.disable_render_template_btn()
     
     def _rerender_templates_count(self):
         cnt = len(self.tmplt_results_lbox_values)
@@ -138,8 +146,7 @@ class SearchOptionsFrame:
             return
         idx, = self.tmplt_results_lbox.curselection()
         self.selected_tmplt_name_var.set(self.tmplt_results_lbox_values[idx])
-        self.render_ingredients_btn['state'] = ''
-        self.render_ingredients_btn['cursor'] = 'hand2'
+        self.enable_render_ingredients_btn()
 
     def _render_ingredients(self):
         template_name = self.selected_tmplt_name_var.get()
@@ -148,9 +155,7 @@ class SearchOptionsFrame:
 
     def _render_templates(self):
         template_names = self.tmplt_results_lbox_values
-        # for n in template_names:
-        #     print(n)
-        # this list of template name has to be propagated to the parent Frame to render the table results
+        self.parent.render_templates(template_names)
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)
@@ -159,3 +164,18 @@ class SearchOptionsFrame:
         self.all_meal_template_names = tmplt_names
         self._rerender_template_names()
 
+    def enable_render_ingredients_btn(self):
+        self.render_ingredients_btn['state'] = ''
+        self.render_ingredients_btn['cursor'] = 'hand2'
+
+    def disable_render_ingredients_btn(self):
+        self.render_ingredients_btn['state'] = 'disabled'
+        self.render_ingredients_btn['cursor'] = ''
+
+    def enable_render_template_btn(self):
+        self.render_template_btn['state'] = ''
+        self.render_template_btn['cursor'] = 'hand2'
+
+    def disable_render_template_btn(self):
+        self.render_template_btn['state'] = 'disabled'
+        self.render_template_btn['cursor'] = ''

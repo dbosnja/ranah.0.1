@@ -110,3 +110,7 @@ class SortOptionsFrame:
         self.sort_btn['state'] = 'disabled'
         self.sort_btn['cursor'] = ''
 
+    def rerender_templates_count(self, tmplt_cnt):
+        cnt_s = str(tmplt_cnt).zfill(2)
+        text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
+        self.tally_cnt_var.set(f'{tmplt_cnt} {text}')

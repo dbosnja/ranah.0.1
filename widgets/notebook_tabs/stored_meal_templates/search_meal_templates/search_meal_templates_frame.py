@@ -46,8 +46,6 @@ class SearchMealTemplatesFrame:
         self.sort_options_frame = SortOptionsFrame(self)
 
         self.templates_table_frame = FoodTableResultsFrame(self, meal_templates_headers.values())
-        # self.templates_table_frame.configure_style('CreateTemplate.TFrame')
-        # mock the scrolling handlers
         self.templates_table_frame.set_scroll_up_handler(self.handle_scroll_up)
         self.templates_table_frame.set_scroll_down_handler(self.handle_scroll_down)
     
@@ -68,4 +66,9 @@ class SearchMealTemplatesFrame:
 
     def handle_scroll_down(self):
         self.parent.handle_scroll_down()
+
+    def render_templates(self, template_names):
+        self.sort_options_frame.rerender_templates_count(len(template_names))
+        self.sort_options_frame.enable_buttons()
+        print(template_names)
 
