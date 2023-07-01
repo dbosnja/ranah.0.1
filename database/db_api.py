@@ -235,3 +235,12 @@ class Database:
             rp = conn.execute(sel_stmt)
             return [getattr(row, template_name) for row in rp]
 
+    def get_meal_template_by_name(self, tmplt_name):
+        """Return one meal template with name `tmplt_name`"""
+
+        col_name = MealTemplatesTableLabels.name.value
+        sel_stmt = select(meal_templates_table)
+        sel_stmt = sel_stmt.where(getattr(meal_templates_table.c, col_name) == tmplt_name)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel_stmt)
+            return rp.first()

@@ -50,6 +50,7 @@ meal_templates_table = Table(
     Column(MealTemplatesTableLabels.template_id.value, Integer, primary_key=True),
     Column(MealTemplatesTableLabels.name.value, String, nullable=False, unique=True),
     Column(MealTemplatesTableLabels.content.value, PickleType, nullable=False),
+    Column(MealTemplatesTableLabels.tally_row.value, PickleType, nullable=False),
     Column(MealTemplatesTableLabels.created_on.value, DateTime, default=datetime.now),
     Column(MealTemplatesTableLabels.updated_on.value, DateTime, default=datetime.now, onupdate=datetime.now),
 )

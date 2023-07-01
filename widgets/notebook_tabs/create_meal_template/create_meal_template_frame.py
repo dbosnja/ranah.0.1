@@ -525,9 +525,14 @@ class CreateMealTemplateFrame:
         for food in self.template_foods:
             food_name = food[consumed_food_map['food_name']]
             content_map[food_name] = {c: food[consumed_food_map[c]] for c in columns}
+
+        st_idx, end_idx = consumed_food_map['food_weight'], consumed_food_map['price'] + 1
+        columns = list(consumed_food_map.keys())[st_idx:end_idx]
+        tally_row = {c: self.tally_row[consumed_food_map[c]] for c in columns}
         values = {
             MealTemplatesTableLabels.name.value: template_name,
             MealTemplatesTableLabels.content.value: content_map,
+            MealTemplatesTableLabels.tally_row.value: tally_row,
         }
         self.db.create_new_meal_template(**values)
 

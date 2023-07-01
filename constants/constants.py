@@ -20,6 +20,7 @@ class MealTemplatesTableLabels(StrEnum):
     template_id = 'template_id'
     name = 'name'
     content = 'content'
+    tally_row = 'tally_row'
     created_on = 'created_on'
     updated_on = 'updated_on'
 
