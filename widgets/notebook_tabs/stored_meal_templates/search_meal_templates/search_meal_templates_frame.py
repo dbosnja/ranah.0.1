@@ -5,7 +5,11 @@ from .search_options_frame import SearchOptionsFrame
 from .sort_options_frame import SortOptionsFrame
 
 from .. .. utility_widgets.leaf_frames import FoodTableResultsFrame
-from constants.constants import meal_templates_headers, MealTemplatesTableLabels, meal_templates_headers_map
+from constants.constants import (meal_templates_headers,
+                                 MealTemplatesTableLabels,
+                                 meal_templates_headers_map,
+                                 MealTemplatesTableColumnsOrder,
+                                 )
 
 
 class SearchMealTemplatesFrame:
@@ -35,10 +39,11 @@ class SearchMealTemplatesFrame:
         self._create_widgets()
         self._grid_widgets()
         self._bind_events()
-    
+
+        self._create_rendered_row_events()
+
     def _create_styles(self):
         ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
-        # ttk.Style().configure('SearchMealTemplates.TFrame', background='black')
     
     def _create_widget_vars(self):
         ...
@@ -59,6 +64,14 @@ class SearchMealTemplatesFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+
+    def _create_rendered_row_events(self):
+        """Define a mapping between event and their handlers for the rendered rows"""
+
+        self.rendered_row_events = {
+            '<Double-1>': self.delete_template_row,
+            '<Button-3>': self.delete_template_row,
+        }
 
     def set_meal_template_names(self):
         self.search_options_frame.set_meal_template_names(self.db.all_meal_templates_names)
@@ -99,8 +112,7 @@ class SearchMealTemplatesFrame:
                   + list(getattr(row, mt_tally_row).values()) \
                   + [created, updated]
             self.meal_templates.append(row)
-            # TODO: add events definitions and handlers
-            self.templates_table_frame.render_result(row)
+            self.templates_table_frame.render_result(row, **self.rendered_row_events)
 
     def clean_table(self):
         """Clean all rows from the table"""
@@ -130,6 +142,28 @@ class SearchMealTemplatesFrame:
 
         self.templates_table_frame.destroy_rows()
         for row in self.meal_templates:
-            # TODO: add events/handlers
-            self.templates_table_frame.render_result(row)
+            self.templates_table_frame.render_result(row, **self.rendered_row_events)
+
+    def delete_template_row(self, p_key):
+        """Delete a row from the table with element `p_key`"""
+
+        mt_template_id = MealTemplatesTableColumnsOrder.template_id.value
+        # update the rows count
+        meal_templates_left = len(self.meal_templates) - 1
+        self.sort_options_frame.rerender_templates_count(meal_templates_left)
+        if not meal_templates_left:
+            self.sort_options_frame.disable_buttons()
+
+        # delete appropriate row and re-render the rest
+        for i, row in enumerate(self.meal_templates):
+            if row[mt_template_id] == p_key:
+                del_idx = i
+                break
+        rows_to_rerender = self.meal_templates[del_idx + 1:]
+        for row in self.meal_templates[del_idx:]:
+            prim_key = row[mt_template_id]
+            self.templates_table_frame.destroy_row(prim_key)
+        for row in rows_to_rerender:
+            self.templates_table_frame.render_result(row, **self.rendered_row_events)
+        self.meal_templates = self.meal_templates[:del_idx] + rows_to_rerender
 

@@ -4,7 +4,7 @@ If the app grows larger, it'd probably make sense to split
 this module into several modules within a (sub)package
 """
 
-from enum import StrEnum
+from enum import StrEnum, IntEnum, auto
 
 
 class NotebookTabLabels(StrEnum):
@@ -23,6 +23,15 @@ class MealTemplatesTableLabels(StrEnum):
     tally_row = 'tally_row'
     created_on = 'created_on'
     updated_on = 'updated_on'
+
+
+class MealTemplatesTableColumnsOrder(IntEnum):
+    template_id = auto(0)
+    name = auto()
+    content = auto()
+    tally_row = auto()
+    created_on = auto()
+    updated_on = auto()
 
 
 NORMATIVE = 100
