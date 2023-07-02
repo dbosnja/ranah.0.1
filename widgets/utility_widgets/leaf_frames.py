@@ -41,35 +41,36 @@ class FoodTableResult:
         'cursor': 'hand2',
     }
     
-    def __init__(self, parent, callback=None):
+    def __init__(self, parent):
         self.parent = parent
-        self.callback = callback
         self.all_row_data = []
     
-    def render_row(self, row, row_data, **kwargs):
+    def render_row(self, row, row_data, events_map, events_map_pkey):
         """Render a row in the food table and attach specific event handler"""
 
-        # NOTE: This method is ripe for a refactor in future; ATM it should take a color
-        # positional arg together with optional callbacks for the events
+        # NOTE: could have been configurable color
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
+
         # save primary key since it's used in the callbacks to distinguish between the rows
         self.p_key = row_data[0]
         # replace primary key with its row number in the table
         row_data = [row] + row_data[1:]
+
         # NOTE: Have to use here `partial`, otherwise `ev_handler` reference will point to
         # the last value left in the iteration, ie all lambdas will call the same callback
-        events_map = {
+        em_pkey = {
             event: partial(lambda _, event_handler: event_handler(self.p_key), event_handler=ev_handler)
-            for event, ev_handler in kwargs.items()
+            for event, ev_handler in events_map_pkey.items()
         }
+        em = {
+            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            for event, ev_handler in events_map.items()
+        }
+        events_map = {**em_pkey, **em}
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
             lbl.grid(row=row, column=i, sticky='we')
-            lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
-            lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
-            if self.callback is not None:
-                lbl.bind('<1>', lambda _: self.callback(self.p_key))
-            # check for events and their handlers in the bag(note: this whole method should handle events and handlers in this manner)
+            # apply events and event handlers
             for event, event_handler in events_map.items():
                 lbl.bind(event, event_handler)
             self.all_row_data.append(lbl)
@@ -100,20 +101,19 @@ class FoodTableHeaders:
         self.header_labels = header_labels
         self.label_widgets = []
         self.marked_column = None
-        
-        self._create_widgets()
-        self._grid_widgets()
 
-    def _create_widgets(self):
-        for header_lbl in self.header_labels:
+    def render_headers(self, events_map):
+        events_map = {
+            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            for event, ev_handler in events_map.items()
+        }
+        for i, header_lbl in enumerate(self.header_labels):
             lbl = ttk.Label(self.parent.frame, text=header_lbl, borderwidth=1, relief='raised', padding=(0, 5, 0, 5), anchor='center')
-            lbl.bind('<Button-4>', lambda _: self.parent.scroll_up_handler())
-            lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
+            # apply events and event handlers
+            for event, event_handler in events_map.items():
+                lbl.bind(event, event_handler)
+            lbl.grid(row=0, column=i, sticky='we')
             self.label_widgets.append(lbl)
-    
-    def _grid_widgets(self):
-        for i, widget in enumerate(self.label_widgets):
-            widget.grid(row=0, column=i, sticky='we')
 
     def mark_column(self, col_id, col_color=None):
         """Mark sorting column with a different color, ie. `col_color`"""
@@ -157,6 +157,9 @@ class FoodTableResultsFrame:
         # enable resizing
         for i in range(self.col_count):
             self.frame.columnconfigure(i, weight=1)
+
+        # Headers Frame
+        self.headers_frame = FoodTableHeaders(self, self.table_headers)
         
         self._bind_events()
 
@@ -166,10 +169,7 @@ class FoodTableResultsFrame:
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky)
-        # NOTE: gridding the whole table implies gridding the table headers as well;
-        # gridding the table rows not though, due to the lazy loading architecture
-        self.render_headers()
-    
+
     def destroy_rows(self):
         """Destroy all widget rows"""
 
@@ -189,21 +189,21 @@ class FoodTableResultsFrame:
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
 
-    def render_headers(self):
-        self.headers_frame = FoodTableHeaders(self, self.table_headers)
+    def render_headers(self, header_events):
+        self.headers_frame.render_headers(header_events)
     
-    def render_results(self, food_tables):
+    def render_results(self, food_tables, row_events, row_events_pkey):
         for i, food_table in enumerate(food_tables):
-            row = FoodTableResult(self, self.row_callback)
-            row.render_row(i + 1, food_table)
+            row = FoodTableResult(self)
+            row.render_row(i + 1, food_table, row_events, row_events_pkey)
             self.all_rows.append(row)
 
-    def render_result(self, food_table, **kwargs):
+    def render_result(self, food_table, row_events, row_events_pkey):
         """Render one result at the end of the table"""
 
         row = FoodTableResult(self)
         self.all_rows.append(row)
-        row.render_row(len(self.all_rows), food_table, **kwargs)
+        row.render_row(len(self.all_rows), food_table, row_events, row_events_pkey)
 
     def destroy_row(self, p_key):
         """Destroy the row with primary key corresponding with `p_key`"""
@@ -228,20 +228,6 @@ class FoodTableResultsFrame:
     def unmark_column(self):
         self.headers_frame.unmark_column()
 
-    def set_row_callback(self, callback):
-        """Set which callback will be called when user clicks on the name field in a row
-
-        NOTE: this API was a mistake, maybe its existence is alright but assumption that
-        there is one(singular!) callback for each row in the table is simply wrong.
-        """
-        self.row_callback = callback
-    
-    def set_scroll_up_handler(self, callback):
-        self.scroll_up_handler = callback
-    
-    def set_scroll_down_handler(self, callback):
-        self.scroll_down_handler = callback
-    
     def _bind_events(self):
         self.frame.bind('<Configure>', lambda _: self.parent.parent.handle_resizing())
 

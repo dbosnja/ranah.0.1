@@ -184,6 +184,7 @@ class ConsumedFoodItemsFrame:
         self.db = db
         self.parent = parent
         self._create_styles()
+        self._create_table_events()
 
         self.frame = ttk.Frame(parent.canvas, style='ConsumedFoodItems.TFrame')
         self.frame.grid(row=0, column=0, sticky='news')
@@ -214,19 +215,33 @@ class ConsumedFoodItemsFrame:
 
         self.consumed_food_table_frame = FoodTableResultsFrame(self, consumed_food_headers.values())
         self.consumed_food_table_frame.configure_style('ConsumedFoodItems.TFrame')
-        self.consumed_food_table_frame.set_row_callback(self._open_update_center)
-        self.consumed_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.consumed_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
         self.consumed_food_search_options_frame.grid_frame(row=1, column=0, sticky='w')
         self.food_tables_tally_lbl.grid(row=2, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
         self.consumed_food_table_frame.grid_frame(row=3, column=0, sticky='we')
+        self.consumed_food_table_frame.render_headers(self.header_events)
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
+        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+
+    def _create_table_events(self):
+        """Define a mapping between event and their handlers for the rendered table"""
+
+        self.row_events_pkey = {
+            '<1>': self.open_update_center,
+        }
+        self.row_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
+
+        self.header_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
 
     def search_foods(self, start_time, end_time, food_name):
         """Search food by start time and optionally by end time and food name
@@ -252,7 +267,7 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.destroy_rows()
         self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the updated list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
+        self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
@@ -293,7 +308,7 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.destroy_rows()
         self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the sorted list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
+        self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
@@ -327,7 +342,7 @@ class ConsumedFoodItemsFrame:
         self.consumed_food_table_frame.destroy_rows()
         self.consumed_food_table_frame.destroy_tally_row()
         # re-render them with the updated list of food tables
-        self.consumed_food_table_frame.render_results(self.consumed_foods)
+        self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
         self.consumed_food_table_frame.render_tally_row(self.tally_row)
 
@@ -343,18 +358,22 @@ class ConsumedFoodItemsFrame:
         Otherwise return both of them.
         """
         time_idx = consumed_food_map['created_on']
-        timestamps = [cf[time_idx] for cf in self.consumed_foods]
+        timestamps = [datetime.datetime.strptime(cf[time_idx], '%d-%m-%Y, %H:%M') for cf in self.consumed_foods]
         if not timestamps:
             return datetime.datetime.now(), datetime.datetime.now()
-        min_t, max_t = min(timestamps), max(timestamps)
-        start_time = datetime.datetime.strptime(min_t, '%d-%m-%Y, %H:%M')
-        end_time = datetime.datetime.strptime(max_t, '%d-%m-%Y, %H:%M')
+        start_time, end_time = min(timestamps), max(timestamps)
         if start_time == end_time:
             return start_time, None
         return start_time, end_time
 
-    def _open_update_center(self, p_key):
+    def open_update_center(self, p_key):
         # Fetch the complete table row since consumed food name is not globally unique
         consumed_food_row = self.db.get_consumed_food_by_primary_key(p_key)
         DialogPickerTopLevel(self, self.db, consumed_food_row)
+
+    def handle_scroll_up(self):
+        self.parent.handle_scroll_up()
+
+    def handle_scroll_down(self):
+        self.parent.handle_scroll_down()
 

@@ -325,7 +325,7 @@ class CreateMealTemplateFrame:
         self.template_foods = []
         self.tally_row = None
 
-        self._create_rendered_row_events()
+        self._create_table_events()
 
         self._create_styles()
 
@@ -358,25 +358,33 @@ class CreateMealTemplateFrame:
         table_headers = list(consumed_food_headers.values())[:consumed_food_map['created_on']]
         self.template_food_table_frame = FoodTableResultsFrame(self, table_headers)
         self.template_food_table_frame.configure_style('CreateTemplate.TFrame')
-        self.template_food_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.template_food_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
 
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
         self.create_meal_options_frame.grid_frame(row=1, column=0, sticky='we')
         self.template_action_frame.grid_frame(row=2, column=0, sticky='w')
         self.template_food_table_frame.grid_frame(row=3, column=0, sticky='we')
+        self.template_food_table_frame.render_headers(self.header_events)
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
+        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
 
-    def _create_rendered_row_events(self):
-        """Define a mapping between event and their handlers for the rendered rows"""
+    def _create_table_events(self):
+        """Define a mapping between event and their handlers for the rendered table"""
 
-        self.rendered_row_events = {
+        self.row_events_pkey = {
             '<Double-1>': self.delete_template_food,
             '<Button-3>': self.delete_template_food,
+        }
+        self.row_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
+
+        self.header_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
         }
 
     def add_to_template(self, food_name, food_weight):
@@ -403,7 +411,7 @@ class CreateMealTemplateFrame:
 
         # rendering
         self.template_food_table_frame.destroy_tally_row()
-        self.template_food_table_frame.render_result(scaled_row, **self.rendered_row_events)
+        self.template_food_table_frame.render_result(scaled_row, self.row_events, self.row_events_pkey)
         self.template_food_table_frame.render_tally_row(self.tally_row)
 
     def _rescale_food_values(self, food_name, food_weight):
@@ -458,7 +466,7 @@ class CreateMealTemplateFrame:
 
         # re-render latter part of rows and updated tally row
         for row in data_to_rerender:
-            self.template_food_table_frame.render_result(row, **self.rendered_row_events)
+            self.template_food_table_frame.render_result(row, self.row_events, self.row_events_pkey)
         self.template_food_table_frame.render_tally_row(self.tally_row)
 
         self.template_foods = self.template_foods[:idx] + data_to_rerender
@@ -495,7 +503,7 @@ class CreateMealTemplateFrame:
         self.template_food_table_frame.destroy_tally_row()
         # re-render them with the sorted list of food tables
         for food in self.template_foods:
-            self.template_food_table_frame.render_result(food, **self.rendered_row_events)
+            self.template_food_table_frame.render_result(food, self.row_events, self.row_events_pkey)
         # render the tally row
         self.template_food_table_frame.render_tally_row(self.tally_row)
 
@@ -540,4 +548,10 @@ class CreateMealTemplateFrame:
         self.save_template_center.dialog_center.destroy()
         messagebox.showinfo(title='Uspješno pohranjivanje predloška',
                             message=f'Predložak `{template_name}` uspješno pohranjen u Ranahu.')
+
+    def handle_scroll_up(self):
+        self.parent.handle_scroll_up()
+
+    def handle_scroll_down(self):
+        self.parent.handle_scroll_down()
 

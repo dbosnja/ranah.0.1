@@ -30,6 +30,7 @@ class SearchMealTemplatesFrame:
         self.meal_templates = []
 
         self._create_styles()
+        self._create_table_events()
 
         self.frame = ttk.Frame(parent.canvas, style='SearchMealTemplates.TFrame')
         self.frame.columnconfigure(0, weight=1)
@@ -38,8 +39,6 @@ class SearchMealTemplatesFrame:
         self._create_widgets()
         self._grid_widgets()
         self._bind_events()
-
-        self._create_rendered_row_events()
 
     def _create_styles(self):
         ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
@@ -52,25 +51,34 @@ class SearchMealTemplatesFrame:
         self.sort_options_frame = SortOptionsFrame(self)
 
         self.templates_table_frame = FoodTableResultsFrame(self, meal_templates_headers.values())
-        self.templates_table_frame.set_scroll_up_handler(self.handle_scroll_up)
-        self.templates_table_frame.set_scroll_down_handler(self.handle_scroll_down)
+        self.templates_table_frame.configure_style('SearchMealTemplates.TFrame')
 
     def _grid_widgets(self):
         self.search_options_frame.grid(row=0, column=0, sticky='we')
         self.sort_options_frame.grid(row=1, column=0, sticky='we')
         self.templates_table_frame.grid_frame(row=2, column=0, sticky='we')
+        self.templates_table_frame.render_headers(self.header_events)
 
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
 
-    def _create_rendered_row_events(self):
-        """Define a mapping between event and their handlers for the rendered rows"""
+    def _create_table_events(self):
+        """Define a mapping between event and their handlers for the rendered table"""
 
-        self.rendered_row_events = {
+        self.row_events_pkey = {
             '<Double-1>': self.delete_template_row,
             '<Button-3>': self.delete_template_row,
             '<1>': self.open_dialog_center,
+        }
+        self.row_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
+
+        self.header_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
         }
 
     def set_meal_template_names(self):
@@ -112,7 +120,7 @@ class SearchMealTemplatesFrame:
                   + list(getattr(row, mt_tally_row).values()) \
                   + [created, updated]
             self.meal_templates.append(row)
-            self.templates_table_frame.render_result(row, **self.rendered_row_events)
+            self.templates_table_frame.render_result(row, self.row_events, self.row_events_pkey)
 
     def clean_table(self):
         """Clean all rows from the table"""
@@ -142,7 +150,7 @@ class SearchMealTemplatesFrame:
 
         self.templates_table_frame.destroy_rows()
         for row in self.meal_templates:
-            self.templates_table_frame.render_result(row, **self.rendered_row_events)
+            self.templates_table_frame.render_result(row, self.row_events, self.row_events_pkey)
 
     def delete_template_row(self, p_key):
         """Delete a row from the table with element `p_key`"""
@@ -164,7 +172,7 @@ class SearchMealTemplatesFrame:
             prim_key = row[mt_template_id]
             self.templates_table_frame.destroy_row(prim_key)
         for row in rows_to_rerender:
-            self.templates_table_frame.render_result(row, **self.rendered_row_events)
+            self.templates_table_frame.render_result(row, self.row_events, self.row_events_pkey)
         self.meal_templates = self.meal_templates[:del_idx] + rows_to_rerender
 
     def open_dialog_center(self, p_key):

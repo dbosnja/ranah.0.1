@@ -102,3 +102,6 @@ TABS:
 
 
 Demo Video: peanut butter + jelly sandwich?
+
+It seems like theres a bug on dipslaying range of datetimes in the tally row in consumed food tab  -> Fixed(Never compare datetimes as strings)
+There's an error when trying to to make an action on a row after an action has already been done -> consumed food tab -> still didn't reproduce it uniquely

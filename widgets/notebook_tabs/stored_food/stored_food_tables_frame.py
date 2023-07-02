@@ -116,6 +116,8 @@ class StoredFoodTablesFrame:
         self.food_tables = []
 
         self._create_styles()
+        self._create_table_events()
+
         # main frame
         self.frame = ttk.Frame(parent.canvas, style='StoredLabels.TFrame')
         self.frame.grid(row=0, column=0, sticky='news')
@@ -139,8 +141,8 @@ class StoredFoodTablesFrame:
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='StoredFoodTopic.TLabel')
 
         self.stored_food_search_options_frame = StoredFoodSearchOptionsFrame(self, self.db)
-        self.stored_food_search_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.stored_food_search_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
+        self.stored_food_search_options_frame.set_scroll_up_handler(self.handle_scroll_up)
+        self.stored_food_search_options_frame.set_scroll_down_handler(self.handle_scroll_down)
 
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
         
@@ -148,20 +150,34 @@ class StoredFoodTablesFrame:
         # in this context I'm using it as a nutrition table frame, therefore the name
         self.nutrition_table_frame = FoodTableResultsFrame(self, nutrition_table_headers.values())
         self.nutrition_table_frame.configure_style('StoredLabels.TFrame')
-        self.nutrition_table_frame.set_row_callback(self._open_update_center)
-        self.nutrition_table_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.nutrition_table_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
     
     def _grid_widgets(self):
         self.topic_lbl.grid(row=0, column=0, sticky='we', padx=(15, 30), pady=(50, 30))
         self.stored_food_search_options_frame.grid_frame(row=1, column=0, sticky='w')
         self.food_tables_tally_lbl.grid(row=2, column=0, sticky='w', padx=(5, 0), pady=(30, 10))
         self.nutrition_table_frame.grid_frame(row=3, column=0, sticky='we')
+        self.nutrition_table_frame.render_headers(self.header_events)
     
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
-    
+        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+
+    def _create_table_events(self):
+        """Define a mapping between event and their handlers for the rendered table"""
+
+        self.row_events_pkey = {
+            '<1>': self.open_update_center,
+        }
+        self.row_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
+
+        self.header_events = {
+            '<Button-4>': self.handle_scroll_up,
+            '<Button-5>': self.handle_scroll_down,
+        }
+
     def _get_food_results(self, name_segment):
         """Fetches all food nutrition tables based on `in` operator
         
@@ -191,7 +207,7 @@ class StoredFoodTablesFrame:
         # Clear all rendered rows
         self.nutrition_table_frame.destroy_rows()
         # re-render them with the updated list of food tables
-        self.nutrition_table_frame.render_results(self.food_tables)
+        self.nutrition_table_frame.render_results(self.food_tables, self.row_events, self.row_events_pkey)
 
     def sort_results(self, sort_option, rev):
         for k, v in nutrition_table_headers.items():
@@ -210,11 +226,17 @@ class StoredFoodTablesFrame:
         # Clear all rendered rows
         self.nutrition_table_frame.destroy_rows()
         # re-render them with the sorted list of food tables
-        self.nutrition_table_frame.render_results(self.food_tables)
+        self.nutrition_table_frame.render_results(self.food_tables, self.row_events, self.row_events_pkey)
 
-    def _open_update_center(self, p_key):
+    def open_update_center(self, p_key):
         # All operations can be done solely on the food table name
         table_row = self.db.get_food_item_table_by_primary_key(p_key)
         dialog_picker = DialogPickerTopLevel(self, self.db, table_row)
         dialog_picker.set_serch_button(self.stored_food_search_options_frame._search_foods)
+
+    def handle_scroll_up(self):
+        self.parent.handle_scroll_up()
+
+    def handle_scroll_down(self):
+        self.parent.handle_scroll_down()
 

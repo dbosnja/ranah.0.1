@@ -35,7 +35,7 @@ class SearchMealTemplatesCanvas:
         # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
-        # self.canvas.configure(yscrollincrement=5)
+        self.canvas.configure(yscrollincrement=5)
     
     def _initialize_search_meal_templates_frame(self):
         self.search_meal_templates_frame = SearchMealTemplatesFrame(self, self.db)
