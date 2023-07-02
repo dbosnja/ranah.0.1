@@ -6,3 +6,4 @@ DB_URL_PARAMS = {
     'database': 'ranah_02',
     'port': 5432
 }
+

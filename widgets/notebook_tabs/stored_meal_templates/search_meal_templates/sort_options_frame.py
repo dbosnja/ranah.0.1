@@ -9,7 +9,7 @@ class SortOptionsFrame:
     def __init__(self, parent):
         self.parent = parent
 
-        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(30, 70, 0, 10))
+        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(10, 70, 0, 10))
 
         self._create_mutual_label_options()
         # self._create_mutual_entry_options()

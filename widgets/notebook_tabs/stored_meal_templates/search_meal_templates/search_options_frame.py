@@ -179,3 +179,4 @@ class SearchOptionsFrame:
     def disable_render_template_btn(self):
         self.render_template_btn['state'] = 'disabled'
         self.render_template_btn['cursor'] = ''
+

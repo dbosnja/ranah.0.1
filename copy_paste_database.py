@@ -96,3 +96,4 @@ for food_name in db1.all_food_label_names():
     db2.insert_new_food_item_record(**values)
 
 input()
+

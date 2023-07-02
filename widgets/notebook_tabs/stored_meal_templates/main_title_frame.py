@@ -34,3 +34,4 @@ class MainTitleFrame:
     
     def _bind_events(self):
         ...
+
