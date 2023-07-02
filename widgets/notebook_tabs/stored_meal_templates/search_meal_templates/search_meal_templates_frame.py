@@ -24,7 +24,6 @@ class SearchMealTemplatesFrame:
 
     Third Frame handles rendering of meal templates in a table-like diplay.
     """
-
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
@@ -44,10 +43,10 @@ class SearchMealTemplatesFrame:
 
     def _create_styles(self):
         ttk.Style().configure('SearchMealTemplates.TFrame', background='#FFD900')
-    
+
     def _create_widget_vars(self):
         ...
-    
+
     def _create_widgets(self):
         self.search_options_frame = SearchOptionsFrame(self)
         self.sort_options_frame = SortOptionsFrame(self)
@@ -71,6 +70,7 @@ class SearchMealTemplatesFrame:
         self.rendered_row_events = {
             '<Double-1>': self.delete_template_row,
             '<Button-3>': self.delete_template_row,
+            '<1>': self.open_dialog_center,
         }
 
     def set_meal_template_names(self):
@@ -86,7 +86,7 @@ class SearchMealTemplatesFrame:
         """Render templates stats
 
         The function always evalutes on a non-empty operand.
-        It deletes the old values in the table and enables sortin/cleaning
+        It deletes the old values in the table and enables sorting/cleaning
         options.
         """
         self.sort_options_frame.rerender_templates_count(len(template_names))
@@ -167,3 +167,6 @@ class SearchMealTemplatesFrame:
             self.templates_table_frame.render_result(row, **self.rendered_row_events)
         self.meal_templates = self.meal_templates[:del_idx] + rows_to_rerender
 
+    def open_dialog_center(self, p_key):
+        """Open dialog center for a template row"""
+        print(p_key)

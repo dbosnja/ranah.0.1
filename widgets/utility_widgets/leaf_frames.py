@@ -8,6 +8,7 @@ are exposed for maneuvering their properties, texts, grid position and so on.
 """
 
 
+from functools import partial
 from tkinter import ttk
 
 
@@ -55,6 +56,12 @@ class FoodTableResult:
         self.p_key = row_data[0]
         # replace primary key with its row number in the table
         row_data = [row] + row_data[1:]
+        # NOTE: Have to use here `partial`, otherwise `ev_handler` reference will point to
+        # the last value left in the iteration, ie all lambdas will call the same callback
+        events_map = {
+            event: partial(lambda _, event_handler: event_handler(self.p_key), event_handler=ev_handler)
+            for event, ev_handler in kwargs.items()
+        }
         for i, data in enumerate(row_data):
             lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, **self.MUTUAL_LABEL_OPTIONS)
             lbl.grid(row=row, column=i, sticky='we')
@@ -62,12 +69,10 @@ class FoodTableResult:
             lbl.bind('<Button-5>', lambda _: self.parent.scroll_down_handler())
             if self.callback is not None:
                 lbl.bind('<1>', lambda _: self.callback(self.p_key))
+            # check for events and their handlers in the bag(note: this whole method should handle events and handlers in this manner)
+            for event, event_handler in events_map.items():
+                lbl.bind(event, event_handler)
             self.all_row_data.append(lbl)
-
-        # check for events and their handlers in the bag
-        for event, event_handler in kwargs.items():
-            for lbl in self.all_row_data:
-                lbl.bind(event, lambda _: event_handler(self.p_key))
 
     def render_tally_row(self, row, tally_row_data):
         # TODO: decide on the color of the tally row
