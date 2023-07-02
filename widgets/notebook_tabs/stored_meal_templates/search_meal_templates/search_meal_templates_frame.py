@@ -1,5 +1,5 @@
 from datetime import datetime
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from .search_options_frame import SearchOptionsFrame
 from .sort_options_frame import SortOptionsFrame
@@ -10,6 +10,7 @@ from constants.constants import (meal_templates_headers,
                                  meal_templates_headers_map,
                                  MealTemplatesTableColumnsOrder,
                                  )
+from .top_level_dialogs import DialogPickerTopLevel
 
 
 class SearchMealTemplatesFrame:
@@ -67,7 +68,6 @@ class SearchMealTemplatesFrame:
         """Define a mapping between event and their handlers for the rendered table"""
 
         self.row_events_pkey = {
-            '<Double-1>': self.delete_template_row,
             '<Button-3>': self.delete_template_row,
             '<1>': self.open_dialog_center,
         }
@@ -177,4 +177,18 @@ class SearchMealTemplatesFrame:
 
     def open_dialog_center(self, p_key):
         """Open dialog center for a template row"""
-        print(p_key)
+
+        self.selected_p_key = p_key
+        mt = self.db.get_meal_template_by_primary_key(p_key)
+        self.selected_mt_name = getattr(mt, MealTemplatesTableLabels.name.value)
+        DialogPickerTopLevel(self, self.selected_mt_name)
+
+    def delete_template_permanently(self, top_dialog, delete_dialog):
+        self.db.delete_meal_template_by_primary_key(self.selected_p_key)
+        self.clean_table()
+        self.set_meal_template_names()
+        delete_dialog.dialog_center.destroy()
+        top_dialog.dialog_center.destroy()
+        messagebox.showinfo(title='Predložak trajno izbrisan',
+                            message=f'`{self.selected_mt_name}` uspješno izbrisan.')
+
