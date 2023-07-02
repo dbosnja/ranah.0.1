@@ -244,3 +244,24 @@ class Database:
         with self.engine.connect() as conn:
             rp = conn.execute(sel_stmt)
             return rp.first()
+
+    def get_meal_template_by_primary_key(self, p_key):
+        """Retrieve one meal template based on its primary_key"""
+
+        tmplt_id = MealTemplatesTableLabels.template_id.value
+        sel = select(meal_templates_table)
+        sel = sel.where(getattr(meal_templates_table.c, tmplt_id) == p_key)
+        with self.engine.connect() as conn:
+            rp = conn.execute(sel)
+            return rp.first()
+
+    def delete_meal_template_by_primary_key(self, p_key):
+        """Delete meal template with primary key `p_key`."""
+
+        tmplt_id = MealTemplatesTableLabels.template_id.value
+        del_stmt = delete(meal_templates_table)
+        del_stmt = del_stmt.where(getattr(meal_templates_table.c, tmplt_id) == p_key)
+        with self.engine.connect() as conn:
+            conn.execute(del_stmt)
+            conn.commit()
+
