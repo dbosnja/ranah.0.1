@@ -192,3 +192,9 @@ class SearchMealTemplatesFrame:
         messagebox.showinfo(title='Predložak trajno izbrisan',
                             message=f'`{self.selected_mt_name}` uspješno izbrisan.')
 
+
+    def add_template_as_consumed(self, top_dialog, add_dialog, **kwargs):
+        print(f'adding {self.selected_mt_name}')
+        top_dialog.dialog_center.destroy()
+        add_dialog.dialog_center.destroy()
+

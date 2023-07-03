@@ -255,7 +255,7 @@ class AddDialogTopLevel:
         self.db.create_new_consumed_food_item(**record)
 
         self.dialog_center.destroy()
-        messagebox.showinfo(title='Konzumirani artikl ažuriran',
+        messagebox.showinfo(title='Konzumirani artikl dodan',
                             message=f'Uspješno dodano {food_weight}g proizvoda',
                             parent=self.parent.dialog_center)
 
