@@ -9,8 +9,6 @@ from constants.constants import consumed_food_headers, consumed_food_timestamp_m
 class AddDialogTopLevel:
     """Description"""
 
-    NORMATIVE = 100
-
     def __init__(self, parent, tmplt_name):
         self.parent = parent
         self.template_name =tmplt_name
@@ -31,6 +29,7 @@ class AddDialogTopLevel:
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
+        self._bind_events()
 
     def _initialize_dialog_window(self):
         self.dialog_center = Toplevel()
@@ -52,35 +51,28 @@ class AddDialogTopLevel:
         self.def_h = f'{time_now.hour}'
         self.def_min = f'{time_now.minute}'
 
-        return [self.template_name] + [self.def_y, self.def_m, self.def_d, self.def_h, self.def_min]
+        return [self.template_name, 100] + [self.def_y, self.def_m, self.def_d, self.def_h, self.def_min]
 
     def _define_regex(self):
-        self.food_weight_with_dot_re = re.compile('^\d{,4}\.\d{,2}$')
-        self.food_weight_wo_dot_re = re.compile('^\d{,4}$')
+        self.template_percentage_re = re.compile('^(^([1-9])$|^([1-9][0-9])$|^(100)$)$')
 
-        self.consumed_time_re = re.compile('(\d{2})-(\d{2})-(\d{4}),\s*(\d{2}):(\d{2})')
         self.consumed_time_year_re = re.compile('^(^20?((2?[3-9]?)|([3-9]?[0-9]?))$)|(^2[1-9]?[0-9]?[0-9]?$)$')
-
         self.consumed_time_month_re = re.compile('^(^[1-9]$)|(^1[0-2]?$)$')
         self.consumed_time_day_re = re.compile('^([1-9]?$)|(^1[0-9]?$)|(^2[0-9]?$)|(^3[0-1]?$)$')
-
         self.consumed_time_hour_re = re.compile('^(^0[0-9]?$)|(^1[0-9]?$)|(^2[0-3]?$)$')
         self.consumed_time_minute_re = re.compile('^[0-5][0-9]?$')
 
     def _define_validations(self):
-        self._validate_food_weight = self.dialog_center.register(self._validate_food_weight_input), '%P'
+        self._validate_template_percentage = self.dialog_center.register(self._validate_template_percentage_input), '%P'
         self._validate_year = self.dialog_center.register(self._validate_year_input), '%P'
         self._validate_month = self.dialog_center.register(self._validate_month_input), '%P'
         self._validate_day = self.dialog_center.register(self._validate_day_input), '%P'
         self._validate_hour = self.dialog_center.register(self._validate_hour_input), '%P'
         self._validate_minute = self.dialog_center.register(self._validate_minute_input), '%P'
 
-    def _validate_food_weight_input(self, entry_value):
-        if entry_value:
-            if '.' in entry_value and self.food_weight_with_dot_re.match(entry_value) is None:
-                return False
-            elif '.' not in entry_value and self.food_weight_wo_dot_re.match(entry_value) is None:
-                return False
+    def _validate_template_percentage_input(self, entry_value):
+        if entry_value and self.template_percentage_re.match(entry_value) is None:
+            return False
         return True
 
     def _validate_year_input(self, entry_value):
@@ -112,12 +104,12 @@ class AddDialogTopLevel:
 
     def _create_styles(self):
         self.add_btn_style = ttk.Style()
-        self.add_btn_style.configure('UpdateFoodTable.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.add_btn_style.map('UpdateFoodTable.TButton', background=[('active', '#00994D')])
+        self.add_btn_style.configure('AddTemplateTable.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.add_btn_style.map('AddTemplateTable.TButton', background=[('active', '#00994D')])
 
         self.cancel_btn_style = ttk.Style()
-        self.cancel_btn_style.configure('CancelUpdate.TButton', font=(25), padding=(0, 5, 0, 5))
-        self.cancel_btn_style.map('CancelUpdate.TButton', background=[('active', '#FF0000')])
+        self.cancel_btn_style.configure('CancelAdding.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.cancel_btn_style.map('CancelAdding.TButton', background=[('active', '#FF0000')])
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {
@@ -147,7 +139,7 @@ class AddDialogTopLevel:
     def _create_widget_vars(self):
         self.title_lbl_var = f'Unesite opcionalni postotak konzumiranja predloška\n`{self.template_name}`\ni opcionalno vrijeme konzumiranja'
 
-        self.food_weight_var = StringVar()
+        self.tmplt_perc_var = StringVar()
         self.year_var = StringVar()
         self.month_var = StringVar()
         self.day_var = StringVar()
@@ -158,7 +150,7 @@ class AddDialogTopLevel:
 
         # NOTE: order is very important here
         self.widget_vars = (
-            self.food_name_var, self.year_var, self.month_var,
+            self.food_name_var, self.tmplt_perc_var ,self.year_var, self.month_var,
             self.day_var, self.hour_var, self.minute_var
         )
         for w_var, food_value in zip(self.widget_vars, self.predefined_food_values):
@@ -169,9 +161,8 @@ class AddDialogTopLevel:
                                    padding=10, font='15', anchor='center', borderwidth=2,
                                    relief='groove', background='#FFFFCC', justify='center')
 
-        self.food_weight_lbl = ttk.Label(text=consumed_food_headers['food_weight'], **self.mutual_label_options)
-        self.food_weight_e = ttk.Entry(textvariable=self.food_weight_var, validatecommand=self._validate_food_weight, **self.mutual_entry_options)
-        self.food_weight_e.focus()
+        self.tmplt_perc_lbl = ttk.Label(text='Postotak', **self.mutual_label_options)
+        self.tmplt_perc_e = ttk.Entry(textvariable=self.tmplt_perc_var, validatecommand=self._validate_template_percentage, **self.mutual_entry_options)
         self.year_lbl = ttk.Label(text=consumed_food_timestamp_map['year'], **self.mutual_label_options)
         self.year_e = ttk.Entry(textvariable=self.year_var, validatecommand=self._validate_year, **self.mutual_entry_options)
 
@@ -188,14 +179,14 @@ class AddDialogTopLevel:
         self.food_name_lbl = ttk.Label(text=consumed_food_headers['food_name'], **self.mutual_label_options)
         self.food_name_e = ttk.Entry(self.dialog_center, textvariable=self.food_name_var, width=20,font='default 17', justify='center', state='readonly')
 
-        self.update_btn = ttk.Button(text='Dodaj', command=self._update_food_table, style='UpdateFoodTable.TButton', **self.mutual_button_options)
-        self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelUpdate.TButton', **self.mutual_button_options)
+        self.add_btn = ttk.Button(text='Dodaj', command=self._add_template, style='AddTemplateTable.TButton', **self.mutual_button_options)
+        self.cancel_btn = ttk.Button(text='Odustani', command=self.dialog_center.destroy, style='CancelAdding.TButton', **self.mutual_button_options)
 
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0, sticky='we', columnspan=4)
 
-        self.food_weight_lbl.grid(row=1, column=0, sticky='we', padx=(10, 5), pady=(20, 5))
-        self.food_weight_e.grid(row=1, column=1, sticky='we', padx=(5, 5), pady=(20, 5))
+        self.tmplt_perc_lbl.grid(row=1, column=0, sticky='we', padx=(10, 5), pady=(20, 5))
+        self.tmplt_perc_e.grid(row=1, column=1, sticky='we', padx=(5, 5), pady=(20, 5))
         self.year_lbl.grid(row=1, column=2, sticky='we', padx=(5, 5), pady=(20, 5))
         self.year_e.grid(row=1, column=3, sticky='we', padx=(5, 10), pady=(20, 5))
 
@@ -212,58 +203,30 @@ class AddDialogTopLevel:
         self.food_name_lbl.grid(row=4, column=0, sticky='we', padx=(10, 5), pady=(10, 5))
         self.food_name_e.grid(row=4, column=1, sticky='we', columnspan=3, padx=(5, 10), pady=(10, 5))
 
-        self.update_btn.grid(row=5, column=0, columnspan=2, sticky='e', padx=(0, 10), pady=(30, 0))
+        self.add_btn.grid(row=5, column=0, columnspan=2, sticky='e', padx=(0, 10), pady=(30, 0))
         self.cancel_btn.grid(row=5, column=2, columnspan=2, sticky='w', padx=(10, 0), pady=(30, 0))
 
-    def _update_food_table(self):
-        self.parent._add_template(self)
-        return
-        food_weight = self.food_weight_var.get()
-        if not food_weight or food_weight == '.' or not float(food_weight):
-            # idempotent operation for this conditions
-            self.dialog_center.destroy()
-            return
+    def _bind_events(self):
+        self.tmplt_perc_e.bind('<KeyRelease>', lambda _: self._handle_percentage_input())
 
-        # update numeric values
-        rescaled_values = self._rescale_values(food_weight)
-        consumed_food = [self.food_row[consumed_food_map['food_name']]] + [float(food_weight)] + rescaled_values
+    def _handle_percentage_input(self):
+        if not self.tmplt_perc_var.get():
+            self.add_btn['state'] = 'disabled'
+            self.add_btn['cursor'] = ''
+        else:
+            self.add_btn['state'] = ''
+            self.add_btn['cursor'] = 'hand2'
 
-        # update datetime values
-        time_now = datetime.datetime.now()
-        # if any of minute, hour, day or month empty, imply current time
-        minute = self.minute_var.get() or time_now.minute
-        hour = self.hour_var.get() or time_now.hour
-        day = self.day_var.get() or time_now.day
-        month = self.month_var.get() or time_now.month
-        # the only valid input for the year is a 4digit string
-        year = self.year_var.get() if len(self.year_var.get()) == 4 else time_now.year
-        consumed_time = f'{day}-{month}-{year}, {hour}:{minute}:{time_now.second}:{time_now.microsecond}'
-        consumed_time = datetime.datetime.strptime(consumed_time, '%d-%m-%Y, %H:%M:%S:%f')
-        consumed_food.append(consumed_time)
-
-        # create record for update operation; ignore primary key
-        # not really best, but this is what I get when I allow children to write to DB
-        record = {
-            k: consumed_food[consumed_food_map[k] - 1]
-            for k in list(consumed_food_map.keys())[1:]
+    def _add_template(self):
+        user_input = {
+            'tmplt_percentage': self.tmplt_perc_var.get(),
+            'year': self.year_var.get(),
+            'month': self.month_var.get(),
+            'day': self.day_var.get(),
+            'hour': self.hour_var.get(),
+            'minute': self.minute_var.get()
         }
-        self.db.create_new_consumed_food_item(**record)
-
-        self.dialog_center.destroy()
-        messagebox.showinfo(title='Konzumirani artikl ažuriran',
-                            message=f'Uspješno dodano {food_weight}g proizvoda',
-                            parent=self.parent.dialog_center)
-
-    def _rescale_values(self, food_weight):
-        food_weight = float(food_weight)
-        scale_factor = round(food_weight / self.NORMATIVE, 2)
-        # fetch the food table and scale the corresponding columns
-        food_table = self.db.get_food_item_table(self.label_name)
-        food_table = food_table[nutrition_table_map['calories']:nutrition_table_map['price'] + 1]
-        food_table = [round(x * scale_factor, 2) for x in food_table]
-        # cast to int wherever it makes sense to
-        food_table = [int(x) if int(x) == x else x for x in food_table]
-        return food_table
+        self.parent._add_template(self, user_input)
 
 
 class DeleteDialogTopLevel:
@@ -421,6 +384,6 @@ class DialogPickerTopLevel:
     def _delete_template(self, delete_picker):
         self.parent.delete_template_permanently(self, delete_picker)
 
-    def _add_template(self, add_picker):
-        self.parent.add_template_as_consumed(self, add_picker)
+    def _add_template(self, add_picker, user_input):
+        self.parent.add_template_as_consumed(self, add_picker, user_input)
 

@@ -9,6 +9,7 @@ from constants.constants import (meal_templates_headers,
                                  MealTemplatesTableLabels,
                                  meal_templates_headers_map,
                                  MealTemplatesTableColumnsOrder,
+                                 consumed_food_map,
                                  )
 from .top_level_dialogs import DialogPickerTopLevel
 
@@ -25,6 +26,9 @@ class SearchMealTemplatesFrame:
 
     Third Frame handles rendering of meal templates in a table-like diplay.
     """
+
+    NORMATIVE = 100
+
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
@@ -80,6 +84,17 @@ class SearchMealTemplatesFrame:
             '<Button-4>': self.handle_scroll_up,
             '<Button-5>': self.handle_scroll_down,
         }
+
+    def _add_consumed_food(self, ratio, food_values, consumed_datetime, columns):
+        whole = 1.0
+        values = {col: food_values[col] for col in columns}
+        if ratio != whole:
+            # scale the values
+            for col in columns:
+                values[col] = round(food_values[col] * ratio, 2)
+        values['created_on'] = consumed_datetime
+        values['food_name'] = food_values['food_name']
+        self.db.create_new_consumed_food_item(**values)
 
     def set_meal_template_names(self):
         self.search_options_frame.set_meal_template_names(self.db.all_meal_templates_names)
@@ -179,8 +194,8 @@ class SearchMealTemplatesFrame:
         """Open dialog center for a template row"""
 
         self.selected_p_key = p_key
-        mt = self.db.get_meal_template_by_primary_key(p_key)
-        self.selected_mt_name = getattr(mt, MealTemplatesTableLabels.name.value)
+        self.selected_mt = self.db.get_meal_template_by_primary_key(p_key)
+        self.selected_mt_name = getattr(self.selected_mt, MealTemplatesTableLabels.name.value)
         DialogPickerTopLevel(self, self.selected_mt_name)
 
     def delete_template_permanently(self, top_dialog, delete_dialog):
@@ -193,8 +208,29 @@ class SearchMealTemplatesFrame:
                             message=f'`{self.selected_mt_name}` uspješno izbrisan.')
 
 
-    def add_template_as_consumed(self, top_dialog, add_dialog, **kwargs):
-        print(f'adding {self.selected_mt_name}')
-        top_dialog.dialog_center.destroy()
+    def add_template_as_consumed(self, top_dialog, add_dialog, user_input):
+        con_year = user_input['year']
+        con_month = user_input['month']
+        con_day = user_input['day']
+        con_hour = user_input['hour']
+        con_minute = user_input['minute']
+        consumed_datetime = f'{con_day}-{con_month}-{con_year}, {con_hour}:{con_minute}'
+        try:
+            consumed_datetime = datetime.strptime(consumed_datetime, '%d-%m-%Y, %H:%M')
+        except ValueError:
+            messagebox.showerror(title='Ilegalan datum',
+                                 message=f'Datum `{consumed_datetime}` ne postoji!',
+                                 parent=add_dialog.dialog_center)
+            return
+        tmplt_percentage = int(user_input['tmplt_percentage'])
+        ratio = tmplt_percentage / self.NORMATIVE
+        st_idx, end_idx = consumed_food_map['food_weight'], consumed_food_map['price'] + 1
+        columns = list(consumed_food_map.keys())[st_idx:end_idx]
+        tmplt_content = getattr(self.selected_mt, MealTemplatesTableLabels.content.value)
+        for food_values in tmplt_content.values():
+            self._add_consumed_food(ratio, food_values, consumed_datetime, columns)
         add_dialog.dialog_center.destroy()
+        top_dialog.dialog_center.destroy()
+        messagebox.showinfo(title='Predložak iskonzumiran',
+                            message=f'Predložak `{self.selected_mt_name}` dodan kao konzumiran')
 
