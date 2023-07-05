@@ -412,7 +412,7 @@ class CreateMealTemplateFrame:
         # rendering
         self.template_food_table_frame.destroy_tally_row()
         self.template_food_table_frame.render_result(scaled_row, self.row_events, self.row_events_pkey)
-        self.template_food_table_frame.render_tally_row(self.tally_row)
+        self.template_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
     def _rescale_food_values(self, food_name, food_weight):
         scale_factor = round(food_weight / NORMATIVE, 2)
@@ -467,7 +467,7 @@ class CreateMealTemplateFrame:
         # re-render latter part of rows and updated tally row
         for row in data_to_rerender:
             self.template_food_table_frame.render_result(row, self.row_events, self.row_events_pkey)
-        self.template_food_table_frame.render_tally_row(self.tally_row)
+        self.template_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
         self.template_foods = self.template_foods[:idx] + data_to_rerender
         if not self.template_foods:
@@ -505,7 +505,7 @@ class CreateMealTemplateFrame:
         for food in self.template_foods:
             self.template_food_table_frame.render_result(food, self.row_events, self.row_events_pkey)
         # render the tally row
-        self.template_food_table_frame.render_tally_row(self.tally_row)
+        self.template_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
     def open_save_center(self):
         self.save_template_center = SaveTemplateCenterTopLevel(self, self.save_template)

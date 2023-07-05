@@ -75,12 +75,19 @@ class FoodTableResult:
                 lbl.bind(event, event_handler)
             self.all_row_data.append(lbl)
 
-    def render_tally_row(self, row, tally_row_data):
+    def render_tally_row(self, row, tally_row_data, events_map):
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
+        events_map = {
+            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            for event, ev_handler in events_map.items()
+        }
         for i, data in enumerate(tally_row_data):
             lbl = ttk.Label(self.parent.frame, text=data, background=bckgrnd_color, anchor='center', padding=5)
             lbl.grid(row=row, column=i, sticky='we')
+            # apply events and event handlers
+            for event, event_handler in events_map.items():
+                lbl.bind(event, event_handler)
             self.all_row_data.append(lbl)
 
     def destroy_row(self):
@@ -198,7 +205,7 @@ class FoodTableResultsFrame:
             row.render_row(i + 1, food_table, row_events, row_events_pkey)
             self.all_rows.append(row)
 
-    def render_result(self, food_table, row_events, row_events_pkey):
+    def render_result(self, food_table, row_events={}, row_events_pkey={}):
         """Render one result at the end of the table"""
 
         row = FoodTableResult(self)
@@ -215,12 +222,12 @@ class FoodTableResultsFrame:
         self.all_rows[idx].destroy_row()
         self.all_rows.pop(idx)
 
-    def render_tally_row(self, tally_row):
+    def render_tally_row(self, tally_row, events_map={}):
         if tally_row is None:
             # idempotent operation
             return
         self.tally_row = FoodTableResult(self)
-        self.tally_row.render_tally_row(len(self.all_rows) + 1, tally_row)
+        self.tally_row.render_tally_row(len(self.all_rows) + 1, tally_row, events_map)
 
     def mark_column(self, col_id, col_color=None):
         self.headers_frame.mark_column(col_id, col_color)

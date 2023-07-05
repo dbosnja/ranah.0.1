@@ -269,7 +269,7 @@ class ConsumedFoodItemsFrame:
         # re-render them with the updated list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        self.consumed_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
         # since there are 2 search operation, save the last one used by a user
         self.last_search_operation = self.consumed_food_search_options_frame._search_foods
@@ -310,7 +310,7 @@ class ConsumedFoodItemsFrame:
         # re-render them with the sorted list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        self.consumed_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
     def search_by_name(self, food_name):
         """Search all consumed foods based only on the given name
@@ -344,7 +344,7 @@ class ConsumedFoodItemsFrame:
         # re-render them with the updated list of food tables
         self.consumed_food_table_frame.render_results(self.consumed_foods, self.row_events, self.row_events_pkey)
         # render the tally row
-        self.consumed_food_table_frame.render_tally_row(self.tally_row)
+        self.consumed_food_table_frame.render_tally_row(self.tally_row, self.header_events)
 
         # since there are 2 search operation, save the last one used by a user
         self.last_search_operation = self.consumed_food_search_options_frame._search_by_name
