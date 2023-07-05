@@ -1,4 +1,4 @@
-from tkinter import ttk
+from tkinter import ttk, StringVar
 
 
 class TemplateIngredientsTitleFrame:
@@ -6,6 +6,7 @@ class TemplateIngredientsTitleFrame:
 
     def __init__(self, parent):
         self.parent = parent
+        self.prefix_title = 'Pregled sastojaka predloška'
 
         self._create_styles()
         
@@ -21,10 +22,10 @@ class TemplateIngredientsTitleFrame:
         ttk.Style().configure('MainTitleFrame.TFrame', background='#FFD900')
     
     def _create_widget_vars(self):
-        self.title_lbl_var = 'Pregled sastojaka predloška'
+        self.title_lbl_var = StringVar(value=self.prefix_title)
     
     def _create_widgets(self):
-        self.title_lbl = ttk.Label(self.frame, text=self.title_lbl_var, background='#FFD900', anchor='center', font='Purisa 17')
+        self.title_lbl = ttk.Label(self.frame, textvariable=self.title_lbl_var, background='#FFD900', anchor='center', font='Purisa 17')
     
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0)
@@ -41,4 +42,10 @@ class TemplateIngredientsTitleFrame:
 
     def handle_scroll_down(self):
         self.parent.handle_scroll_down()
+
+    def render_prefix_title(self):
+        self.title_lbl_var.set(self.prefix_title)
+
+    def render_full_title(self, template_name):
+        self.title_lbl_var.set(f'{self.prefix_title} {template_name}')
 

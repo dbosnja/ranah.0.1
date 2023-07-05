@@ -90,7 +90,8 @@ class MealTemplateIngredientsFrame:
                                      for i, ing_map in enumerate(getattr(mt, mt_content).values())]
         self.tally_row = ['\u2211', 'Ukupno'] + [i for i in getattr(mt, mt_tally_row).values()]
 
-        # enable buttons and calculate tally count
+        # update title, enable buttons and calculate tally count
+        self.template_ingredients_title_frame.render_full_title(tmplt_name)
         self.sort_options_frame.enable_buttons()
         self.sort_options_frame.rerender_templates_count(len(self.template_ingredients))
 
