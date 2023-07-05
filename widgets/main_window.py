@@ -15,7 +15,7 @@ class MainWindow:
     # TODO: handle <Escape> event better -> separate between dev and prod mode
     # dev mode -> Escape quits the app; prod mode -> pop-up asks are you sure
 
-    ROOT_TITLE = 'ranah.2.0.'
+    ROOT_TITLE = 'ranah.2.0'
     
     def __init__(self, root, db):
         self.db = db

@@ -1,18 +1,15 @@
 from tkinter import ttk
 
 
-class MainTitleFrame:
-    """Frame for rendering the title of stored-meal-canvas
+class TemplateIngredientsTitleFrame:
+    """Frame for rendering title of the meal template ingredients frame."""
 
-    Yes, it's not a generic one(thought of it too late) and it's tightly coupled
-    (at least in its idea)
-    """
     def __init__(self, parent):
         self.parent = parent
 
         self._create_styles()
         
-        self.frame = ttk.Frame(parent.canvas, style='MainTitleFrame.TFrame', padding=(0, 25))
+        self.frame = ttk.Frame(parent.frame, style='MainTitleFrame.TFrame', padding=(0, 20, 0, 0))
         self.frame.columnconfigure(0, weight=1)
 
         self._create_widget_vars()
@@ -24,10 +21,10 @@ class MainTitleFrame:
         ttk.Style().configure('MainTitleFrame.TFrame', background='#FFD900')
     
     def _create_widget_vars(self):
-        self.title_label_text = 'Pregledaj sve predloške objedâ'
+        self.title_lbl_var = 'Pregled sastojaka predloška'
     
     def _create_widgets(self):
-        self.title_lbl = ttk.Label(self.frame, text=self.title_label_text, background='#FFD900', font='Helvetica 25')
+        self.title_lbl = ttk.Label(self.frame, text=self.title_lbl_var, background='#FFD900', anchor='center', font='Purisa 17')
     
     def _grid_widgets(self):
         self.title_lbl.grid(row=0, column=0)
@@ -35,6 +32,9 @@ class MainTitleFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+
+    def grid(self, row, column, sticky='we'):
+        self.frame.grid(row=row, column=column, sticky=sticky)
 
     def handle_scroll_up(self):
         self.parent.handle_scroll_up()

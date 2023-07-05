@@ -113,3 +113,4 @@ class SortOptionsFrame:
         cnt_s = str(tmplt_cnt).zfill(2)
         text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
         self.tally_cnt_var.set(f'{tmplt_cnt} {text}')
+

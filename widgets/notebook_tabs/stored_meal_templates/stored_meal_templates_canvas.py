@@ -2,7 +2,8 @@ from tkinter import Canvas
 
 from .main_title_frame import MainTitleFrame
 from .search_meal_templates.search_meal_templates_canvas import SearchMealTemplatesCanvas
-# from ...utility_widgets.leaf_frames import ScrollBarWidget
+from .meal_template_ingredients_frame import MealTemplateIngredientsFrame
+from ...utility_widgets.leaf_frames import ScrollBarWidget
 
 
 class StoredMealTemplatesCanvas:
@@ -34,6 +35,7 @@ class StoredMealTemplatesCanvas:
         
         self._initialize_title_frame()
         self._initialize_search_templates_canvas()
+        self._initialize_ingredients_frame()
         self._initialize_scrollbar()
 
         self._bind_events()
@@ -48,31 +50,41 @@ class StoredMealTemplatesCanvas:
         # enable resizing
         self.canvas.rowconfigure(0, weight=1)
         self.canvas.columnconfigure(0, weight=1)
-        # self.canvas.configure(yscrollincrement=5)
+        self.canvas.configure(yscrollincrement=5)
     
     def _initialize_title_frame(self):
         self.main_title_frame = MainTitleFrame(self)
-        self.main_title_frame_id = self.canvas.create_window(50, 60, window=self.main_title_frame.frame, anchor='w')
+        self.main_title_frame_id = self.canvas.create_window(50, 20, window=self.main_title_frame.frame, anchor='nw')
 
     def _initialize_search_templates_canvas(self):
         self.search_templates_canvas = SearchMealTemplatesCanvas(self, self.db)
         self.search_templates_canvas_id = self.canvas.create_window(50, 150, window=self.search_templates_canvas.canvas, anchor='nw')
 
+    def _initialize_ingredients_frame(self):
+        self.meal_ingredients_frame = MealTemplateIngredientsFrame(self)
+        self.meal_ingredients_frame_id = self.canvas.create_window(50, 800, window=self.meal_ingredients_frame.frame, anchor='nw')
+
     def _initialize_scrollbar(self):
-        ...
+        scrolly = ScrollBarWidget(self.canvas)
+        scrolly.attach_to_scrollable(self.canvas)
+        scrolly.grid(row=0, column=1, sticky='ns')
 
     def _bind_events(self):
         # whenever canvas itself is configured, make sure the width of the child frame is the same as canvas'
         # the reason why i need to do that is because the canvas now behaves as a geometry manager(create_window method)
         # also, when the table size changes, the canvas size does not, i guess this is important for future reading
         self.canvas.bind('<Configure>', lambda _: self._configure_canvas())
-        # self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        # self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
 
     def _configure_canvas(self):
-        self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 100)
-        self.canvas.itemconfigure(self.search_templates_canvas_id, width=self.canvas.winfo_width() - 100)
+        self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 120)
+
+        self.canvas.itemconfigure(self.search_templates_canvas_id, width=self.canvas.winfo_width() - 120)
         self.canvas.itemconfigure(self.search_templates_canvas_id, height=600)
+
+        self.canvas.itemconfigure(self.meal_ingredients_frame_id, width=self.canvas.winfo_width() - 120)
+        self.canvas.itemconfigure(self.meal_ingredients_frame_id, height=300)
 
     def handle_scroll_up(self):
         self.canvas.yview_scroll(-5, "units")
@@ -81,16 +93,17 @@ class StoredMealTemplatesCanvas:
         self.canvas.yview_scroll(5, "units")
 
     def handle_resizing(self):
-        """Handle resizing of the scrollregion whenever the size of the table changes
+        """Handle resizing of the scrollregion whenever the size of the table changes"""
 
-        NOTE: This whole thing with scrollregion is a bit weirdish. Whenever the table size exceeds
-        the window size, everything works as expected, but there were some problems with scrollregion
-        when the table size was small, ie the canvas height was larger than the frame height
-        """
-        if self.frame.frame.winfo_height() > self.canvas.winfo_height():
+        tally_height = sum(getattr(fr, 'winfo_height')()
+                            for fr in (self.main_title_frame.frame,
+                                       self.search_templates_canvas.canvas,
+                                       self.meal_ingredients_frame.frame))
+        if tally_height > self.canvas.winfo_height():
             s_region = self.canvas.bbox('all')
-            # add some extra space at the bottom, s_region is a tuple!
-            s_region = s_region[:3] + (s_region[-1] + 50,)
+            # add some extra space at the bottom and acknowledge canvas' "padding" on left, top
+            # s_region is a tuple!
+            s_region = (0, 0) + s_region[2:3] + (s_region[-1] + 50,)
         else:
             # for some reason works well with -2 translation
             s_region = (0, 0, 0, self.canvas.winfo_height() - 2)
