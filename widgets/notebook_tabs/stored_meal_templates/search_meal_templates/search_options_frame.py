@@ -150,8 +150,7 @@ class SearchOptionsFrame:
 
     def _render_ingredients(self):
         template_name = self.selected_tmplt_name_var.get()
-        # print(template_name)
-        # this has to be propagated to the main Canvas which will handle this event
+        self.parent.render_ingredients(template_name)
 
     def _render_templates(self):
         template_names = self.tmplt_results_lbox_values

@@ -80,3 +80,6 @@ class SearchMealTemplatesCanvas:
     def set_meal_template_names(self):
         self.search_meal_templates_frame.set_meal_template_names()
 
+    def render_ingredients(self, tmplt_name):
+        self.parent.render_ingredients(tmplt_name)
+

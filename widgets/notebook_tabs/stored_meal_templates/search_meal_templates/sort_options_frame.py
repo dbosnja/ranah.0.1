@@ -6,11 +6,12 @@ from constants.constants import meal_templates_headers, meal_templates_headers_m
 class SortOptionsFrame:
     """Frame which is in charge of sorting options for selected meal templates."""
     
-    def __init__(self, parent, sort_options):
+    def __init__(self, parent, sort_options, padding):
         self.parent = parent
         self.sort_options_var = sort_options
+        self.padding = padding
 
-        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(10, 70, 0, 10))
+        self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=self.padding)
 
         self._create_mutual_label_options()
         # self._create_mutual_entry_options()

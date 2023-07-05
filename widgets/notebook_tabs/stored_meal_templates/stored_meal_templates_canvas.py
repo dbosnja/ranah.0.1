@@ -61,8 +61,8 @@ class StoredMealTemplatesCanvas:
         self.search_templates_canvas_id = self.canvas.create_window(50, 150, window=self.search_templates_canvas.canvas, anchor='nw')
 
     def _initialize_ingredients_frame(self):
-        self.meal_ingredients_frame = MealTemplateIngredientsFrame(self)
-        self.meal_ingredients_frame_id = self.canvas.create_window(50, 800, window=self.meal_ingredients_frame.frame, anchor='nw')
+        self.meal_ingredients_frame = MealTemplateIngredientsFrame(self, self.db)
+        self.meal_ingredients_frame_id = self.canvas.create_window(50, 750, window=self.meal_ingredients_frame.frame, anchor='nw')
 
     def _initialize_scrollbar(self):
         scrolly = ScrollBarWidget(self.canvas)
@@ -81,10 +81,10 @@ class StoredMealTemplatesCanvas:
         self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 120)
 
         self.canvas.itemconfigure(self.search_templates_canvas_id, width=self.canvas.winfo_width() - 120)
-        self.canvas.itemconfigure(self.search_templates_canvas_id, height=600)
+        self.canvas.itemconfigure(self.search_templates_canvas_id, height=550)
 
         self.canvas.itemconfigure(self.meal_ingredients_frame_id, width=self.canvas.winfo_width() - 120)
-        self.canvas.itemconfigure(self.meal_ingredients_frame_id, height=300)
+        self.canvas.itemconfigure(self.meal_ingredients_frame_id, height=self.meal_ingredients_frame.get_height())
 
     def handle_scroll_up(self):
         self.canvas.yview_scroll(-5, "units")
@@ -95,10 +95,12 @@ class StoredMealTemplatesCanvas:
     def handle_resizing(self):
         """Handle resizing of the scrollregion whenever the size of the table changes"""
 
+        self.canvas.itemconfigure(self.meal_ingredients_frame_id, height=self.meal_ingredients_frame.get_height())
         tally_height = sum(getattr(fr, 'winfo_height')()
-                            for fr in (self.main_title_frame.frame,
-                                       self.search_templates_canvas.canvas,
-                                       self.meal_ingredients_frame.frame))
+                            for fr in (self.main_title_frame.frame, self.search_templates_canvas.canvas))
+        tally_height += self.meal_ingredients_frame.get_height()
+        # add the margins in-between the frames/Canvas
+        tally_height += 112
         if tally_height > self.canvas.winfo_height():
             s_region = self.canvas.bbox('all')
             # add some extra space at the bottom and acknowledge canvas' "padding" on left, top
@@ -111,4 +113,7 @@ class StoredMealTemplatesCanvas:
 
     def set_meal_template_names(self):
         self.search_templates_canvas.set_meal_template_names()
+
+    def render_ingredients(self, tmplt_name):
+        self.meal_ingredients_frame.render_ingredients(tmplt_name)
 

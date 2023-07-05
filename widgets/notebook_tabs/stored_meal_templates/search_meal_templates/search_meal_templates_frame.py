@@ -56,7 +56,8 @@ class SearchMealTemplatesFrame:
 
         st_idx = meal_templates_headers_map['food_name']
         sort_options = list(meal_templates_headers.values())[st_idx:]
-        self.sort_options_frame = SortOptionsFrame(self, sort_options)
+        padding = (10, 70, 0, 10)
+        self.sort_options_frame = SortOptionsFrame(self, sort_options, padding)
 
         self.templates_table_frame = FoodTableResultsFrame(self, meal_templates_headers.values())
         self.templates_table_frame.configure_style('SearchMealTemplates.TFrame')
@@ -236,4 +237,7 @@ class SearchMealTemplatesFrame:
         top_dialog.dialog_center.destroy()
         messagebox.showinfo(title='Predložak iskonzumiran',
                             message=f'Predložak `{self.selected_mt_name}` dodan kao konzumiran')
+
+    def render_ingredients(self, tmplt_name):
+        self.parent.render_ingredients(tmplt_name)
 
