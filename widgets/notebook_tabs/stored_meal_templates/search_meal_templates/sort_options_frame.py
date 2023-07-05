@@ -6,8 +6,9 @@ from constants.constants import meal_templates_headers, meal_templates_headers_m
 class SortOptionsFrame:
     """Frame which is in charge of sorting options for selected meal templates."""
     
-    def __init__(self, parent):
+    def __init__(self, parent, sort_options):
         self.parent = parent
+        self.sort_options_var = sort_options
 
         self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=(10, 70, 0, 10))
 
@@ -31,10 +32,6 @@ class SortOptionsFrame:
     def _create_widget_vars(self):
         self.tally_cnt_var = StringVar(value='0 rezultata')
         self.selected_sort_option_var = StringVar()
-        
-        st_idx = meal_templates_headers_map['food_name']
-        self.sort_options_var = list(meal_templates_headers.values())[st_idx:]
-        
         self.sort_option_direction_var = StringVar(value='asc')
 
     def _create_widgets(self):

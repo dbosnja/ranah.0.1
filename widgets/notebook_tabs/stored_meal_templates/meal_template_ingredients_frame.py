@@ -56,7 +56,11 @@ class MealTemplateIngredientsFrame:
     
     def _create_widgets(self):
         self.template_ingredients_title_frame = TemplateIngredientsTitleFrame(self)
-        self.sort_options_frame = SortOptionsFrame(self)
+
+        st_idx, end_idx = meal_templates_headers_map['food_name'], meal_templates_headers_map['price'] + 1
+        sort_options = list(meal_templates_headers.values())[st_idx:end_idx]
+        self.sort_options_frame = SortOptionsFrame(self, sort_options)
+
         self.template_ingredients_table_frame = FoodTableResultsFrame(self, self.header_labels)
         self.template_ingredients_table_frame.configure_style(style_name='MainTitleFrame.TFrame')
     

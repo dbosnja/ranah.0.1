@@ -53,7 +53,10 @@ class SearchMealTemplatesFrame:
 
     def _create_widgets(self):
         self.search_options_frame = SearchOptionsFrame(self)
-        self.sort_options_frame = SortOptionsFrame(self)
+
+        st_idx = meal_templates_headers_map['food_name']
+        sort_options = list(meal_templates_headers.values())[st_idx:]
+        self.sort_options_frame = SortOptionsFrame(self, sort_options)
 
         self.templates_table_frame = FoodTableResultsFrame(self, meal_templates_headers.values())
         self.templates_table_frame.configure_style('SearchMealTemplates.TFrame')
