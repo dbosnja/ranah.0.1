@@ -156,6 +156,7 @@ class SearchMealTemplatesFrame:
         for k, v in meal_templates_headers.items():
             if v == key:
                 idx = meal_templates_headers_map[k]
+                break
         self.templates_table_frame.mark_column(idx)
 
         if idx == meal_templates_headers_map['food_name']:

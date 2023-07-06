@@ -124,3 +124,22 @@ class MealTemplateIngredientsFrame:
         self.template_ingredients_table_frame.destroy_rows()
         self.template_ingredients_table_frame.destroy_tally_row()
 
+    def sort_table(self, key, reverse):
+        for k, v in meal_templates_headers.items():
+            if v == key:
+                idx = meal_templates_headers_map[k]
+                break
+        self.template_ingredients_table_frame.mark_column(idx)
+
+        if idx == meal_templates_headers_map['food_name']:
+            # sort by name works based on ASCII -> compare with case insensitivity
+            self.template_ingredients.sort(key=lambda row: row[idx].lower(), reverse=reverse)
+        else:
+            self.template_ingredients.sort(key=lambda row: row[idx], reverse=reverse)
+
+        self.template_ingredients_table_frame.destroy_rows()
+        self.template_ingredients_table_frame.destroy_tally_row()
+        for row in self.template_ingredients:
+            self.template_ingredients_table_frame.render_result(row, self.row_events)
+        self.template_ingredients_table_frame.render_tally_row(self.tally_row, self.header_events)
+
