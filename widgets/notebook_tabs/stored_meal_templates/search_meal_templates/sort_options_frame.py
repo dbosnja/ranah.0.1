@@ -14,7 +14,6 @@ class SortOptionsFrame:
         self.frame = ttk.Frame(parent.frame, style='SearchMealTemplates.TFrame', padding=self.padding)
 
         self._create_mutual_label_options()
-        # self._create_mutual_entry_options()
         self._create_mutual_button_options()
 
         self._create_fonts()

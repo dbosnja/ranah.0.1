@@ -112,3 +112,15 @@ class MealTemplateIngredientsFrame:
                     self.sort_options_frame.frame,
                     self.template_ingredients_table_frame.frame))
 
+    def clean_table(self):
+        self.template_ingredients_title_frame.render_prefix_title()
+        self.sort_options_frame.rerender_templates_count(0)
+        self.sort_options_frame.disable_buttons()
+
+        self.template_ingredients = []
+        self.tally_row = None
+
+        self.template_ingredients_table_frame.unmark_column()
+        self.template_ingredients_table_frame.destroy_rows()
+        self.template_ingredients_table_frame.destroy_tally_row()
+
