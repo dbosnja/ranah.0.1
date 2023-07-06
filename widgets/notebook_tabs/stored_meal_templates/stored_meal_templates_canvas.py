@@ -117,3 +117,6 @@ class StoredMealTemplatesCanvas:
     def render_ingredients(self, tmplt_name):
         self.meal_ingredients_frame.render_ingredients(tmplt_name)
 
+    def clean_table_on_delete(self, template_name):
+        self.meal_ingredients_frame.clean_table_on_delete(template_name)
+

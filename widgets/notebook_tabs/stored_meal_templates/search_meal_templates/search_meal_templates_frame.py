@@ -206,6 +206,7 @@ class SearchMealTemplatesFrame:
     def delete_template_permanently(self, top_dialog, delete_dialog):
         self.db.delete_meal_template_by_primary_key(self.selected_p_key)
         self.clean_table()
+        self.parent.clean_table_on_delete(self.selected_mt_name)
         self.set_meal_template_names()
         delete_dialog.dialog_center.destroy()
         top_dialog.dialog_center.destroy()

@@ -265,3 +265,14 @@ class Database:
             conn.execute(del_stmt)
             conn.commit()
 
+    def update_meal_template_by_name(self, template_name, **values):
+        """Update a meal template vector based on its name"""
+
+        update_stmt = update(meal_templates_table)
+        mt_name = MealTemplatesTableLabels.name.value
+        update_stmt = update_stmt.where(getattr(meal_templates_table.c, mt_name) == template_name)
+        update_stmt = update_stmt.values(values)
+        with self.engine.connect() as conn:
+            conn.execute(update_stmt)
+            conn.commit()
+

@@ -83,3 +83,6 @@ class SearchMealTemplatesCanvas:
     def render_ingredients(self, tmplt_name):
         self.parent.render_ingredients(tmplt_name)
 
+    def clean_table_on_delete(self, template_name):
+        self.parent.clean_table_on_delete(template_name)
+

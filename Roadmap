@@ -75,7 +75,7 @@ a) Users can search through a list of stored meal templates and render one or mo
    there's also an option for sorting the results, as per usual.
    Clicking on one of the results, users can either delete it permanently or add template as consumed.
    When adding the template as consumed, users can choose consuming datetime and
-   the percentage of the template(both optionally, default value is now and 100%, respectively).
+   the percentage of the template(both optionally, default value is now and 100%, respectively).  DONE
 b) If and only if one result is rendered, users can choose to see details of its ingredients.
    Apart of containing the ingredients list, there's a tally row at the end of the table as usual.
    Clicking on one of the ingredients, users can delete the ingredient from the template and update it,
@@ -86,9 +86,8 @@ b) If and only if one result is rendered, users can choose to see details of its
 
 8. Add calories tab
 9. Use messageboxes for info/warning alerts/pop-ups. DONE
-10. Implement the Dependency Injection for database instance(instead of propagating it throughout the app)
-11. Enhance all referenced file paths to be cross-platform.
-12. Mark sorting column with a different color.  DONE
+10. Enhance all referenced file paths and scrolling events to be cross-platform.
+11. Mark sorting column with a different color.  DONE
    
 
 TABS:
@@ -107,3 +106,14 @@ It seems like theres a bug on dipslaying range of datetimes in the tally row in 
 There's an error when trying to to make an action on a row after an action has already been done -> consumed food tab -> still didn't reproduce it uniquely
 -> the error is when trying to update a consumed food table row -> The error is happening because I'm searching through
 nutrition labels table while I'm actually updating the consumed food table
+
+
+Ranah3000:
+
+- enable pagination for every search option(up to 20 results per a page)
+- implement advanced stats(graphs)
+- enable i18n
+- refactor code:
+	- use inheritance instead of compositions
+	- use Dependency Injection for database instance(instead of propagating it throughout the app)
+	- use generic types instead of retyping them(eg. top-level Dialogs)
