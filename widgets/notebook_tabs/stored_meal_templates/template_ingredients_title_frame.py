@@ -33,6 +33,8 @@ class TemplateIngredientsTitleFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
         self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.title_lbl.bind('<Button-4>', lambda _: self.handle_scroll_up())
+        self.title_lbl.bind('<Button-5>', lambda _: self.handle_scroll_down())
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)

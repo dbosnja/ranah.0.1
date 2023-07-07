@@ -4,7 +4,7 @@ from .template_ingredients_title_frame import TemplateIngredientsTitleFrame
 from .search_meal_templates.sort_options_frame import SortOptionsFrame
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame
 from constants.constants import meal_templates_headers, meal_templates_headers_map, MealTemplatesTableLabels
-from .top_level_dialogs import DialogPickerTopLevel
+from .top_level_dialogs import DialogPickerTopLevel, AddDialogTopLevel
 
 
 class MealTemplateIngredientsFrame:
@@ -214,4 +214,11 @@ class MealTemplateIngredientsFrame:
 
         messagebox.showinfo(title='Sastojak trajno izbrisan',
                             message=f'Uspješno izbrisan `{self.ingredient_name}` sastojak')
+
+    def open_add_dialog(self, dialog_picker):
+        all_food_names = self.db.all_food_label_names
+        AddDialogTopLevel(dialog_picker, self.meal_template_name, all_food_names)
+
+    def add_ingredient(self, dialog_picker, add_picker, ingredient_name, ingredient_weight):
+        print(f'Dodajem {ingredient_name} mase {ingredient_weight} grama...')
 
