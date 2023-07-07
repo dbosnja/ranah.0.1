@@ -235,6 +235,7 @@ class DeleteDialogTopLevel:
         self._initialize_dialog_window()
 
         # its children
+        self._create_fonts()
         self._create_styles()
         self._create_mutual_button_options()
         self._create_widget_vars()
@@ -250,13 +251,16 @@ class DeleteDialogTopLevel:
         self.dialog_center.columnconfigure(0, weight=1)
         self.dialog_center.bind('<Escape>', lambda _: self.dialog_center.destroy())
 
+    def _create_fonts(self):
+        self.buttons_font = font.Font(family='Chilanka', size=16)
+
     def _create_styles(self):
         self.yes_btn_style = ttk.Style()
-        self.yes_btn_style.configure('Yes.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.yes_btn_style.configure('Yes.TButton', font=self.buttons_font, padding=(0, 8, 0, 1))
         self.yes_btn_style.map('Yes.TButton', background=[('active', '#00994D')])
 
         self.no_btn_style = ttk.Style()
-        self.no_btn_style.configure('No.TButton', font=(25), padding=(0, 5, 0, 5))
+        self.no_btn_style.configure('No.TButton', font=self.buttons_font, padding=(0, 8, 0, 1))
         self.no_btn_style.map('No.TButton', background=[('active', '#FF0000')])
 
     def _create_mutual_button_options(self):
@@ -383,6 +387,9 @@ class DialogPickerTopLevel:
     
     def _create_update_dialog(self):
         ...
+
+    def destroy_dialog(self):
+        self.dialog_center.destroy()
 
     def delete_ingredient(self, delete_picker):
         self.parent.delete_ingredient(self, delete_picker)

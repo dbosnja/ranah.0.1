@@ -3,7 +3,10 @@ from tkinter import ttk, messagebox
 from .template_ingredients_title_frame import TemplateIngredientsTitleFrame
 from .search_meal_templates.sort_options_frame import SortOptionsFrame
 from ...utility_widgets.leaf_frames import FoodTableResultsFrame
-from constants.constants import meal_templates_headers, meal_templates_headers_map, MealTemplatesTableLabels
+from constants.constants import (meal_templates_headers,
+                                 meal_templates_headers_map,
+                                 MealTemplatesTableLabels,
+                                 nutrition_table_map)
 from .top_level_dialogs import DialogPickerTopLevel, AddDialogTopLevel
 
 
@@ -86,6 +89,10 @@ class MealTemplateIngredientsFrame:
         row = [int(x) if int(x) == x else x for x in row]
 
         return ['\u2211', 'Ukupno'] + row
+
+    def _scale_values(self, ratio, values):
+        values = [round(v * ratio, 2) for v in values]
+        return [int(v) if int(v) == v else v for v in values]
 
     def handle_scroll_up(self):
         self.parent.handle_scroll_up()
@@ -220,5 +227,47 @@ class MealTemplateIngredientsFrame:
         AddDialogTopLevel(dialog_picker, self.meal_template_name, all_food_names)
 
     def add_ingredient(self, dialog_picker, add_picker, ingredient_name, ingredient_weight):
-        print(f'Dodajem {ingredient_name} mase {ingredient_weight} grama...')
+        if ingredient_name in {f[meal_templates_headers_map['food_name']] for f in self.template_ingredients}:
+            messagebox.showerror(title='Duplicirani sastojak',
+                                 message=f'Sastojak `{ingredient_name}` već postoji u predlošku!',
+                                 parent=add_picker.dialog_center)
+            return
+
+        # calculate updated values and update the DB model
+        ratio = ingredient_weight / 100
+        st_idx, end_idx = nutrition_table_map['calories'], nutrition_table_map['price'] + 1
+        new_row = self.db.get_food_item_table(ingredient_name)
+        new_row = self._scale_values(ratio, new_row[st_idx:end_idx])
+        new_row = [len(self.template_ingredients), ingredient_name, ingredient_weight] + new_row
+        self.tally_row = self._update_tally_row(new_row)
+        self.template_ingredients.append(new_row)
+
+        mt = self.db.get_meal_template_by_name(self.meal_template_name)
+        mt_content = MealTemplatesTableLabels.content.value
+        mt_tally_row = MealTemplatesTableLabels.tally_row.value
+        st_idx, end_idx = meal_templates_headers_map['food_weight'], meal_templates_headers_map['price'] + 1
+        columns = list(meal_templates_headers_map.keys())[st_idx:end_idx]
+        new_tally_row = {c: self.tally_row[meal_templates_headers_map[c]] for c in columns}
+        new_content = {
+                **{'food_name': ingredient_name},
+                **{c: new_row[meal_templates_headers_map[c]] for c in columns}
+        }
+        new_values = {
+            mt_content: {**getattr(mt, mt_content), **{ingredient_name: new_content}},
+            mt_tally_row: new_tally_row,
+        }
+        self.db.update_meal_template_by_name(self.meal_template_name, **new_values)
+
+        # update rendered table
+        self.template_ingredients_table_frame.destroy_tally_row()
+        self.template_ingredients_table_frame.render_result(new_row, self.row_events, self.row_events_pkey)
+        self.template_ingredients_table_frame.render_tally_row(self.tally_row, self.header_events)
+        self.template_ingredients_table_frame.unmark_column()
+        self.sort_options_frame.rerender_templates_count(len(self.template_ingredients))
+
+        # destroy dialogs and show successful message
+        add_picker.destroy_dialog()
+        dialog_picker.destroy_dialog()
+        messagebox.showinfo(title='Sastojak dodan',
+                            message=f'Sastojak `{ingredient_name}` uspješno dodan u predložak')
 
