@@ -5,6 +5,137 @@ from tkinter import ttk, Toplevel, PhotoImage, StringVar, Listbox, font
 from ...utility_widgets.leaf_frames import ScrollBarWidget
 
 
+class UpdateDialogTopLevel:
+    """Description"""
+    def __init__(self, parent, ingredient_name):
+        self.parent = parent
+        self.ingredient_name = ingredient_name
+
+        self._initialize_dialog_window()
+
+        self._define_regex()
+        self._define_validations()
+
+        self._create_mutual_entry_options()
+        self._create_mutual_label_options()
+        self._create_mutual_button_options()
+
+        # its children
+        self._create_fonts()
+        self._create_styles()
+        self._create_widget_vars()
+        self._create_widgets()
+        self._grid_widgets()
+        self._bind_events()
+
+    def _initialize_dialog_window(self):
+        self.dialog_center = Toplevel()
+        self.dialog_center.title('Ažuriranje sastojka predloška')
+        # Hardcoded values, but I'll live with it
+        self.dialog_center.geometry(f'600x300+2500+450')
+        self.dialog_center.minsize(500, 300)
+        self.dialog_center.columnconfigure(0, weight=1)
+        self.dialog_center.columnconfigure(1, weight=1)
+        self.dialog_center.bind('<Escape>', lambda _: self.destroy_dialog())
+
+    def _create_fonts(self):
+        self.buttons_font = font.Font(family='Chilanka', size=16)
+
+    def _create_styles(self):
+        self.update_btn_style = ttk.Style()
+        self.update_btn_style.configure('UpdateIngredient.TButton', font=self.buttons_font, padding=(0, 8, 0, 1))
+        self.update_btn_style.map('UpdateIngredient.TButton', background=[('active', '#00994D')])
+
+        self.cancel_btn_style = ttk.Style()
+        self.cancel_btn_style.configure('CancelUpdateIngredient.TButton', font=self.buttons_font, padding=(0, 8, 0, 1))
+        self.cancel_btn_style.map('CancelUpdateIngredient.TButton', background=[('active', '#FF0000')])
+
+    def _create_mutual_button_options(self):
+        self.mutual_button_options = {
+            'master': self.dialog_center,
+            'cursor': 'hand2',
+        }
+
+    def _create_mutual_entry_options(self):
+        self.mutual_entry_options = {
+            'master': self.dialog_center,
+            'width': 10,
+            'font': 'normal 17',
+            'justify': 'center',
+            'validate': 'key',
+            'validatecommand': self._validate_food_weight,
+        }
+
+    def _create_mutual_label_options(self):
+        self.mutual_label_options = {
+            'master': self.dialog_center,
+            'anchor': 'center',
+            'borderwidth': 2,
+            'relief': 'groove',
+            'padding': 5,
+            'font': '15',
+            'background': '#FFFFCC',
+            'justify': 'center',
+        }
+
+    def _create_widget_vars(self):
+        self.title_lbl_var = f'Unesite novu masu sastojka\n`{self.ingredient_name}`'
+        self.weight_e_var = StringVar()
+
+    def _create_widgets(self):
+        self.title_lbl = ttk.Label(text=self.title_lbl_var, **self.mutual_label_options)
+        self.weight_lbl = ttk.Label(text='Nova masa je', **self.mutual_label_options)
+        self.weight_e = ttk.Entry(textvariable=self.weight_e_var, **self.mutual_entry_options)
+
+        self.update_btn = ttk.Button(text='Ažuriraj', style='UpdateIngredient.TButton', state='disabled',
+                                     command=self._update_ingredient, **self.mutual_button_options)
+        self.cancel_btn = ttk.Button(text='Odustani', style='CancelUpdateIngredient.TButton',
+                                     command=self.destroy_dialog, **self.mutual_button_options)
+
+    def _grid_widgets(self):
+        self.title_lbl.grid(row=0, column=0, columnspan=2, sticky='we', pady=(0, 20))
+        self.weight_lbl.grid(row=1, column=0, columnspan=2, sticky='we', pady=(0, 20))
+        self.weight_e.grid(row=2, column=0, columnspan=2, pady=(0, 20))
+
+        self.update_btn.grid(row=3, column=0, sticky='e', padx=(0, 10))
+        self.cancel_btn.grid(row=3, column=1, sticky='w', padx=(10, 0))
+
+    def _bind_events(self):
+        self.weight_e.bind('<KeyRelease>', lambda _: self._handle_ingredient_weight_entry())
+
+    def _update_ingredient(self):
+        new_weight = int(self.weight_e_var.get())
+        self.parent.update_ingredient(self, new_weight)
+
+    def _define_regex(self):
+        self.food_weight_re = re.compile('^[1-9]{1}[0-9]{0,3}$')
+
+    def _define_validations(self):
+        self._validate_food_weight = self.dialog_center.register(self._validate_food_weight_input), '%P'
+
+    def _validate_food_weight_input(self, entry_value):
+        if entry_value and self.food_weight_re.match(entry_value) is None:
+                return False
+        return True
+
+    def _handle_ingredient_weight_entry(self):
+        if self.weight_e_var.get():
+            self._enable_update_button()
+        else:
+            self._disable_update_button()
+
+    def _enable_update_button(self):
+        self.update_btn['state'] = ''
+        self.update_btn['cursor'] = 'hand2'
+
+    def _disable_update_button(self):
+        self.update_btn['state'] = 'disabled'
+        self.update_btn['cursor'] = ''
+
+    def destroy_dialog(self):
+        self.dialog_center.destroy()
+
+
 class AddIngredientFrame:
     """Frame for rendering the UI needed to add a new ingredient to the meal template"""
 
@@ -289,6 +420,9 @@ class DeleteDialogTopLevel:
     def _delete_ingredient(self):
         self.parent.delete_ingredient(self)
 
+    def destroy_dialog(self):
+        self.dialog_center.destroy()
+
 
 class DialogPickerTopLevel:
     """Description"""
@@ -377,7 +511,7 @@ class DialogPickerTopLevel:
         self.close_btn.grid(row=4, column=0, pady=(0, 20))
 
     def _bind_events(self):
-        pass
+        ...
 
     def _create_delete_dialog(self):
         DeleteDialogTopLevel(self, self.ingredient_name)
@@ -386,7 +520,7 @@ class DialogPickerTopLevel:
         self.parent.open_add_dialog(self)
     
     def _create_update_dialog(self):
-        ...
+        UpdateDialogTopLevel(self, self.ingredient_name)
 
     def destroy_dialog(self):
         self.dialog_center.destroy()
@@ -396,4 +530,7 @@ class DialogPickerTopLevel:
 
     def add_ingredient(self, add_picker, ingredient_name, ingredient_weight):
         self.parent.add_ingredient(self, add_picker, ingredient_name, ingredient_weight)
+
+    def update_ingredient(self, update_picker, new_weight):
+        self.parent.update_ingredient(self, update_picker, new_weight)
 

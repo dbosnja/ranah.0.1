@@ -216,8 +216,8 @@ class MealTemplateIngredientsFrame:
         self.template_ingredients = self.template_ingredients[:self.p_key] + rows_to_rerender
 
         self.sort_options_frame.rerender_templates_count(len(self.template_ingredients))
-        dialog_picker.dialog_center.destroy()
-        delete_picker.dialog_center.destroy()
+        dialog_picker.destroy_dialog()
+        delete_picker.destroy_dialog()
 
         messagebox.showinfo(title='Sastojak trajno izbrisan',
                             message=f'Uspješno izbrisan `{self.ingredient_name}` sastojak')
@@ -270,4 +270,7 @@ class MealTemplateIngredientsFrame:
         dialog_picker.destroy_dialog()
         messagebox.showinfo(title='Sastojak dodan',
                             message=f'Sastojak `{ingredient_name}` uspješno dodan u predložak')
+
+    def update_ingredient(self, dialog_picker, update_picker, new_weight):
+        print(f'nova masa je {new_weight} od sastojka {self.ingredient_name}')
 

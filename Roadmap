@@ -107,6 +107,8 @@ There's an error when trying to to make an action on a row after an action has a
 -> the error is when trying to update a consumed food table row -> The error is happening because I'm searching through
 nutrition labels table while I'm actually updating the consumed food table
 
+Fix validation on Create Food Tab
+
 
 Ranah3000:
 
