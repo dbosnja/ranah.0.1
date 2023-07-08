@@ -212,6 +212,13 @@ class FoodTableResultsFrame:
         self.all_rows.append(row)
         row.render_row(len(self.all_rows), food_table, row_events, row_events_pkey)
 
+    def render_result_at(self, idx, food_table, row_events={}, row_events_pkey={}):
+        """Render one result at the position `idx`"""
+
+        row = FoodTableResult(self)
+        row.render_row(idx + 1, food_table, row_events, row_events_pkey)
+        self.all_rows.insert(idx, row)
+
     def destroy_row(self, p_key):
         """Destroy the row with primary key corresponding with `p_key`"""
 

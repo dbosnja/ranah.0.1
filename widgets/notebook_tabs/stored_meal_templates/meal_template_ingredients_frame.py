@@ -272,5 +272,46 @@ class MealTemplateIngredientsFrame:
                             message=f'Sastojak `{ingredient_name}` uspješno dodan u predložak')
 
     def update_ingredient(self, dialog_picker, update_picker, new_weight):
-        print(f'nova masa je {new_weight} od sastojka {self.ingredient_name}')
+        ing_name_id, ing_weight_id, ing_price_id = (
+                    meal_templates_headers_map['food_name'],
+                    meal_templates_headers_map['food_weight'],
+                    meal_templates_headers_map['price']
+        )
+        # update the internal state
+        update_row = self.template_ingredients[self.p_key]
+        self.tally_row = self._update_tally_row(update_row, addition=False)
+        ratio = round(new_weight / update_row[ing_weight_id], 3)
+        values = update_row[ing_weight_id + 1:ing_price_id + 1]
+        self.template_ingredients[self.p_key] = update_row[:ing_weight_id] + [new_weight] + self._scale_values(ratio, values)
+        update_row = self.template_ingredients[self.p_key]
+        self.tally_row = self._update_tally_row(update_row)
+
+        # update DB model
+        mt = self.db.get_meal_template_by_name(self.meal_template_name)
+        mt_content = MealTemplatesTableLabels.content.value
+        mt_tally_row = MealTemplatesTableLabels.tally_row.value
+        columns = list(meal_templates_headers_map.keys())[ing_weight_id:ing_price_id + 1]
+        new_tally_row = {c: self.tally_row[meal_templates_headers_map[c]] for c in columns}
+        new_content = {
+                **{'food_name': update_row[ing_name_id]},
+                **{c: update_row[meal_templates_headers_map[c]] for c in columns}
+        }
+        new_values = {
+            mt_content: {**getattr(mt, mt_content), **{update_row[ing_name_id]: new_content}},
+            mt_tally_row: new_tally_row,
+        }
+        self.db.update_meal_template_by_name(self.meal_template_name, **new_values)
+
+        # update the rendered table
+        self.template_ingredients_table_frame.unmark_column()
+        self.template_ingredients_table_frame.destroy_row(self.p_key)
+        self.template_ingredients_table_frame.render_result_at(self.p_key, update_row, self.row_events, self.row_events_pkey)
+        self.template_ingredients_table_frame.destroy_tally_row()
+        self.template_ingredients_table_frame.render_tally_row(self.tally_row, self.header_events)
+
+        # destroy dialogs and render successful msg
+        dialog_picker.destroy_dialog()
+        update_picker.destroy_dialog()
+        messagebox.showinfo(title='Sastojak ažuriran',
+                            message=f'Sastojak `{self.ingredient_name}` uspješno ažuriran!')
 
