@@ -7,6 +7,7 @@ from constants.constants import (consumed_food_headers,
                                  consumed_food_map,
                                  consumed_food_timestamp_map,
                                  nutrition_table_map)
+from constants.images_paths import close_img_path, delete_img_path, update_img_path
 
 
 class UpdateDialogTopLevel:
@@ -383,9 +384,9 @@ class DialogPickerTopLevel:
         self.close_btn_style.configure('Close.TButton', **self.mutual_style_options)
     
     def _create_images(self):
-        self.update_img = PhotoImage(file='./assets/images/update_icon.png')
-        self.delete_img = PhotoImage(file='./assets/images/delete_icon.png')
-        self.close_img = PhotoImage(file='./assets/images/close_icon.png')
+        self.update_img = PhotoImage(file=update_img_path)
+        self.delete_img = PhotoImage(file=delete_img_path)
+        self.close_img = PhotoImage(file=close_img_path)
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {

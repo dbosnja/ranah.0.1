@@ -67,7 +67,7 @@ Ranah2.0 Roadmap
 
 ## ITERATION 2.4 ##
 
-# ITERATION 2.5 #
+# ITERATION 2.5 #  #DONE
 
 REQUEST: User has to be able to operate with all the stored meal templates.
 
@@ -80,7 +80,7 @@ b) If and only if one result is rendered, users can choose to see details of its
    Apart of containing the ingredients list, there's a tally row at the end of the table as usual.
    Clicking on one of the ingredients, users can delete the ingredient from the template and update it,
    updating in that way the meal template itself.
-   There's also an option of sorting the list of ingredients, as per usual.
+   There's also an option of sorting the list of ingredients, as per usual.   DONE
 
 ## ITERATION 2.5 ##
 

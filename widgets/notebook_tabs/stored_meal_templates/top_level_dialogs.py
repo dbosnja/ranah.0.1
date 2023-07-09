@@ -3,6 +3,7 @@ import re
 from tkinter import ttk, Toplevel, PhotoImage, StringVar, Listbox, font
 
 from ...utility_widgets.leaf_frames import ScrollBarWidget
+from constants.images_paths import add_img_path, close_img_path, delete_img_path, update_img_path
 
 
 class UpdateDialogTopLevel:
@@ -466,10 +467,10 @@ class DialogPickerTopLevel:
         self.close_btn_style.configure('Close.TButton', **self.mutual_style_options)
     
     def _create_images(self):
-        self.add_img = PhotoImage(file='./assets/images/add_icon.png')
-        self.update_img = PhotoImage(file='./assets/images/update_icon.png')
-        self.delete_img = PhotoImage(file='./assets/images/delete_icon.png')
-        self.close_img = PhotoImage(file='./assets/images/close_icon.png')
+        self.add_img = PhotoImage(file=add_img_path)
+        self.update_img = PhotoImage(file=update_img_path)
+        self.delete_img = PhotoImage(file=delete_img_path)
+        self.close_img = PhotoImage(file=close_img_path)
 
     def _create_mutual_button_options(self):
         self.mutual_button_options = {
