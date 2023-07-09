@@ -69,8 +69,8 @@ class SearchMealTemplatesFrame:
         self.templates_table_frame.render_headers(self.header_events)
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -80,13 +80,13 @@ class SearchMealTemplatesFrame:
             '<1>': self.open_dialog_center,
         }
         self.row_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
     def _add_consumed_food(self, ratio, food_values, consumed_datetime, columns):
@@ -103,11 +103,8 @@ class SearchMealTemplatesFrame:
     def set_meal_template_names(self):
         self.search_options_frame.set_meal_template_names(self.db.all_meal_templates_names)
 
-    def handle_scroll_up(self):
-        self.parent.handle_scroll_up()
-
-    def handle_scroll_down(self):
-        self.parent.handle_scroll_down()
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
     def render_templates(self, template_names):
         """Render templates stats

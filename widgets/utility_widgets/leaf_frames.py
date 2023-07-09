@@ -63,7 +63,7 @@ class FoodTableResult:
             for event, ev_handler in events_map_pkey.items()
         }
         em = {
-            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            event: partial(lambda event, event_handler: event_handler(event), event_handler=ev_handler)
             for event, ev_handler in events_map.items()
         }
         events_map = {**em_pkey, **em}
@@ -79,7 +79,7 @@ class FoodTableResult:
         # TODO: decide on the color of the tally row
         bckgrnd_color = '#E3E7EA' if row % 2 == 0 else '#FFFFE6'
         events_map = {
-            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            event: partial(lambda event, event_handler: event_handler(event), event_handler=ev_handler)
             for event, ev_handler in events_map.items()
         }
         for i, data in enumerate(tally_row_data):
@@ -111,7 +111,7 @@ class FoodTableHeaders:
 
     def render_headers(self, events_map):
         events_map = {
-            event: partial(lambda _, event_handler: event_handler(), event_handler=ev_handler)
+            event: partial(lambda event, event_handler: event_handler(event), event_handler=ev_handler)
             for event, ev_handler in events_map.items()
         }
         for i, header_lbl in enumerate(self.header_labels):

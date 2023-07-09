@@ -58,8 +58,8 @@ class SortOptionsFrame:
         self.sort_btn.grid(row=0, column=6, sticky='w')
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _create_mutual_label_options(self):
         self.mutual_label_options = {
@@ -110,4 +110,7 @@ class SortOptionsFrame:
         cnt_s = str(tmplt_cnt).zfill(2)
         text = 'rezultat' if cnt_s[-1] == '1' and cnt_s[-2] != '1' else 'rezultata'
         self.tally_cnt_var.set(f'{tmplt_cnt} {text}')
+
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 

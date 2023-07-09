@@ -133,8 +133,8 @@ class CreateTemplateOptionsFrame:
     def _bind_events(self):
         self.food_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_food_name())
         self.food_weight_e.bind('<KeyRelease>', lambda _: self._handle_food_weight_keyreleased())
-        self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
-        self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
         self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
         self.search_name_e.bind('<KeyRelease>', lambda _: self._search_by_name_on_release())
 
@@ -205,11 +205,8 @@ class CreateTemplateOptionsFrame:
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
     
-    def set_scroll_up_handler(self, callback):
-        self.scroll_up_handler = callback
-    
-    def set_scroll_down_handler(self, callback):
-        self.scroll_down_handler = callback
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
     def update_food_label_names(self, food_names, parent_call=True):
         # TODO: make this work properly; ie. justify the text by center
@@ -287,7 +284,8 @@ class TemplateActionsFrame:
         self.sort_btn.grid(row=0, column=6, padx=(50, 0))
 
     def _bind_events(self):
-        ...
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky, padx=0, pady=(0, 10))
@@ -314,6 +312,9 @@ class TemplateActionsFrame:
         self.clean_template_btn['cursor'] = ''
         self.sort_btn.state(['disabled'])
         self.sort_btn['cursor'] = ''
+
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
 
 class CreateMealTemplateFrame:
@@ -347,13 +348,8 @@ class CreateMealTemplateFrame:
 
     def _create_widgets(self):
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='CreateTemplateTopic.TLabel')
-        
         self.create_meal_options_frame = CreateTemplateOptionsFrame(self, self.db)
-        self.create_meal_options_frame.set_scroll_up_handler(self.parent.handle_scroll_up)
-        self.create_meal_options_frame.set_scroll_down_handler(self.parent.handle_scroll_down)
-
         self.template_action_frame = TemplateActionsFrame(self)
-
         # define table headers without `consumed` timestamp
         table_headers = list(consumed_food_headers.values())[:consumed_food_map['created_on']]
         self.template_food_table_frame = FoodTableResultsFrame(self, table_headers)
@@ -367,8 +363,8 @@ class CreateMealTemplateFrame:
         self.template_food_table_frame.render_headers(self.header_events)
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -378,13 +374,13 @@ class CreateMealTemplateFrame:
             '<Button-3>': self.delete_template_food,
         }
         self.row_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
     def add_to_template(self, food_name, food_weight):
@@ -549,9 +545,6 @@ class CreateMealTemplateFrame:
         messagebox.showinfo(title='Uspješno pohranjivanje predloška',
                             message=f'Predložak `{template_name}` uspješno pohranjen u Ranahu.')
 
-    def handle_scroll_up(self):
-        self.parent.handle_scroll_up()
-
-    def handle_scroll_down(self):
-        self.parent.handle_scroll_down()
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 

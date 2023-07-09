@@ -74,8 +74,8 @@ class StoredMealTemplatesCanvas:
         # the reason why i need to do that is because the canvas now behaves as a geometry manager(create_window method)
         # also, when the table size changes, the canvas size does not, i guess this is important for future reading
         self.canvas.bind('<Configure>', lambda _: self._configure_canvas())
-        self.canvas.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.canvas.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.canvas.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.canvas.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _configure_canvas(self):
         self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 120)
@@ -86,11 +86,12 @@ class StoredMealTemplatesCanvas:
         self.canvas.itemconfigure(self.meal_ingredients_frame_id, width=self.canvas.winfo_width() - 120)
         self.canvas.itemconfigure(self.meal_ingredients_frame_id, height=self.meal_ingredients_frame.get_height())
 
-    def handle_scroll_up(self):
-        self.canvas.yview_scroll(-5, "units")
-
-    def handle_scroll_down(self):
-        self.canvas.yview_scroll(5, "units")
+    def mouse_wheel_event_handler(self, event):
+        # handle mouse-wheel events for all platforms
+        if event.num == 4 or event.delta > 0:
+            self.canvas.yview_scroll(-5, "units")
+        elif event.num == 5 or event.delta < 0:
+            self.canvas.yview_scroll(5, "units")
 
     def handle_resizing(self):
         """Handle resizing of the scrollregion whenever the size of the table changes"""

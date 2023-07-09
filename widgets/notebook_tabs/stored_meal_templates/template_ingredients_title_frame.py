@@ -31,19 +31,16 @@ class TemplateIngredientsTitleFrame:
         self.title_lbl.grid(row=0, column=0)
     
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
-        self.title_lbl.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.title_lbl.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.title_lbl.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.title_lbl.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)
 
-    def handle_scroll_up(self):
-        self.parent.handle_scroll_up()
-
-    def handle_scroll_down(self):
-        self.parent.handle_scroll_down()
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
     def render_prefix_title(self):
         self.title_lbl_var.set(self.prefix_title)

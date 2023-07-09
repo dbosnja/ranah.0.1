@@ -78,8 +78,8 @@ class StoredFoodSearchOptionsFrame:
         self.sort_btn.grid(row=2, column=8, columnspan=5, pady=(20, 0))
 
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.scroll_up_handler())
-        self.frame.bind('<Button-5>', lambda _: self.scroll_down_handler())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
         self.search_name_e.bind('<Return>', lambda _: self._search_foods())
 
     def _search_foods(self):
@@ -99,11 +99,8 @@ class StoredFoodSearchOptionsFrame:
     def configure_style(self, style_name):
         self.frame.configure(style=style_name)
 
-    def set_scroll_up_handler(self, callback):
-        self.scroll_up_handler = callback
-
-    def set_scroll_down_handler(self, callback):
-        self.scroll_down_handler = callback
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
 
 class StoredFoodTablesFrame:
@@ -139,13 +136,8 @@ class StoredFoodTablesFrame:
     
     def _create_widgets(self):
         self.topic_lbl = ttk.Label(self.frame, text=self.topic_lbl_text, style='StoredFoodTopic.TLabel')
-
         self.stored_food_search_options_frame = StoredFoodSearchOptionsFrame(self, self.db)
-        self.stored_food_search_options_frame.set_scroll_up_handler(self.handle_scroll_up)
-        self.stored_food_search_options_frame.set_scroll_down_handler(self.handle_scroll_down)
-
         self.food_tables_tally_lbl = ttk.Label(self.frame, borderwidth=2, relief='ridge', textvariable=self.food_tables_tally_lbl_var, padding=5)
-        
         # NOTE: FoodTableResultsFrame is generic enough to handle various use-cases
         # in this context I'm using it as a nutrition table frame, therefore the name
         self.nutrition_table_frame = FoodTableResultsFrame(self, nutrition_table_headers.values())
@@ -159,8 +151,8 @@ class StoredFoodTablesFrame:
         self.nutrition_table_frame.render_headers(self.header_events)
     
     def _bind_events(self):
-        self.frame.bind('<Button-4>', lambda _: self.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -169,13 +161,13 @@ class StoredFoodTablesFrame:
             '<1>': self.open_update_center,
         }
         self.row_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
-            '<Button-4>': self.handle_scroll_up,
-            '<Button-5>': self.handle_scroll_down,
+            '<Button-4>': self.mouse_wheel_event_handler,
+            '<Button-5>': self.mouse_wheel_event_handler,
         }
 
     def _get_food_results(self, name_segment):
@@ -234,9 +226,6 @@ class StoredFoodTablesFrame:
         dialog_picker = DialogPickerTopLevel(self, self.db, table_row)
         dialog_picker.set_serch_button(self.stored_food_search_options_frame._search_foods)
 
-    def handle_scroll_up(self):
-        self.parent.handle_scroll_up()
-
-    def handle_scroll_down(self):
-        self.parent.handle_scroll_down()
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 

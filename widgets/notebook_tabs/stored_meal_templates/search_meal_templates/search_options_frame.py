@@ -93,8 +93,8 @@ class SearchOptionsFrame:
     def _bind_events(self):
         self.tmplt_results_lbox.bind('<<ListboxSelect>>', lambda _: self._set_selected_template_name())
         self.search_e.bind('<KeyRelease>', lambda _: self._filter_template_names())
-        self.frame.bind('<Button-4>', lambda _: self.parent.handle_scroll_up())
-        self.frame.bind('<Button-5>', lambda _: self.parent.handle_scroll_down())
+        self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
+        self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
 
     def _filter_template_names(self):
         name = self.search_e_var.get().strip()
@@ -178,4 +178,7 @@ class SearchOptionsFrame:
     def disable_render_template_btn(self):
         self.render_template_btn['state'] = 'disabled'
         self.render_template_btn['cursor'] = ''
+
+    def mouse_wheel_event_handler(self, event):
+        self.parent.mouse_wheel_event_handler(event)
 
