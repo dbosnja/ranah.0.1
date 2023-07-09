@@ -47,11 +47,13 @@ class MealTemplateIngredientsFrame:
         self.row_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
     
     def _create_widget_vars(self):
@@ -78,6 +80,7 @@ class MealTemplateIngredientsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _update_tally_row(self, row, addition=True):
         start_id, end_id = meal_templates_headers_map['food_weight'], meal_templates_headers_map['price'] + 1

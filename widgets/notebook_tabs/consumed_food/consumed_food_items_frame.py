@@ -126,6 +126,7 @@ class ConsumedFoodSearchOptionsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
         self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
     
     def _search_foods(self):
@@ -218,6 +219,7 @@ class ConsumedFoodItemsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -228,11 +230,13 @@ class ConsumedFoodItemsFrame:
         self.row_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
     def search_foods(self, start_time, end_time, food_name):

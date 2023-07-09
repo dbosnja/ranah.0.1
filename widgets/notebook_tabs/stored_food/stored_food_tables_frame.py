@@ -80,6 +80,7 @@ class StoredFoodSearchOptionsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
         self.search_name_e.bind('<Return>', lambda _: self._search_foods())
 
     def _search_foods(self):
@@ -153,6 +154,7 @@ class StoredFoodTablesFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -163,11 +165,13 @@ class StoredFoodTablesFrame:
         self.row_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
     def _get_food_results(self, name_segment):

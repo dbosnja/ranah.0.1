@@ -135,6 +135,7 @@ class CreateTemplateOptionsFrame:
         self.food_weight_e.bind('<KeyRelease>', lambda _: self._handle_food_weight_keyreleased())
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
         self.search_name_e.bind('<Return>', lambda _: self._search_by_name())
         self.search_name_e.bind('<KeyRelease>', lambda _: self._search_by_name_on_release())
 
@@ -286,6 +287,7 @@ class TemplateActionsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def grid_frame(self, row, column, sticky):
         self.frame.grid(row=row, column=column, sticky=sticky, padx=0, pady=(0, 10))
@@ -365,6 +367,7 @@ class CreateMealTemplateFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _create_table_events(self):
         """Define a mapping between event and their handlers for the rendered table"""
@@ -376,11 +379,13 @@ class CreateMealTemplateFrame:
         self.row_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
         self.header_events = {
             '<Button-4>': self.mouse_wheel_event_handler,
             '<Button-5>': self.mouse_wheel_event_handler,
+            '<MouseWheel>': self.mouse_wheel_event_handler,
         }
 
     def add_to_template(self, food_name, food_weight):

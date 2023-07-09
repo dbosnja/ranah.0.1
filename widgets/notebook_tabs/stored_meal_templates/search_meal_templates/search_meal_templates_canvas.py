@@ -54,6 +54,8 @@ class SearchMealTemplatesCanvas:
         self.canvas.bind('<Configure>', lambda _: self.canvas.itemconfigure(self.search_meal_templates_frame_id, width=self.canvas.winfo_width()))
         self.canvas.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.canvas.bind('<Button-5>', self.mouse_wheel_event_handler)
+        # for Windows and Macintosh machines
+        self.canvas.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def mouse_wheel_event_handler(self, event):
         # handle mouse-wheel events for all platforms

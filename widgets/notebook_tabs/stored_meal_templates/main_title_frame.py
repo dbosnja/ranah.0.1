@@ -35,6 +35,7 @@ class MainTitleFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def mouse_wheel_event_handler(self, event):
         self.parent.mouse_wheel_event_handler(event)

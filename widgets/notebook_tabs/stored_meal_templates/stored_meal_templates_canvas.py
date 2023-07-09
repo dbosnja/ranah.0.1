@@ -76,6 +76,8 @@ class StoredMealTemplatesCanvas:
         self.canvas.bind('<Configure>', lambda _: self._configure_canvas())
         self.canvas.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.canvas.bind('<Button-5>', self.mouse_wheel_event_handler)
+        # for Windows and Macintosh machines
+        self.canvas.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _configure_canvas(self):
         self.canvas.itemconfigure(self.main_title_frame_id, width=self.canvas.winfo_width() - 120)

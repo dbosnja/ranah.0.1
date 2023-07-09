@@ -33,8 +33,10 @@ class TemplateIngredientsTitleFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
         self.title_lbl.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.title_lbl.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.title_lbl.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def grid(self, row, column, sticky='we'):
         self.frame.grid(row=row, column=column, sticky=sticky)

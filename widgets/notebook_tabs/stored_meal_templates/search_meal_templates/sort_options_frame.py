@@ -60,6 +60,7 @@ class SortOptionsFrame:
     def _bind_events(self):
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _create_mutual_label_options(self):
         self.mutual_label_options = {

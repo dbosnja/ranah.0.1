@@ -95,6 +95,7 @@ class SearchOptionsFrame:
         self.search_e.bind('<KeyRelease>', lambda _: self._filter_template_names())
         self.frame.bind('<Button-4>', self.mouse_wheel_event_handler)
         self.frame.bind('<Button-5>', self.mouse_wheel_event_handler)
+        self.frame.bind('<MouseWheel>', self.mouse_wheel_event_handler)
 
     def _filter_template_names(self):
         name = self.search_e_var.get().strip()
