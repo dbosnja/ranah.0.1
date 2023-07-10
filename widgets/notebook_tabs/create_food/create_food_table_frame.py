@@ -33,7 +33,7 @@ class CreateFoodLabelFrame:
             self.frame.columnconfigure(i, weight=1)
 
         # define the validations
-        self.double_pattern = re.compile('^\d{,4}\.?\d{,2}$')
+        self.double_pattern = re.compile('(^0$)|(^[1-9][0-9]{0,2}$)|(^0\.[0-9]{0,2}$)|(^[1-9][0-9]{0,2}\.[0-9]{0,2}$)')
         self._validate_double = self.frame.register(self._validate_double_input), '%P'
         
         # init and render widgets
@@ -42,7 +42,8 @@ class CreateFoodLabelFrame:
         self._create_widget_vars()
         self._create_widgets()
         self._grid_widgets()
-    
+        self._bind_events()
+
     def _validate_double_input(self, entry_value):
         if entry_value and self.double_pattern.match(entry_value) is None:
             return False
@@ -103,22 +104,12 @@ class CreateFoodLabelFrame:
 
     def _create_new_record(self, *args):
         stripped_food_name = self.food_name_var.get().strip()
-        
-        # raise error if food name not defined
-        if not stripped_food_name:
-            messagebox.showerror(message='Ime artikla nije definirano!', title='Artikl bez imena')
-            return
-        
+
         # raise error if food name already present in Ranah
         if not self.db.is_food_name_unique(stripped_food_name):
             messagebox.showerror(message=f'Artikl s nazivom`{stripped_food_name}` već postoji!', title='Duplicirano ime artikla')
             return
-        
-        # raise error if food price not defined
-        if not self.food_price_var.get():
-            messagebox.showerror(message='Cijena artikla nije definirana!', title='Artikl bez cijene')
-            return
-        
+
         record = {
             'label_name': stripped_food_name,
             'calories': self._parse_input_to_float(self.calory_var.get()),
@@ -167,7 +158,7 @@ class CreateFoodLabelFrame:
         self.food_name_lbl = ttk.Label(text=self.text_constants['food_name_lbl'], **self.mutual_label_options)
         self.food_name_e = ttk.Entry(self.frame, textvariable=self.food_name_var, width=50, font='default 17')
         
-        self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'], cursor='hand2',
+        self.create_btn = ttk.Button(self.frame, text=self.text_constants['create_btn'], state='disabled',
                                      command=self._create_new_record, padding=5, style='Create.TButton')
     
     def _grid_widgets(self):
@@ -197,4 +188,22 @@ class CreateFoodLabelFrame:
         self.food_name_e.grid(row=5, column=1, sticky='wn', columnspan=3)
 
         self.create_btn.grid(row=6, column=1, pady=5, columnspan=2)
+
+    def _bind_events(self):
+        self.food_name_e.bind('<KeyRelease>', lambda _: self.create_btn_state_handler())
+        self.food_price_e.bind('<KeyRelease>', lambda _: self.create_btn_state_handler())
+
+    def _enable_create_btn(self):
+        self.create_btn['state'] = ''
+        self.create_btn['cursor'] = 'hand2'
+
+    def _disable_create_btn(self):
+        self.create_btn['state'] = 'disabled'
+        self.create_btn['cursor'] = ''
+
+    def create_btn_state_handler(self):
+        if self.food_name_var.get().strip() and self.food_price_var.get():
+            self._enable_create_btn()
+        else:
+            self._disable_create_btn()
 

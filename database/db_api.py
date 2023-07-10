@@ -89,7 +89,6 @@ class Database:
         The API does also formatting of the fetched data. All floats are rounded to 2 decimals
         and datetime is formatted as `day full-month-name year HH:MM`
         """
-        
         sel = select(nutrition_labels_table)
         sel = sel.where(nutrition_labels_table.c.label_name == food_name)
         with self.engine.connect() as conn:
