@@ -7,8 +7,8 @@ Currently they are mostly self-contained, meaning that generic public APIs
 are exposed for maneuvering their properties, texts, grid position and so on.
 """
 
-
 from functools import partial
+
 from tkinter import ttk
 
 

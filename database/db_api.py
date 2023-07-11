@@ -1,7 +1,12 @@
 from sqlalchemy import create_engine, URL, select, and_, extract, delete, update, column
 
 from .connection_params import DB_URL_PARAMS
-from .schema import metadata, nutrition_labels_table, consumed_food_items_table, meal_templates_table, MealTemplatesTableLabels
+from .schema import (metadata,
+                     nutrition_labels_table,
+                     consumed_food_items_table,
+                     meal_templates_table,
+                     MealTemplatesTableLabels)
+
 
 class Database:
     """Database Interface
@@ -224,7 +229,7 @@ class Database:
 
     @property
     def all_meal_templates_names(self):
-        """Fetch all first dimensions among all vectors in meal-templates space"""
+        """Fetch all name dimensions of all vectors in meal-templates space"""
 
         template_name = MealTemplatesTableLabels.name.value
         name_c = column(template_name)

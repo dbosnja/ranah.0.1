@@ -261,14 +261,15 @@ class UpdateDialogTopLevel:
 
     def _rescale_values(self, food_weight):
         food_weight = float(food_weight)
-        scale_factor = round(food_weight / self.NORMATIVE, 2)
-        # fetch the food table and scale the corresponding columns
-        food_table = self.db.get_food_item_table(self.label_name)
-        food_table = food_table[nutrition_table_map['calories']:nutrition_table_map['price'] + 1]
-        food_table = [round(x * scale_factor, 2) for x in food_table]
-        # cast to int wherever it makes sense to
-        food_table = [int(x) if int(x) == x else x for x in food_table]
-        return food_table
+
+        # fetch the original consumed food row
+        c_food_row = self.db.get_consumed_food_by_primary_key(self.row_p_key)
+        scale_factor = round(food_weight / c_food_row[consumed_food_map['food_weight']], 3)
+
+        # scale the corresponding columns
+        c_food_row = c_food_row[consumed_food_map['calories']:consumed_food_map['price'] + 1]
+        c_food_row = [round(x * scale_factor, 2) for x in c_food_row]
+        return c_food_row
 
 
 class DeleteDialogTopLevel:
