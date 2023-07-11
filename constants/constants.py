@@ -37,6 +37,11 @@ class MealTemplatesTableColumnsOrder(IntEnum):
 NORMATIVE = 100
 
 
+NUTRITION_LABELS_NUMERIC_DEFAULT = .0
+DB_SCHEMA_NUMERIC_PRECISION = 10
+DB_SCHEMA_NUMERIC_SCALE = 4
+
+
 # TODO: clean this file up a bit, some names are misleading,
 # also back-patching definitions should have same type for both Canvas
 
