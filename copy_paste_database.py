@@ -1,4 +1,4 @@
-#! /home/dom_ak45/.local/share/virtualenvs/ranah.0.1-U4ckHnxd/bin/python
+# NOTE: tread lightly with this script; it can modify a complete database
 
 from sqlalchemy import URL, create_engine, select, Table, MetaData, Column, Integer, String, Numeric
 
@@ -34,11 +34,11 @@ DB_URL_PARAMS1 = {
 
 DB_URL_PARAMS2 = {
     'drivername': 'postgresql+psycopg2',
-    'username': 'ranah',
-    'password': 'ranah',
-    'host': 'localhost',
-    'database': 'ranah_02',
-    'port': 5432
+    'username': 'ranah2',
+    'password': 'ranah2',
+    'host': 'localhost2',
+    'database': 'ranah_022',
+    'port': 54322
 }
 
 class Database:
