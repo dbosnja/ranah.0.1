@@ -1,0 +1,114 @@
+Ranah2.0 Roadmap
+
+0. Create new ranah2.0 database DONE
+
+# ITERATION 2.1 #  DONE
+
+1. Enable multiple tabs/windows option, ie obsolete one-window application DONE
+2. Make Frames scrollable wherever it makes sense to DONE
+3. Add price, created_on, updated_on dimensions for every food article/table DONE
+
+## ITERATION 2.1 ##
+
+
+# ITERATION 2.2 #   #DONE
+
+4. Enable reading through all saved food articles, their nutrition table and filtering based on names and various sorting(eg. based on the creation date)
+   Enable updating the rows, deleting and adding them  DONE
+
+   Clean up code -> basically crate a dictionary for shared init option values everywhere it makes sense.  DONE
+				 -> Reorganize project tree structure -> current one does not make sense anylonger  DONE
+
+## ITERATION 2.2 ##
+
+# ITERATION 2.3   #DONE
+
+5. Enhance reading through the consumed food articles with:
+	a) all possible combinations of day, month, year inputs DONE
+	b) ranges of dates  DONE
+	c) it should be a drop-down list instead of user writing in the numbers   DONE
+	d) list all consumed food within the required time range together with their data   DONE
+	e) end the list with a final row which represents the total sum of all listed rows  DONE
+	f) enable and implement update/delete/close operation on every consumed food row  DONE
+	g) add callback everywhere in the row  DONE
+	h) create search/sort options frame for stored food tab just like the one present for consumed food tab   DONE
+	i) search consumed food ONLY by name?	DONE
+	j) search button handler must turn off colored column off, ie style it like the rest of the column headers  DONE
+	k) add option on stored food table has to include datetime option as well(besides the weight option)  DONE
+	l) Update and Delete operations on food operands need to refresh the state of the application, and do the re-rendering.
+   	   Similar to broswer refreshing the page when an update operation is done. Otherwise clicking on deleted row is producing an error
+   	   and update operation are not visible until user clicks search button again, this should be automatic behaviour.  DONE
+	m) fix the sorting -> fails for timestamps key   DONE
+
+## ITERATION 2.3 ##
+
+# ITERATION 2.4 #  #DONE
+6. Enable creation of meal templates.
+   a) For a start user has to be able to search and choose a set of food articles
+      together with their weights and store it permanently under a unique name.   DONE
+
+   b) Whenever user opens up the create meal template, corresponding frame needs to
+      update the total number of food results and the dropdown list with ALL of the food names   DONE
+
+   c) Works in a similar fashion to shopping cart, ie. user sees immediately which food articles are added in the list
+	  Right/double-left click deletes the added food from the template
+	  If there's at least one food in a template enable `add-template` button and print out the tally row
+	  If there's 0 added food items in a template, disable `add-template` button and don't print out the tally row   DONE
+
+   d) Clicking on `add-template` button spawns a new dialog center which takes one argument -> the template's name
+      The templates name is stripped and checked if evaluates to True and if it is unique
+	  If this conditions are satisfied, the template is permanently saved   DONE
+
+   e) In order to save a template, DB has to be extended with the template model.
+      Model consists of template's name(unique), it's content and potentialy created-on/updated-on timestamps
+	  DB API is extended as needed.   DONE
+
+   f) User should be able to sort template foods by any dimension in any direction with coloring of the sorting column   DONE
+
+## ITERATION 2.4 ##
+
+# ITERATION 2.5 #  #DONE
+
+REQUEST: User has to be able to operate with all the stored meal templates.
+
+a) Users can search through a list of stored meal templates and render one or more of them,
+   there's also an option for sorting the results, as per usual.
+   Clicking on one of the results, users can either delete it permanently or add template as consumed.
+   When adding the template as consumed, users can choose consuming datetime and
+   the percentage of the template(both optionally, default value is now and 100%, respectively).  DONE
+b) If and only if one result is rendered, users can choose to see details of its ingredients.
+   Apart of containing the ingredients list, there's a tally row at the end of the table as usual.
+   Clicking on one of the ingredients, users can delete the ingredient from the template and update it,
+   updating in that way the meal template itself.
+   There's also an option of sorting the list of ingredients, as per usual.   DONE
+
+## ITERATION 2.5 ##
+
+8. Add calories tab
+9. Use messageboxes for info/warning alerts/pop-ups. DONE
+10. Enhance all referenced file paths and scrolling events to be cross-platform.  DONE
+11. Mark sorting column with a different color.  DONE
+   
+
+TABS:
+
+1. create new nutrition table / Nova nutritivna tablica
+2. read through all nutrition table / Sve nutritivne tablice
+3. read through consumed food within a specified range / Konzumirana hrana
+4. Create new meal template / Novi predlozak objeda
+5. Read through meal templates / Svi predlosci objeda
+6. Calories / Kalorije
+
+
+Demo Video: peanut butter + jelly sandwich?
+
+
+Ranah3000:
+
+- enable pagination for every search option(up to 20 results per a page)
+- implement advanced stats(graphs)
+- enable i18n
+- refactor code:
+	- use inheritance instead of compositions
+	- use Dependency Injection for database instance(instead of propagating it throughout the app)
+	- use generic types instead of retyping them(eg. top-level Dialogs)
